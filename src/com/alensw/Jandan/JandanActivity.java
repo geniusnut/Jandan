@@ -31,6 +31,7 @@ public class JandanActivity extends FragmentActivity implements
 	protected ListView mListView;
 	protected SimpleAdapter mAdapter;
 	protected JandanParser mParser;
+	public static NewsLoader mNewsLoader;
 	protected boolean isParsing;
 	int page = 0;
 	protected List<Map<String, Object>> items = new ArrayList<Map<String,Object>>();
@@ -43,16 +44,9 @@ public class JandanActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		mListView = (ListView) findViewById(R.id.news_list);
-		final HashMap<String, Object> itemMap = new HashMap<String, Object>();
-		itemMap.put("link", "http://i.jandan.net");
-		itemMap.put("image", "");
-		itemMap.put("title", "title");
-		itemMap.put("by", "OIOI");
-		itemMap.put("tag", "disu");
-		itemMap.put("cont", 123);
-		items.add(itemMap);
 		mParser = new JandanParser(this);
-		new loader().execute(++page);
+		mNewsLoader = new NewsLoader();
+		mNewsLoader.execute(++page);
 		//items.addAll(list);
 
 		mAdapter = new SimpleAdapter(this, items, R.layout.news_item,
@@ -70,7 +64,12 @@ public class JandanActivity extends FragmentActivity implements
 				return false;
 			}
 		});
-
+		mParser.setOnImageChangedlistener(new JandanParser.OnImageChangedlistener() {
+			@Override
+			public void OnImageChanged() {
+				mAdapter.notifyDataSetChanged();;
+			}
+		});
 		Log.d("JandanActivity", "initDrawer()");
 
 		initDrawer();
@@ -174,7 +173,7 @@ public class JandanActivity extends FragmentActivity implements
 		list.add(ooxxMap);
 	}
 
-	private class loader extends AsyncTask<Integer, Void, List<Map<String, Object>>> {
+	private class NewsLoader extends AsyncTask<Integer, Void, List<Map<String, Object>>> {
 		@Override
 		protected List<Map<String, Object>> doInBackground(Integer... page) {
 			isParsing = true;

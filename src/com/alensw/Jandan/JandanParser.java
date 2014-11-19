@@ -85,29 +85,24 @@ public class JandanParser {
             }
 
             //image
-            pattern = Pattern.compile("src=(.*)\"");
+            pattern = Pattern.compile("src=\"(.*?)\"");
             matcher = pattern.matcher(thumbs_b.toString());
-
-            /*if (matcher.find()) {
-
+            //Log.d(TAG, "thumbs_b = " + thumbs_b);
+            if (matcher.find()) {
                 item.put("image",R.drawable.loading);
-
-                final Matcher finalMatcher = matcher;
+                final String thumbUrl = matcher.group(1);
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        item.put("image", getBitMap(
-                                finalMatcher.group()
-                                        .substring(5, finalMatcher.group().length()-1)
-                                        .replaceAll("square","small")));
+                        item.put("image", getBitMap(thumbUrl));
                         listener.OnImageChanged();
                     }
                 }).start();
 
-            }*/
+            }
 
             Elements indexs = i.getElementsByClass("indexs");
-            Log.d(TAG, "indexs = " + indexs);
+
             //title
             pattern = Pattern.compile("l\">(.*)</a>");
             matcher = pattern.matcher(indexs.toString());
@@ -386,6 +381,7 @@ public class JandanParser {
     private Bitmap getBitMap(String strUrl) {
         Bitmap bitmap = null;
         InputStream is = null;
+        Log.d(TAG, "getBitmap url = " + strUrl);
         try {
             URL url = new URL(strUrl);
             URLConnection conn = url.openConnection();
@@ -394,6 +390,7 @@ public class JandanParser {
             return null;
         }
         bitmap = BitmapFactory.decodeStream(is);
+        Log.d(TAG, "bitmap : " + bitmap.getWidth() + "   " + bitmap.getHeight());
         if  ( bitmap.getHeight() >= 4096 ){
             return Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth()/(bitmap.getHeight()/4096),4096);
         }
