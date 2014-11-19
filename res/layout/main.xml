@@ -3,10 +3,22 @@
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent">
 
-    <FrameLayout
+    <RelativeLayout
             android:id="@+id/content"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent">
+        <ListView
+                android:id="@+id/news_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@null"
+                android:scrollbars="none"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:animateLayoutChanges="true"
+                >
+        </ListView>
+    </RelativeLayout>
 
     <ListView
             android:id="@+id/drawer"
