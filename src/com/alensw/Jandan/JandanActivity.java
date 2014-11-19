@@ -3,6 +3,7 @@ package com.alensw.Jandan;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -56,9 +57,10 @@ public class JandanActivity extends FragmentActivity implements
 		mAdapter.setViewBinder(new SimpleAdapter.ViewBinder() {
 			@Override
 			public boolean setViewValue(View view, Object data, String textRepresentation) {
-				if (view instanceof ImageView && data instanceof Drawable) {
-					ImageView iv = (ImageView) view;
-					iv.setImageDrawable((Drawable) data);
+				if ((view instanceof ImageView) && (data instanceof Bitmap)) {
+					ImageView imageView = (ImageView) view;
+					Bitmap bmp = (Bitmap) data;
+					imageView.setImageBitmap(bmp);
 					return true;
 				}
 				return false;
@@ -67,14 +69,24 @@ public class JandanActivity extends FragmentActivity implements
 		mParser.setOnImageChangedlistener(new JandanParser.OnImageChangedlistener() {
 			@Override
 			public void OnImageChanged() {
-				mAdapter.notifyDataSetChanged();;
+				new notifyDataSetChanged().execute();
 			}
 		});
+
+
 		Log.d("JandanActivity", "initDrawer()");
 
 		initDrawer();
 	}
-
+	private class notifyDataSetChanged extends AsyncTask<Void, Void, Void>{
+		@Override
+		protected Void doInBackground(Void... voids) {
+			return null;
+		}
+		protected void onPostExecute(Void voids){
+			mAdapter.notifyDataSetChanged();
+		}
+	}
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
