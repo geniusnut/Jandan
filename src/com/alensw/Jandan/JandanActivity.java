@@ -1,20 +1,22 @@
 package com.alensw.Jandan;
 
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
+import android.os.*;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import com.larvalabs.svgandroid.SVG;
@@ -33,7 +35,8 @@ public class JandanActivity extends FragmentActivity implements
 	protected SimpleAdapter mAdapter;
 	protected JandanParser mParser;
 	public static NewsLoader mNewsLoader;
-	protected boolean isParsing;
+	private Handler mHandler = new Handler(Looper.getMainLooper());
+	protected boolean isParsing = false;
 	int page = 0;
 	protected List<Map<String, Object>> items = new ArrayList<Map<String,Object>>();
 	private ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
@@ -44,6 +47,7 @@ public class JandanActivity extends FragmentActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		setActionBar();
 		mListView = (ListView) findViewById(R.id.news_list);
 		mParser = new JandanParser(this);
 		mNewsLoader = new NewsLoader();
@@ -66,16 +70,54 @@ public class JandanActivity extends FragmentActivity implements
 				return false;
 			}
 		});
+
 		mParser.setOnImageChangedlistener(new JandanParser.OnImageChangedlistener() {
 			@Override
 			public void OnImageChanged() {
+				//mAdapter.notifyDataSetChanged();
 				new notifyDataSetChanged().execute();
 			}
 		});
 
+		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+				TextView link = (TextView) view.findViewById(R.id.link);
+				TextView title = (TextView) view.findViewById(R.id.title);
+				TextView comm = (TextView)view.findViewById(R.id.cont);
+				String acomm = comm.getText().toString();
+				String atitle = title.getText().toString();
+				String alink = link.getText().toString();
+				Intent intent = new Intent(view.getContext(), PostActivity.class);
+				intent.putExtra("link",alink);
+				intent.putExtra("comm",acomm);
+				intent.putExtra(Intent.EXTRA_TITLE,atitle);
+				startActivity(intent);
+			}
+		});
+		mListView.setOnScrollListener(new AbsListView.OnScrollListener(){
+			int vPosition = 0;
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
 
+			}
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+				if (mListView.getFirstVisiblePosition() > 0) {
+					if (mListView.getFirstVisiblePosition() != vPosition) {
+						if (mAdapter.getCount() - 8 <= mListView.getFirstVisiblePosition()) {
+							if (!isParsing) {
+								//mNewsLoader.execute(++page);
+								new NewsLoader().execute(++page);
+							}
+						}
+					}
+					vPosition = mListView.getFirstVisiblePosition();
+				}
+			}
+		});
 		Log.d("JandanActivity", "initDrawer()");
-
 		initDrawer();
 	}
 	private class notifyDataSetChanged extends AsyncTask<Void, Void, Void>{
@@ -206,5 +248,20 @@ public class JandanActivity extends FragmentActivity implements
 		}
 	}
 
+	private void setActionBar() {
+		LayoutInflater inflater = (LayoutInflater) getActionBar()
+				.getThemedContext().getSystemService(LAYOUT_INFLATER_SERVICE);
 
+		View customActionBarView = inflater.inflate(R.layout.actionbar, null);
+
+		ActionBar actionBar = getActionBar();
+		actionBar.setDisplayOptions(
+				ActionBar.DISPLAY_SHOW_CUSTOM,
+				ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME
+						| ActionBar.DISPLAY_SHOW_TITLE);
+		actionBar.setCustomView(customActionBarView,
+				new ActionBar.LayoutParams(
+						ViewGroup.LayoutParams.MATCH_PARENT,
+						ViewGroup.LayoutParams.MATCH_PARENT));
+	}
 }

@@ -109,8 +109,12 @@ public class JandanParser {
             if (matcher.find()){
                 item.put("title",matcher.group(1));
             }
-
-
+            Elements title2 = i.getElementsByClass("title2");
+            pattern = Pattern.compile("title=\"(.+?)\"");
+            matcher = pattern.matcher(title2.toString());
+            if (matcher.find()){
+                item.put("title", matcher.group(1));
+            }
 
             //cont
             pattern = Pattern.compile(">([0-9]*)</span>");
@@ -121,7 +125,12 @@ public class JandanParser {
                 item.put("cont","0");
             }
             Elements time_s = i.getElementsByClass("time_s");
-
+            //Log.d("JandanParser", "time_s : " + time_s);
+            pattern = Pattern.compile(" ([0-9]+) ");
+            matcher = pattern.matcher(time_s.toString());
+            if (matcher.find()){
+                item.put("cont", matcher.group());
+            }
             //by
             pattern = Pattern.compile("author.+?>(.+?)</a>");
             matcher = pattern.matcher(time_s.toString());
@@ -381,7 +390,7 @@ public class JandanParser {
     private Bitmap getBitMap(String strUrl) {
         Bitmap bitmap = null;
         InputStream is = null;
-        Log.d(TAG, "getBitmap url = " + strUrl);
+        //Log.d(TAG, "getBitmap url = " + strUrl);
         try {
             URL url = new URL(strUrl);
             URLConnection conn = url.openConnection();
@@ -390,7 +399,7 @@ public class JandanParser {
             return null;
         }
         bitmap = BitmapFactory.decodeStream(is);
-        Log.d(TAG, "bitmap : " + bitmap.getWidth() + "   " + bitmap.getHeight());
+        //Log.d(TAG, "bitmap : " + bitmap.getWidth() + "   " + bitmap.getHeight());
         if  ( bitmap.getHeight() >= 4096 ){
             return Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth()/(bitmap.getHeight()/4096),4096);
         }
