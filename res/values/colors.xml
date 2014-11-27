@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bar_dark">#c0000000</color>
+    <color name="high_light">#a00099cc</color>
+    <color name="holo_blue">#ff0099cc</color>
+    <color name="red">#e51c23</color>
+    <color name="purple500">#9c27b0</color>
+    <color name="purpleA200">#e040fb</color>
+    <color name="lightBlue">#03a9f4</color>
+    <color name="lightBlueA200">#40c4ff</color>
+    <color name="blue">#5677fc</color>
+    <color name="blueA200">#6889ff</color>
+    <color name="teal500">#009688</color>
+    <color name="tealA200">#64ffda</color>
+    <color name="yellow500">#ffeb3b</color>
+    <color name="yellowA200">#ffeb3b</color>
+    <color name="deepOrange">#ff5722</color>
+    <color name="deepOrangeA200">#ff6e40</color>
+    <color name="cyan500">#00bcd4</color>
+    <color name="cyanA200">#18ffff</color>
+
+
+</resources>

@@ -132,7 +132,6 @@ public class JandanActivity extends FragmentActivity implements
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
-
 		toggle.syncState();
 	}
 
@@ -179,7 +178,7 @@ public class JandanActivity extends FragmentActivity implements
 
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		drawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
-		toggle=
+		toggle =
 				new ActionBarDrawerToggle(this, drawerLayout,
 						R.drawable.ic_drawer,
 						R.string.app_name,

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="#fafafa">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_post_back"
+        android:orientation="horizontal"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp">
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_back"/>
+        <ImageView
+            android:src="@drawable/jandan"
+            android:layout_marginLeft="-4dp"
+            android:background="@null"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="4dp"
+            android:scaleType="fitCenter"/>
+    </LinearLayout>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:src="@drawable/ic_share"
+        android:background="@null"
+        android:id="@+id/btn_post_share"
+        android:layout_toLeftOf="@+id/btn_post_comm"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="8dp"
+        android:id="@+id/btn_post_comm">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:src="@drawable/comm"
+            android:background="@null"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="46dp"
+            android:text="00"
+            android:gravity="center"
+            android:id="@+id/btn_post_comm_text"
+            android:layout_marginLeft="-5dp"
+            android:textColor="#424242"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+</RelativeLayout>

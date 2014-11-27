@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Jandan</string>
+    <string name="column_news">NEWS</string>
+    <string name="column_pics">PICS</string>
+    <string name="column_ooxx">OOXX</string>
+
 </resources>
