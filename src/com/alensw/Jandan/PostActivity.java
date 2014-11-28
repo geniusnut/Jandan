@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.TextView;
  * Created by yw07 on 14-11-20.
  */
 public class PostActivity extends Activity{
+	private final String TAG = "PostActivity";
 	Activity postActivity = this;
 	String link ;
 	String title ;
@@ -36,12 +38,13 @@ public class PostActivity extends Activity{
 		mComm.setText(comm);
 		webview = (WebView) findViewById(R.id.webview);
 		webview.clearCache(true);
+		Log.d(TAG, "webViewLoad : " + link);
 		new webViewLoad().execute(link);
 
 
-		commwebview = (WebView) findViewById(R.id.post_comm);
-		commwebview.clearCache(true);
-		new commViewLoad().execute(link);
+		//commwebview = (WebView) findViewById(R.id.post_comm);
+		//commwebview.clearCache(true);
+		//new commViewLoad().execute(link);
 	}
 
 	private class webViewLoad extends AsyncTask<String, Void, String> {

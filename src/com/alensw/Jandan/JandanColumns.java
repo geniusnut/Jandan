@@ -16,7 +16,7 @@ public class JandanColumns {
 	private static final Column[] mColumns = new Column[] {
 			new Column() {{
 				cid = ColumnID.NEWS;
-				icon = R.raw.logo_discovery;
+				icon = R.raw.news;
 				title  = R.string.column_news;
 				summary = 0;
 			}},

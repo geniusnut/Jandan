@@ -28,6 +28,9 @@ public class PostFormater {
 				"\t<meta http-equiv=\"Content-Type\" content=\"text/html;\" />\n" +
 				"\t<title>CSS</title>\n" +
 				"\t<style type=\"text/css\">\n" +
+				"\t\th2 {\n" +
+				"\t\t\tcolor:#FF0000\n" +
+				"\t\t}\n" +
 				"\t\tbody {\n" +
 				"\t\t\tbackground:#fafafa;\n" +
 				"\t\t\tfont-family:Arial, Helvetica, sans-serif;\n" +
@@ -53,7 +56,7 @@ public class PostFormater {
 				"\t\t}\n" +
 				"\t\ta {  \n" +
 				"\t\t\tfont-size:1.1em;\n" +
-				"\t\t\tcolor: #454545;  \n" +
+				"\t\t\tcolor: #e51c23;  \n" +
 				"\t\t\ttext-decoration: none;  \n" +
 				"\t\t}  \n" +
 				"\t</style>\n" +
@@ -73,6 +76,7 @@ public class PostFormater {
 		data = document.getElementsByClass("postinfo").toString()+
 				document.getElementsByClass("entry").get(0).toString();
 
+		Log.d(TAG, "Postinfo : " + data);
 		return CSS + data;
 	}
 

@@ -202,7 +202,7 @@ public class JandanActivity extends FragmentActivity implements
 		final TextView tv = (TextView)findViewById(R.id.title);
 		//final int color = tv.getTextColors().getDefaultColor();
 		//Log.d("JandanActivity", "color = " + color);
-		Drawable iconNews = SVG.getDrawable(getResources(), R.raw.logo_discovery,
+		Drawable iconNews = SVG.getDrawable(getResources(), R.raw.news,
 				 0x00ffffff | 0xc0000000);
 		newsMap.put("img", iconNews);
 		newsMap.put("title", "News");
@@ -210,7 +210,7 @@ public class JandanActivity extends FragmentActivity implements
 		list.add(newsMap);
 
 		final HashMap<String, Object> picMap = new HashMap<String, Object>();
-		Drawable iconPic = SVG.getDrawable(getResources(), R.raw.logo_gallery,
+		Drawable iconPic = SVG.getDrawable(getResources(), R.raw.pic,
 				 0x00ffffff | 0xc0000000);
 		picMap.put("img", iconPic);
 		picMap.put("title", "Picture");
@@ -218,7 +218,7 @@ public class JandanActivity extends FragmentActivity implements
 		list.add(picMap);
 
 		final HashMap<String, Object> ooxxMap = new HashMap<String, Object>();
-		Drawable iconOOXX = SVG.getDrawable(getResources(), R.raw.logo_flickr,
+		Drawable iconOOXX = SVG.getDrawable(getResources(), R.raw.ooxx,
 				 0x00ffffff | 0xc0000000);
 		ooxxMap.put("img", iconOOXX);
 		ooxxMap.put("title", "OOXX");
