@@ -28,6 +28,9 @@ import java.util.Map;
 
 public class JandanActivity extends FragmentActivity implements
 		OnItemClickListener {
+	private final String TAG = "JandanActivity";
+	private NewsFragment newsFrag = null;
+	private PicFragment picFrag = null;
 	private DrawerLayout drawerLayout=null;
 	private ActionBarDrawerToggle toggle=null;
 	private ListView drawer=null;
@@ -48,11 +51,11 @@ public class JandanActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		setActionBar();
-		mListView = (ListView) findViewById(R.id.news_list);
+		/*mListView = (ListView) findViewById(R.id.news_list);
 		mParser = new JandanParser(this);
 		mNewsLoader = new NewsLoader();
 		mNewsLoader.execute(++page);
-		//items.addAll(list);
+
 
 		mAdapter = new SimpleAdapter(this, items, R.layout.news_item,
 				new String[]{"link", "image", "title", "by", "tag", "cont"},
@@ -81,7 +84,7 @@ public class JandanActivity extends FragmentActivity implements
 
 		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+			public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 				TextView link = (TextView) view.findViewById(R.id.link);
 				TextView title = (TextView) view.findViewById(R.id.title);
 				TextView comm = (TextView)view.findViewById(R.id.cont);
@@ -116,7 +119,10 @@ public class JandanActivity extends FragmentActivity implements
 					vPosition = mListView.getFirstVisiblePosition();
 				}
 			}
-		});
+		});*/
+		if (getFragmentManager().findFragmentById(R.id.content) == null) {
+			showNews();
+		}
 		Log.d("JandanActivity", "initDrawer()");
 		initDrawer();
 	}
@@ -174,10 +180,22 @@ public class JandanActivity extends FragmentActivity implements
 				return false;
 			}
 		});
-		drawer.setOnItemClickListener(this);
+		drawer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				if (position == 0) {
+					showNews();
+				} else if (position == 1) {
+					showPic();
+				} else if (position == 2) {
+					showOOXX();
+				}
+
+				drawerLayout.closeDrawers();
+			}
+		});
 
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		drawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
 		toggle =
 				new ActionBarDrawerToggle(this, drawerLayout,
 						R.drawable.ic_drawer,
@@ -262,5 +280,26 @@ public class JandanActivity extends FragmentActivity implements
 				new ActionBar.LayoutParams(
 						ViewGroup.LayoutParams.MATCH_PARENT,
 						ViewGroup.LayoutParams.MATCH_PARENT));
+	}
+	private void showNews() {
+		if (newsFrag == null) {
+			newsFrag = new NewsFragment();
+		}
+		if (!newsFrag.isVisible()) {
+			getFragmentManager().popBackStack();
+			getFragmentManager().beginTransaction().replace(R.id.content, newsFrag).commit();
+		}
+	}
+	private void showPic() {
+		if (picFrag == null) {
+			picFrag = new PicFragment();
+		}
+		if (!picFrag.isVisible()) {
+			getFragmentManager().popBackStack();
+			getFragmentManager().beginTransaction().replace(R.id.content, picFrag).commit();
+		}
+	}
+	private void showOOXX() {
+
 	}
 }
