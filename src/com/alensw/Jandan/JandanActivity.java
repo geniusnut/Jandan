@@ -8,15 +8,14 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.*;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
+import android.support.v7.app.ActionBarDrawerToggle;
+
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import com.larvalabs.svgandroid.SVG;
@@ -26,14 +25,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class JandanActivity extends FragmentActivity implements
+public class JandanActivity extends ActionBarActivity implements
 		OnItemClickListener {
 	private final String TAG = "JandanActivity";
 	private NewsFragment newsFrag = null;
 	private PicFragment picFrag = null;
-	private DrawerLayout drawerLayout=null;
+	private DrawerLayout mDrawerLayout;
+	private ViewGroup mDrawerPanel;
+	private Toolbar toolbar;
+	private ListView mDrawerList;
 	private ActionBarDrawerToggle toggle=null;
-	private ListView drawer=null;
 	protected ListView mListView;
 	protected SimpleAdapter mAdapter;
 	protected JandanParser mParser;
@@ -50,7 +51,12 @@ public class JandanActivity extends FragmentActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		setActionBar();
+		toolbar = (Toolbar) findViewById(R.id.toolbar);
+		if (toolbar != null) {
+			setSupportActionBar(toolbar);
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		}
+		toolbar.setNavigationIcon(R.drawable.ic_ab_drawer);
 		/*mListView = (ListView) findViewById(R.id.news_list);
 		mParser = new JandanParser(this);
 		mNewsLoader = new NewsLoader();
@@ -126,6 +132,11 @@ public class JandanActivity extends FragmentActivity implements
 		Log.d("JandanActivity", "initDrawer()");
 		initDrawer();
 	}
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.menu, menu);
+		return true;
+	}
 	private class notifyDataSetChanged extends AsyncTask<Void, Void, Void>{
 		@Override
 		protected Void doInBackground(Void... voids) {
@@ -162,13 +173,24 @@ public class JandanActivity extends FragmentActivity implements
 
 	}
 	private void initDrawer(){
-		drawer=(ListView)findViewById(R.id.drawer);
-		drawer.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		mDrawerPanel = (ViewGroup) mDrawerLayout.findViewById(R.id.drawer_panel);
+		mDrawerList = (ListView) mDrawerPanel.findViewById(R.id.drawer_list);
+
 		initList();
+		mDrawerPanel.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.d(TAG, "mDrawerPanel onClick");
+				if (mDrawerLayout.isDrawerOpen(Gravity.LEFT))
+					mDrawerLayout.closeDrawer(Gravity.LEFT);
+			}
+		});
 		SimpleAdapter sa = new SimpleAdapter(this, list,
 				R.layout.drawer_row, strings, ids
 		);
-		drawer.setAdapter(sa);
+
+		mDrawerList.setAdapter(sa);
 		sa.setViewBinder(new SimpleAdapter.ViewBinder() {
 			@Override
 			public boolean setViewValue(View view, Object data, String textRepresentation) {
@@ -180,7 +202,7 @@ public class JandanActivity extends FragmentActivity implements
 				return false;
 			}
 		});
-		drawer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+		mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				if (position == 0) {
@@ -191,28 +213,27 @@ public class JandanActivity extends FragmentActivity implements
 					showOOXX();
 				}
 
-				drawerLayout.closeDrawers();
+				mDrawerLayout.closeDrawers();
 			}
 		});
 
-		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		toggle =
-				new ActionBarDrawerToggle(this, drawerLayout,
-						R.drawable.ic_drawer,
+				new ActionBarDrawerToggle(this, mDrawerLayout,
 						R.string.app_name,
 						R.string.app_name) {
 					public void onDrawerOpened(View view) {
 						super.onDrawerOpened(view);
 						setTitle("Drawer Opened");
+						mDrawerList.requestFocus();
 					}
 					public void onDrawerClosed(View view) {
 						super.onDrawerClosed(view);
 						setTitle(R.string.app_name);
 					}
 				};
-		drawerLayout.setDrawerListener(toggle);
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		getActionBar().setHomeButtonEnabled(true);
+		mDrawerLayout.setDrawerListener(toggle);
+
 	}
 
 	private void initList(){

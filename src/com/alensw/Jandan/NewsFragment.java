@@ -76,7 +76,6 @@ public class NewsFragment extends Fragment {
 
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-				Log.d(TAG, "onScroll");
 				if (mListView.getFirstVisiblePosition() > 0) {
 					if (mListView.getFirstVisiblePosition() != vPosition) {
 						if (mAdapter.getCount() - 8 <= mListView.getFirstVisiblePosition()) {
