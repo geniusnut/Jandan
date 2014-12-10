@@ -55,6 +55,7 @@ public class JandanActivity extends ActionBarActivity implements
 		if (toolbar != null) {
 			setSupportActionBar(toolbar);
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+			getSupportActionBar().setLogo(SVG.getDrawable(getResources(), R.raw.jandan));
 		}
 		toolbar.setNavigationIcon(R.drawable.ic_ab_drawer);
 		/*mListView = (ListView) findViewById(R.id.news_list);
