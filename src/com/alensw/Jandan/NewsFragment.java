@@ -32,10 +32,10 @@ public class NewsFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 		ViewGroup rootView = (ViewGroup) inflater.inflate(
-				R.layout.main, container, false);
+				R.layout.newsfrag, container, false);
 
 		mListView = (ListView) rootView.findViewById(R.id.news_list);
-		mAdapter = new SimpleAdapter(getActivity(), items, R.layout.news_item,
+		mAdapter = new SimpleAdapter(getActivity(), items, R.layout.news_item1,
 				new String[]{"link", "image", "title", "by", "tag", "cont"},
 				new int[]{R.id.link, R.id.image, R.id.title, R.id.by, R.id.tag, R.id.cont});
 		mAdapter.setViewBinder(new SimpleAdapter.ViewBinder() {

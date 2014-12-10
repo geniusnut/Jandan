@@ -53,85 +53,17 @@ public class JandanActivity extends ActionBarActivity implements
 		setContentView(R.layout.main);
 		toolbar = (Toolbar) findViewById(R.id.toolbar);
 		if (toolbar != null) {
+			toolbar.setTitle("煎蛋");
 			setSupportActionBar(toolbar);
-			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-			getSupportActionBar().setLogo(SVG.getDrawable(getResources(), R.raw.jandan));
 		}
-		toolbar.setNavigationIcon(R.drawable.ic_ab_drawer);
-		/*mListView = (ListView) findViewById(R.id.news_list);
-		mParser = new JandanParser(this);
-		mNewsLoader = new NewsLoader();
-		mNewsLoader.execute(++page);
+		toolbar.setLogo(R.drawable.jandan);
 
-
-		mAdapter = new SimpleAdapter(this, items, R.layout.news_item,
-				new String[]{"link", "image", "title", "by", "tag", "cont"},
-				new int[]{R.id.link, R.id.image, R.id.title, R.id.by, R.id.tag, R.id.cont});
-		mListView.setAdapter(mAdapter);
-		mAdapter.setViewBinder(new SimpleAdapter.ViewBinder() {
-			@Override
-			public boolean setViewValue(View view, Object data, String textRepresentation) {
-				if ((view instanceof ImageView) && (data instanceof Bitmap)) {
-					ImageView imageView = (ImageView) view;
-					Bitmap bmp = (Bitmap) data;
-					imageView.setImageBitmap(bmp);
-					return true;
-				}
-				return false;
-			}
-		});
-
-		mParser.setOnImageChangedlistener(new JandanParser.OnImageChangedlistener() {
-			@Override
-			public void OnImageChanged() {
-				//mAdapter.notifyDataSetChanged();
-				new notifyDataSetChanged().execute();
-			}
-		});
-
-		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-				TextView link = (TextView) view.findViewById(R.id.link);
-				TextView title = (TextView) view.findViewById(R.id.title);
-				TextView comm = (TextView)view.findViewById(R.id.cont);
-				String acomm = comm.getText().toString();
-				String atitle = title.getText().toString();
-				String alink = link.getText().toString();
-				Intent intent = new Intent(view.getContext(), PostActivity.class);
-				intent.putExtra("link",alink);
-				intent.putExtra("comm",acomm);
-				intent.putExtra(Intent.EXTRA_TITLE,atitle);
-				startActivity(intent);
-			}
-		});
-		mListView.setOnScrollListener(new AbsListView.OnScrollListener(){
-			int vPosition = 0;
-			@Override
-			public void onScrollStateChanged(AbsListView view, int scrollState) {
-
-			}
-
-			@Override
-			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-				if (mListView.getFirstVisiblePosition() > 0) {
-					if (mListView.getFirstVisiblePosition() != vPosition) {
-						if (mAdapter.getCount() - 8 <= mListView.getFirstVisiblePosition()) {
-							if (!isParsing) {
-								//mNewsLoader.execute(++page);
-								new NewsLoader().execute(++page);
-							}
-						}
-					}
-					vPosition = mListView.getFirstVisiblePosition();
-				}
-			}
-		});*/
 		if (getFragmentManager().findFragmentById(R.id.content) == null) {
 			showNews();
 		}
-		Log.d("JandanActivity", "initDrawer()");
 		initDrawer();
+		Log.d("JandanActivity", "initDrawer()");
+
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -219,8 +151,7 @@ public class JandanActivity extends ActionBarActivity implements
 		});
 
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		toggle =
-				new ActionBarDrawerToggle(this, mDrawerLayout,
+		toggle = new ActionBarDrawerToggle(this, mDrawerLayout,
 						R.string.app_name,
 						R.string.app_name) {
 					public void onDrawerOpened(View view) {
