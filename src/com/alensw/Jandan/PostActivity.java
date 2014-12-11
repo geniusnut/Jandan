@@ -10,9 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.*;
 import android.webkit.WebView;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.*;
 import com.larvalabs.svgandroid.SVG;
 
 /**
@@ -37,10 +35,20 @@ public class PostActivity extends ActionBarActivity {
 		if (toolbar != null) {
 			toolbar.setTitle("News");
 			ImageView share = (ImageView) toolbar.findViewById(R.id.share);
-			share.setImageDrawable(SVG.getDrawable(getResources(), R.raw.ic_menu_share));
+			share.setLayoutParams(new Toolbar.LayoutParams(20, 20, Gravity.RIGHT));
+			//share.setImageDrawable(SVG.getDrawable(getResources(), R.raw.ic_menu_share));
 			setSupportActionBar(toolbar);
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		}
+
+		ProgressBar progressBar = new ProgressBar(this);
+		progressBar.setLayoutParams(new Toolbar.LayoutParams(Gravity.RIGHT));
+		progressBar.setIndeterminate(true);
+		ImageButton imageButton = (ImageButton) findViewById(R.id.ib);
+		//imageButton.setLayoutParams(new Toolbar.LayoutParams(Gravity.RIGHT));
+		if (imageButton != null)
+			toolbar.addView(imageButton);
+		toolbar.addView(progressBar);
 
 		//setActionBar();
 		link = getIntent().getStringExtra("link");

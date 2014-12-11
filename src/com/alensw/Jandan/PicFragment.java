@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,9 +22,11 @@ import java.util.Map;
 public class PicFragment extends Fragment {
 	protected ListView mListView;
 	SimpleAdapter mAdapter;
+
 	public PicLoader mPicLoader;
 	List<Map<String, Object>> items = new ArrayList<Map<String,Object>>();
 
+	LocalCache mPicCache;
 	JandanParser mParser;
 	int picPage = 0;
 	boolean isParsing = false;
@@ -111,6 +114,7 @@ public class PicFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mPicCache = new LocalCache(getActivity());
 	}
 
 	@Override
@@ -154,4 +158,5 @@ public class PicFragment extends Fragment {
 			isParsing = false;
 		}
 	}
+
 }
