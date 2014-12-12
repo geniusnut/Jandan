@@ -35,7 +35,8 @@ public class PostActivity extends ActionBarActivity {
 		if (toolbar != null) {
 			toolbar.setTitle("News");
 			ImageView share = (ImageView) toolbar.findViewById(R.id.share);
-			share.setLayoutParams(new Toolbar.LayoutParams(20, 20, Gravity.RIGHT));
+			Log.d(TAG, "toolbar width" + toolbar.getMeasuredWidth());
+			share.setLayoutParams(new Toolbar.LayoutParams(56, 56, Gravity.RIGHT));
 			//share.setImageDrawable(SVG.getDrawable(getResources(), R.raw.ic_menu_share));
 			setSupportActionBar(toolbar);
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -48,7 +49,7 @@ public class PostActivity extends ActionBarActivity {
 		//imageButton.setLayoutParams(new Toolbar.LayoutParams(Gravity.RIGHT));
 		if (imageButton != null)
 			toolbar.addView(imageButton);
-		toolbar.addView(progressBar);
+		//toolbar.addView(progressBar);
 
 		//setActionBar();
 		link = getIntent().getStringExtra("link");
@@ -101,8 +102,14 @@ public class PostActivity extends ActionBarActivity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
+		switch (id) {
+			case R.id.action_settings:
+				return true;
+			case android.R.id.home:
+				postActivity.finish();
+				return true;
+			default:
+				break;
 		}
 		return super.onOptionsItemSelected(item);
 	}

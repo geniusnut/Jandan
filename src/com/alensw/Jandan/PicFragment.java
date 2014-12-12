@@ -26,7 +26,7 @@ public class PicFragment extends Fragment {
 	public PicLoader mPicLoader;
 	List<Map<String, Object>> items = new ArrayList<Map<String,Object>>();
 
-	LocalCache mPicCache;
+	FileCache mPicCache;
 	JandanParser mParser;
 	int picPage = 0;
 	boolean isParsing = false;
@@ -114,7 +114,7 @@ public class PicFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mPicCache = new LocalCache(getActivity());
+		mPicCache = new FileCache(getActivity());
 	}
 
 	@Override
@@ -156,6 +156,10 @@ public class PicFragment extends Fragment {
 			items.addAll(result);
 			mAdapter.notifyDataSetChanged();
 			isParsing = false;
+			if (mAdapter.getCount() < 10) {
+				new PicLoader().execute(picPage);
+				picPage ++;
+			}
 		}
 	}
 

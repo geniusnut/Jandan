@@ -1,6 +1,7 @@
 package com.alensw.Jandan;
 
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,6 +16,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -24,6 +27,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.regex.Matcher;
@@ -42,6 +49,8 @@ public class JandanParser {
     String PIC_PAGE ;
     String OOXX_PAGE ;
     int timeout = 5000;
+    FileCache mCache;
+    ThreadPoolExecutor mExecutor;
     OnImageChangedlistener listener;
 
     public interface OnImageChangedlistener{
@@ -53,6 +62,8 @@ public class JandanParser {
 
     public JandanParser(Context context){
         this.context = context;
+        mCache = new FileCache(context);
+        mExecutor = new ThreadPoolExecutor(2, 25, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(25));
     }
 
     public List<Map<String, Object>> JandanHomePage(int Page){
@@ -162,6 +173,7 @@ public class JandanParser {
     public List<Map<String, Object>> JandanPicPage(int Page){
 
         List<Map<String, Object>> items = new ArrayList<Map<String,Object>>();
+        ContentValues values = new ContentValues(6);
 
         //page
         if (Page == 0){
@@ -203,8 +215,10 @@ public class JandanParser {
             //id
             Pattern pattern = Pattern.compile("comment-[0-9]*");
             Matcher matcher = pattern.matcher(i.toString());
+            final String id = (matcher.group().substring(8));
             if (matcher.find()){
-                item.put("id",matcher.group().substring(8));
+                item.put("id", id);
+                values.put(NodeColumns.ID, id);
                 //Log.e(TAG,item.get("id").toString());
             }
 
@@ -246,14 +260,15 @@ public class JandanParser {
                 }
             }
 
-            //image
-            pattern = Pattern.compile("src=\"(\\S*)[^ ][jpg]\"");
+            //imageHashMap<String, Object>()
+            //pattern = Pattern.compile("src=\"(\\S*)[^ ][jpg]\"");
+            pattern = Pattern.compile("src=\"(.+?)\"");
             matcher = pattern.matcher(i.toString());
             if (matcher.find()){
                 item.put("image",R.drawable.loading);
-
+                values.put(NodeColumns.URL, matcher.group(1));
                 final Matcher finalMatcher = matcher;
-                new Thread(new Runnable() {
+                /*mExecutor.submit(new Thread(new Runnable() {
                     @Override
                     public void run() {
                         //Log.e(TAG,finalMatcher.group().substring(5, finalMatcher.group().length()-1));
@@ -262,8 +277,12 @@ public class JandanParser {
                                         .substring(5, finalMatcher.group().length()-1)));
                         listener.OnImageChanged();
                     }
-                }).start();
+                }));*/
+                mExecutor.submit(new dlTask(values.getAsString("url"), id));
+                BitmapFactory.decodeFile()
             }
+            if (values.size() > 0)
+                mCache.updateCache(values);
 
             //add item to items
             if(item.get("image") != null) {
@@ -271,6 +290,39 @@ public class JandanParser {
             }
         }
         return items;
+    }
+
+    private class dlTask implements Callable<File> {
+        private final String mUrl;
+        private final String mId;
+        public dlTask(String url, String id) {
+            mUrl = url;
+            mId = id;
+        }
+
+        @Override
+        public File call() throws Exception {
+            File file = null;
+            file = mCache.generateCacheFile(mId);
+            InputStream is = null;
+            FileOutputStream os = new FileOutputStream(file);
+            try {
+                URL url = new URL(mUrl);
+                URLConnection conn = url.openConnection();
+                is = conn.getInputStream();
+                final byte[] data = new byte[8192];
+                int bytes = 0;
+                while ((bytes = is.read(data)) >= 0) {
+                    if (bytes > 0)
+                        os.write(data, 0, bytes);
+                }
+            } catch (IOException e) {
+                return null;
+            } finally {
+                is.close();
+            }
+            return null;
+        }
     }
 
 
@@ -406,5 +458,6 @@ public class JandanParser {
         }
         return bitmap;
     }
+
 
 }
