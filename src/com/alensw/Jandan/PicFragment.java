@@ -126,13 +126,6 @@ public class PicFragment extends Fragment {
 		mParser.setOnImageChangedlistener(new JandanParser.OnImageChangedlistener() {
 			@Override
 			public void OnImageChanged() {
-				//mAdapter.notifyDataSetChanged();
-				new notifyDataSetChanged().execute();
-			}
-		});
-		mParser.setOnImageChangedlistener(new JandanParser.OnImageChangedlistener() {
-			@Override
-			public void OnImageChanged() {
 				new notifyDataSetChanged().execute();
 			}
 		});

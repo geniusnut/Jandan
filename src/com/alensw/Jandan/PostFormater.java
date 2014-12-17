@@ -87,7 +87,7 @@ public class PostFormater {
 				"\t<title>CSS</title>\n" +
 				"\t<style type=\"text/css\">\n" +
 				"\t\tbody {\n" +
-				"\t\t\tbackground:#fafafa;\n" +
+				"\t\t\tbackground:#f3f2f4;\n" +
 				"\t\t\tfont-family:Arial, Helvetica, sans-serif;\n" +
 				"\t\t\tfont-size:1em;\n" +
 				"\t\t\tcolor: #42454c; \n" +

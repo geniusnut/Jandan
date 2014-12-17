@@ -3,12 +3,22 @@ package com.alensw.Jandan;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.LightingColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.ColorRes;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.*;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.webkit.WebView;
 import android.widget.*;
 import com.larvalabs.svgandroid.SVG;
@@ -22,8 +32,10 @@ public class PostActivity extends ActionBarActivity {
 	String link ;
 	String title ;
 	String comm;
+	ScrollView scrollView;
 	WebView webview;
 	WebView commwebview;
+	ImageView ivCarat;
 	private Toolbar toolbar;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -45,10 +57,6 @@ public class PostActivity extends ActionBarActivity {
 		ProgressBar progressBar = new ProgressBar(this);
 		progressBar.setLayoutParams(new Toolbar.LayoutParams(Gravity.RIGHT));
 		progressBar.setIndeterminate(true);
-		ImageButton imageButton = (ImageButton) findViewById(R.id.ib);
-		//imageButton.setLayoutParams(new Toolbar.LayoutParams(Gravity.RIGHT));
-		if (imageButton != null)
-			toolbar.addView(imageButton);
 		//toolbar.addView(progressBar);
 
 		//setActionBar();
@@ -56,17 +64,64 @@ public class PostActivity extends ActionBarActivity {
 		title = getIntent().getStringExtra(Intent.EXTRA_TITLE);
 		comm = getIntent().getStringExtra("comm");
 
-		//TextView mComm = (TextView) findViewById(R.id.btn_post_comm_text);
-		//mComm.setText(comm);
+		TextView mComm = (TextView) findViewById(R.id.btn_post_comm_text);
+		mComm.setText(comm);
+		Drawable myIcon = getResources().getDrawable(R.drawable.icon_expand);
+		ColorFilter filter = new LightingColorFilter( Color.BLUE, Color.BLUE );
+		myIcon.setColorFilter(filter);
+		ivCarat = (ImageView)findViewById(R.id.ivCarat);
+		((ImageView)findViewById(R.id.ivCarat)).setImageDrawable(myIcon);
+		scrollView = (ScrollView) findViewById(R.id.scrollView);
 		webview = (WebView) findViewById(R.id.webview);
 		webview.clearCache(true);
 		Log.d(TAG, "webViewLoad : " + link);
 		new webViewLoad().execute(link);
 
 
-		//commwebview = (WebView) findViewById(R.id.post_comm);
-		//commwebview.clearCache(true);
-		//new commViewLoad().execute(link);
+		commwebview = (WebView) findViewById(R.id.post_comm);
+		commwebview.clearCache(true);
+		new commViewLoad().execute(link);
+
+		commwebview.setVisibility(View.GONE);
+		final LinearLayout linearLayout = (LinearLayout) findViewById(R.id.btn_post_comm);
+		linearLayout.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				if (commwebview.getVisibility() == View.VISIBLE) {
+					ivCarat.setRotation(0);
+					commwebview.removeAllViews();
+					commwebview.setVisibility(View.GONE);
+				}
+				else {
+					ivCarat.setRotation(180);
+					commwebview.setVisibility(View.VISIBLE);
+					Log.d(TAG, "commwebview bottom : " + commwebview.getBottom());
+					/* RotateAnimation anim = new RotateAnimation(0f, 180f, 15f, 15f);
+					anim.setInterpolator(new LinearInterpolator());
+					anim.setRepeatCount(Animation.INFINITE);
+					anim.setDuration(700);
+					// Start animating the image
+					final ImageView ivCarat1 = (ImageView)findViewById(R.id.ivCarat);
+					ivCarat1.startAnimation(anim);
+					ivCarat1.setrotate
+					// Later.. stop the animation
+					ivCarat1.setAnimation(null); */
+
+					new Handler().post(new Runnable() {
+						@Override
+						public void run() {
+							scrollView.smoothScrollTo(0, linearLayout.getTop() - 10);
+						}
+					});
+					/*scrollView.post(new Runnable() {
+						@Override
+						public void run() {
+							scrollView.smoothScrollTo(0, linearLayout.getTop()-10);
+						}
+					});*/
+				}
+			}
+		});
 	}
 
 	private class webViewLoad extends AsyncTask<String, Void, String> {

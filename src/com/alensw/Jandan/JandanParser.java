@@ -27,10 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.regex.Matcher;
@@ -215,8 +212,8 @@ public class JandanParser {
             //id
             Pattern pattern = Pattern.compile("comment-[0-9]*");
             Matcher matcher = pattern.matcher(i.toString());
-            final String id = (matcher.group().substring(8));
             if (matcher.find()){
+                String id = (matcher.group().substring(8));
                 item.put("id", id);
                 values.put(NodeColumns.ID, id);
                 //Log.e(TAG,item.get("id").toString());
@@ -278,8 +275,8 @@ public class JandanParser {
                         listener.OnImageChanged();
                     }
                 }));*/
-                mExecutor.submit(new dlTask(values.getAsString("url"), id));
-                BitmapFactory.decodeFile()
+                mExecutor.submit(new dlTask(values.getAsString("url"), values.getAsString("_id")));
+                //BitmapFactory.decodeFile()
             }
             if (values.size() > 0)
                 mCache.updateCache(values);
@@ -302,8 +299,7 @@ public class JandanParser {
 
         @Override
         public File call() throws Exception {
-            File file = null;
-            file = mCache.generateCacheFile(mId);
+            File file = mCache.generateCacheFile(mId);
             InputStream is = null;
             FileOutputStream os = new FileOutputStream(file);
             try {
@@ -316,12 +312,13 @@ public class JandanParser {
                     if (bytes > 0)
                         os.write(data, 0, bytes);
                 }
+                listener.OnImageChanged();
             } catch (IOException e) {
                 return null;
             } finally {
                 is.close();
             }
-            return null;
+            return file;
         }
     }
 

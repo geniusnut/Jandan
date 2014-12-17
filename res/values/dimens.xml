@@ -1,3 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="extra_news_item_divider_inset">14.0dip</dimen>
 </resources>

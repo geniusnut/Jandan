@@ -37,6 +37,8 @@ public class FileCache extends SQLiteOpenHelper {
 	public FileCache(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		mCacheDir = buildPath(Environment.getExternalStorageDirectory(), "Android", "data", context.getPackageName(), "cache");
+		mCacheDir.mkdirs();
+		Log.d(TAG, mCacheDir + " : " + mCacheDir.isDirectory());
 		//mContext = context;
 	}
 
