@@ -54,28 +54,26 @@ public class PostActivity extends ActionBarActivity {
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		}
 
-		ProgressBar progressBar = new ProgressBar(this);
-		progressBar.setLayoutParams(new Toolbar.LayoutParams(Gravity.RIGHT));
-		progressBar.setIndeterminate(true);
-		//toolbar.addView(progressBar);
-
 		//setActionBar();
 		link = getIntent().getStringExtra("link");
 		title = getIntent().getStringExtra(Intent.EXTRA_TITLE);
 		comm = getIntent().getStringExtra("comm");
 
+		webview = (WebView) findViewById(R.id.webview);
+		webview.clearCache(true);
+		Log.d(TAG, "webViewLoad : " + link);
+		new webViewLoad().execute(link);
+
 		TextView mComm = (TextView) findViewById(R.id.btn_post_comm_text);
-		mComm.setText(comm);
+
+		mComm.setText(getString(R.string.post_comments, comm));
 		Drawable myIcon = getResources().getDrawable(R.drawable.icon_expand);
 		ColorFilter filter = new LightingColorFilter( Color.BLUE, Color.BLUE );
 		myIcon.setColorFilter(filter);
 		ivCarat = (ImageView)findViewById(R.id.ivCarat);
 		((ImageView)findViewById(R.id.ivCarat)).setImageDrawable(myIcon);
 		scrollView = (ScrollView) findViewById(R.id.scrollView);
-		webview = (WebView) findViewById(R.id.webview);
-		webview.clearCache(true);
-		Log.d(TAG, "webViewLoad : " + link);
-		new webViewLoad().execute(link);
+
 
 
 		commwebview = (WebView) findViewById(R.id.post_comm);
@@ -96,17 +94,6 @@ public class PostActivity extends ActionBarActivity {
 					ivCarat.setRotation(180);
 					commwebview.setVisibility(View.VISIBLE);
 					Log.d(TAG, "commwebview bottom : " + commwebview.getBottom());
-					/* RotateAnimation anim = new RotateAnimation(0f, 180f, 15f, 15f);
-					anim.setInterpolator(new LinearInterpolator());
-					anim.setRepeatCount(Animation.INFINITE);
-					anim.setDuration(700);
-					// Start animating the image
-					final ImageView ivCarat1 = (ImageView)findViewById(R.id.ivCarat);
-					ivCarat1.startAnimation(anim);
-					ivCarat1.setrotate
-					// Later.. stop the animation
-					ivCarat1.setAnimation(null); */
-
 					new Handler().post(new Runnable() {
 						@Override
 						public void run() {
@@ -130,6 +117,7 @@ public class PostActivity extends ActionBarActivity {
 			PostFormater postFormater = new PostFormater(getApplicationContext());
 			return postFormater.postFormater(strings[0]);
 		}
+		@Override
 		protected void onPostExecute(String data){
 			webview.loadDataWithBaseURL("", data, "text/html", "UTF-8", "");
 		}

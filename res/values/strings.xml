@@ -7,4 +7,5 @@
     <string name="news_tag"> </string>
     <string name="news_comments">[%s]</string>
     <string name="action_settings">settings</string>
+    <string name="post_comments">共有%s条评论</string>
 </resources>

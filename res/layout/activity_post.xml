@@ -27,37 +27,40 @@
 
             <View style="@style/Divider"/>
 
-            <LinearLayout
+            <RelativeLayout
                 android:orientation="horizontal"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="8dp"
                 android:id="@+id/btn_post_comm">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:src="@drawable/comm"
-                    android:background="@null" />
+                    android:background="@null"
+                    android:id="@+id/imageView"
+                    android:layout_alignTop="@+id/btn_post_comm_text"
+                    android:layout_alignParentLeft="true" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="46dp"
-                    android:text="00"
+                    android:text="@string/post_comments"
                     android:gravity="center"
                     android:id="@+id/btn_post_comm_text"
-                    android:layout_marginLeft="-5dp"
                     android:textColor="#424242"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/imageView" />
 
                 <ImageView
                     android:id="@+id/ivCarat"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:src="@drawable/icon_expand"
-                    android:layout_centerVertical="true"/>
-            </LinearLayout>
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"/>
+            </RelativeLayout>
             <View
                 android:layout_gravity="top"
                 android:background="@drawable/references_shadow"
