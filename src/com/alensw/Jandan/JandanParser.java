@@ -5,6 +5,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Message;
@@ -133,17 +135,13 @@ public class JandanParser {
             }else {
                 item.put("cont","0");
             }
+
             Elements time_s = i.getElementsByClass("time_s");
             //Log.d("JandanParser", "time_s : " + time_s);
-            pattern = Pattern.compile(" ([0-9]+) ");
-            matcher = pattern.matcher(time_s.toString());
-            if (matcher.find()){
-                item.put("cont", matcher.group());
-            }
             //by
             pattern = Pattern.compile("author.+?>(.+?)</a>");
             matcher = pattern.matcher(time_s.toString());
-            if (matcher.find()){
+            if (matcher.find()) {
                 item.put("by",matcher.group(1));
             }
 
@@ -219,24 +217,23 @@ public class JandanParser {
                 //Log.e(TAG,item.get("id").toString());
             }
 
+            Elements author = i.getElementsByClass("author");
             //updater
-            pattern = Pattern.compile("<b>(.*)</b>");
-            matcher = pattern.matcher(i.toString());
+            pattern = Pattern.compile(">(.*?)</strong>");
+            matcher = pattern.matcher(author.toString());
             if (matcher.find()){
-                item.put("updater",matcher.group().substring(3,matcher.group().length()-4));
-
+                item.put("updater",matcher.group(1));
             }
 
-            Elements time = i.getElementsByClass("time");
             //time
-            pattern = Pattern.compile("[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]");
-            matcher = pattern.matcher(time.toString());
+            pattern = Pattern.compile(">@(.*?)<");
+            matcher = pattern.matcher(author.toString());
             if (matcher.find()){
-                item.put("time",matcher.group());
+                item.put("time",matcher.group(1));
             }
 
             //text
-            Elements text = i.getElementsByClass("commenttext");
+            Elements text = i.getElementsByClass("text");
             pattern = Pattern.compile("<p>(\\S*)<br");
             matcher = pattern.matcher(text.toString());
             if (matcher.find()){
@@ -257,26 +254,45 @@ public class JandanParser {
                 }
             }
 
+            listener.OnImageChanged();
             //imageHashMap<String, Object>()
             //pattern = Pattern.compile("src=\"(\\S*)[^ ][jpg]\"");
-            pattern = Pattern.compile("src=\"(.+?)\"");
+            pattern = Pattern.compile("img src=\"(.+?)\"");
             matcher = pattern.matcher(i.toString());
             if (matcher.find()){
                 item.put("image",R.drawable.loading);
                 values.put(NodeColumns.URL, matcher.group(1));
                 final Matcher finalMatcher = matcher;
-                /*mExecutor.submit(new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //Log.e(TAG,finalMatcher.group().substring(5, finalMatcher.group().length()-1));
-                        item.put("image", getBitMap(
-                                finalMatcher.group()
-                                        .substring(5, finalMatcher.group().length()-1)));
+                Future<?> future = mExecutor.submit(new dlTask(values.getAsString("url"), values.getAsString("_id")));
+                File file = null;
+                try {
+                    file = (File) future.get();
+                } catch (Throwable e) {
+                    Log.e(TAG, "futureTask get : " + e);
+                }
+                if (file != null) {
+                    Bitmap bitmap;
+                    bitmap = BitmapFactory.decodeFile(file.getPath());
+
+                    if (bitmap != null) {
+                        Log.d(TAG, "bitmap : " + bitmap.getWidth() + "   " + bitmap.getHeight());
+                        if (bitmap.getWidth() <= 600) {
+                            float scale = 600/bitmap.getWidth();
+                            item.put("image", createScaledBitmap(bitmap, scale));
+                        } else if (bitmap.getHeight() >= 4096) {
+                            item.put("image", Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth() / (bitmap.getHeight() / 4096), 4096));
+                        } else {
+                            item.put("image", bitmap);
+                        }
                         listener.OnImageChanged();
                     }
-                }));*/
-                mExecutor.submit(new dlTask(values.getAsString("url"), values.getAsString("_id")));
-                //BitmapFactory.decodeFile()
+                }
+            }
+
+            pattern = Pattern.compile("org_src=\"(.+?)\"");
+            matcher = pattern.matcher(i.toString());
+            if (matcher.find()) {
+                values.put(NodeColumns.ORG_URL, matcher.group(1));
             }
             if (values.size() > 0)
                 mCache.updateCache(values);
@@ -312,7 +328,7 @@ public class JandanParser {
                     if (bytes > 0)
                         os.write(data, 0, bytes);
                 }
-                listener.OnImageChanged();
+                //listener.OnImageChanged();
             } catch (IOException e) {
                 return null;
             } finally {
@@ -457,4 +473,31 @@ public class JandanParser {
     }
 
 
+    public static Bitmap createScaledBitmap(Bitmap bitmap, float scale) {
+        Bitmap newBmp = null;
+        Bitmap.Config config = Bitmap.Config.ARGB_8888;
+        while (newBmp == null) {
+            try {
+                final int width = bitmap.getWidth();
+                final int height = bitmap.getHeight();
+                final int outWidth = Math.round(width * scale);
+                final int outHeight = Math.round(height * scale);
+                newBmp = Bitmap.createBitmap(outWidth, outHeight, config);
+                final Canvas canvas = new Canvas(newBmp);
+                canvas.scale(scale, scale);
+                canvas.drawBitmap(bitmap, 0, 0, new Paint(Paint.DITHER_FLAG | Paint.FILTER_BITMAP_FLAG));
+                //	Log.d("BitmapUtils", "create scaled: " + width + "x" + height + " -> " + outWidth + "x" + outHeight);
+                return newBmp;
+            } catch (OutOfMemoryError e) {
+                if (config == Bitmap.Config.ARGB_8888) {
+                    config = Bitmap.Config.RGB_565;
+                    continue;
+                }
+            } catch (Throwable e) {
+                Log.e("BitmapUtils", "create scaled: " + e);
+            }
+            break;
+        }
+        return null;
+    }
 }

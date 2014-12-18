@@ -23,6 +23,7 @@
         <RelativeLayout
             android:id="@+id/drawer_panel"
             android:layout_gravity="left|start"
+            android:background="@color/teal500"
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
             <ListView

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<inset android:drawable="@color/digest_separator_color_morning"
+<inset  xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@color/digest_separator_color_morning"
     android:insetLeft="@dimen/extra_news_item_divider_inset"
-    android:insetRight="@dimen/extra_news_item_divider_inset"
-  xmlns:android="http://schemas.android.com/apk/res/android" />
+    android:insetRight="@dimen/extra_news_item_divider_inset" >
+
+</inset>

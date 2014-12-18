@@ -29,7 +29,8 @@ public class PostFormater {
 				"\t<title>CSS</title>\n" +
 				"\t<style type=\"text/css\">\n" +
 				"\t\th2 {\n" +
-				"\t\t\tcolor:#FF0000\n" +
+				"\t\t\tcolor:#e51c23;\n" +
+				"\t\t\tfont-size:1em;\n" +
 				"\t\t}\n" +
 				"\t\tbody {\n" +
 				"\t\t\tbackground:#fafafa;\n" +
@@ -76,7 +77,7 @@ public class PostFormater {
 		data = document.getElementsByClass("postinfo").toString()+
 				document.getElementsByClass("entry").get(0).toString();
 
-		Log.d(TAG, "Postinfo : " + data);
+		//Log.d(TAG, "Postinfo : " + data);
 		return CSS + data;
 	}
 
@@ -89,8 +90,9 @@ public class PostFormater {
 				"\t\tbody {\n" +
 				"\t\t\tbackground:#f3f2f4;\n" +
 				"\t\t\tfont-family:Arial, Helvetica, sans-serif;\n" +
-				"\t\t\tfont-size:1em;\n" +
+				"\t\t\tfont-size:0.8em;\n" +
 				"\t\t\tcolor: #42454c; \n" +
+				"\t\t\tmargin-left:1;\n" +
 				"\t\t}\n" +
 				"\t\tembed {\n" +
 				"\t\t\tdisplay:none;\n" +
@@ -127,6 +129,7 @@ public class PostFormater {
 
 		data = document.getElementsByClass("commentlist").toString();
 
+		Log.d(TAG, "CommentInfo : " + data);
 		return CSS + data;
 	}
 }

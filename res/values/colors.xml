@@ -20,6 +20,7 @@
     <color name="cyanA200">#18ffff</color>
     <color name="primaryColor">#2196F3</color>
     <color name="primaryColorDark">#0D47A1</color>
+    <color name="littleGray">#b3b4b7</color>
 
     <color name="digest_separator_color_morning">#ffe5e5e5</color>
 </resources>

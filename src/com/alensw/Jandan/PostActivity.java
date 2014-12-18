@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
-import android.graphics.PorterDuff;
+import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -67,11 +67,11 @@ public class PostActivity extends ActionBarActivity {
 		TextView mComm = (TextView) findViewById(R.id.btn_post_comm_text);
 
 		mComm.setText(getString(R.string.post_comments, comm));
-		Drawable myIcon = getResources().getDrawable(R.drawable.icon_expand);
-		ColorFilter filter = new LightingColorFilter( Color.BLUE, Color.BLUE );
-		myIcon.setColorFilter(filter);
+		//Drawable iconExpand = getResources().getDrawable(R.drawable.icon_expand);
+		//iconExpand.setColorFilter(R.color.lightBlue, Mode.MULTIPLY);
 		ivCarat = (ImageView)findViewById(R.id.ivCarat);
-		((ImageView)findViewById(R.id.ivCarat)).setImageDrawable(myIcon);
+		//((ImageView)findViewById(R.id.ivCarat)).setImageDrawable(iconExpand);
+		//((ImageView)findViewById(R.id.ivCarat)).setBackgroundColor(Color.GRAY);
 		scrollView = (ScrollView) findViewById(R.id.scrollView);
 
 
@@ -81,8 +81,8 @@ public class PostActivity extends ActionBarActivity {
 		new commViewLoad().execute(link);
 
 		commwebview.setVisibility(View.GONE);
-		final LinearLayout linearLayout = (LinearLayout) findViewById(R.id.btn_post_comm);
-		linearLayout.setOnClickListener(new View.OnClickListener() {
+		final RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.btn_post_comm);
+		relativeLayout.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				if (commwebview.getVisibility() == View.VISIBLE) {
@@ -93,11 +93,10 @@ public class PostActivity extends ActionBarActivity {
 				else {
 					ivCarat.setRotation(180);
 					commwebview.setVisibility(View.VISIBLE);
-					Log.d(TAG, "commwebview bottom : " + commwebview.getBottom());
 					new Handler().post(new Runnable() {
 						@Override
 						public void run() {
-							scrollView.smoothScrollTo(0, linearLayout.getTop() - 10);
+							scrollView.smoothScrollTo(0, relativeLayout.getTop() - 10);
 						}
 					});
 					/*scrollView.post(new Runnable() {

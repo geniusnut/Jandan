@@ -81,20 +81,20 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="tag"
-                            android:textColor="#b3b4b7"
+                            android:textColor="@color/littleGray"
                             android:textSize="5pt"
                             android:id="@+id/by"/>
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="\@"
-                            android:textColor="#b3b4b7"
+                            android:textColor="@color/littleGray"
                             android:textSize="5pt"/>
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="updater"
-                            android:textColor="#b3b4b7"
+                            android:textColor="@color/littleGray"
                             android:textSize="5pt"
                             android:id="@+id/tag" />
 

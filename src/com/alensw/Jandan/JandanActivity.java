@@ -176,24 +176,24 @@ public class JandanActivity extends ActionBarActivity implements
 		Drawable iconNews = SVG.getDrawable(getResources(), R.raw.news,
 				 0x00ffffff | 0xc0000000);
 		newsMap.put("img", iconNews);
-		newsMap.put("title", "News");
-		newsMap.put("info", "There is no news around world!");
+		newsMap.put("title", "新鲜事");
+		newsMap.put("info", "地球上没有新鲜事");
 		list.add(newsMap);
 
 		final HashMap<String, Object> picMap = new HashMap<String, Object>();
 		Drawable iconPic = SVG.getDrawable(getResources(), R.raw.pic,
 				 0x00ffffff | 0xc0000000);
 		picMap.put("img", iconPic);
-		picMap.put("title", "Picture");
-		picMap.put("info", "There is no news around world!");
+		picMap.put("title", "无聊图");
+		picMap.put("info", "");
 		list.add(picMap);
 
 		final HashMap<String, Object> ooxxMap = new HashMap<String, Object>();
 		Drawable iconOOXX = SVG.getDrawable(getResources(), R.raw.ooxx,
 				 0x00ffffff | 0xc0000000);
 		ooxxMap.put("img", iconOOXX);
-		ooxxMap.put("title", "OOXX");
-		ooxxMap.put("info", "There is no news around world!");
+		ooxxMap.put("title", "妹子图");
+		ooxxMap.put("info", "");
 		list.add(ooxxMap);
 	}
 
