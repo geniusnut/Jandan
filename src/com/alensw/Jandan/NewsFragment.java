@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,10 +23,13 @@ import java.util.Map;
 public class NewsFragment extends Fragment {
 	private final String TAG = "NewsFragment";
 	protected ListView mListView;
+	protected SwipeRefreshLayout swipeLayout;
 	protected JandanParser mParser;
+
 	public static NewsLoader mNewsLoader;
 	protected SimpleAdapter mAdapter;
 	protected boolean isParsing = false;
+	protected Handler mHandler;
 	int page = 0;
 	protected List<Map<String, Object>> items = new ArrayList<Map<String,Object>>();
 
@@ -32,8 +37,20 @@ public class NewsFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 		ViewGroup rootView = (ViewGroup) inflater.inflate(
-				R.layout.newsfrag, container, false);
+				R.layout.swipe_news_frag, container, false);
 
+		swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
+		swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+			@Override
+			public void onRefresh() {
+				page = 0;
+				new NewsLoader().execute(++page);
+			}
+		});
+		swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
+				android.R.color.holo_green_light,
+				android.R.color.holo_orange_light,
+				android.R.color.holo_red_light);
 		mListView = (ListView) rootView.findViewById(R.id.news_list);
 		mAdapter = new SimpleAdapter(getActivity(), items, R.layout.news_item1,
 				new String[]{"link", "image", "title", "by", "tag", "cont"},
@@ -100,6 +117,7 @@ public class NewsFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
+		mHandler = new Handler();
 		mParser = new JandanParser(getActivity().getApplicationContext());
 		mNewsLoader = new NewsLoader();
 		mNewsLoader.execute(++page);
@@ -107,7 +125,13 @@ public class NewsFragment extends Fragment {
 			@Override
 			public void OnImageChanged() {
 				//mAdapter.notifyDataSetChanged();
-				new notifyDataSetChanged().execute();
+				//new notifyDataSetChanged().execute();
+				mHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						mAdapter.notifyDataSetChanged();
+					}
+				});
 			}
 		});
 	}
@@ -139,6 +163,7 @@ public class NewsFragment extends Fragment {
 			}
 			items.addAll(result);
 			mAdapter.notifyDataSetChanged();
+			swipeLayout.setRefreshing(false);
 			isParsing = false;
 		}
 	}

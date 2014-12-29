@@ -93,6 +93,8 @@ public class PostActivity extends ActionBarActivity {
 				else {
 					ivCarat.setRotation(180);
 					commwebview.setVisibility(View.VISIBLE);
+					Log.d(TAG, "scroll to " + (relativeLayout.getTop() - 10));
+					Log.d(TAG, "Scrollview height : " + scrollView.getBottom());
 					new Handler().post(new Runnable() {
 						@Override
 						public void run() {
