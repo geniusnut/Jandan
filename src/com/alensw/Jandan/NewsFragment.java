@@ -151,16 +151,16 @@ public class NewsFragment extends Fragment {
 		protected List<Map<String, Object>> doInBackground(Integer... page) {
 			isParsing = true;
 			List<Map<String, Object>> list = mParser.JandanHomePage(page[0]);
-			if (page[0] == 1){
-				items.clear();
-			}
 			return list;
 
 		}
+
 		protected void onPostExecute(List<Map<String, Object>> result) {
 			if(result.isEmpty()){
 				//Toast.makeText(, "载入出错了！请稍后再试。", Toast.LENGTH_SHORT).show();
 			}
+			if (page == 1)
+				items.clear();
 			items.addAll(result);
 			mAdapter.notifyDataSetChanged();
 			swipeLayout.setRefreshing(false);
