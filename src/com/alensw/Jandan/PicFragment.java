@@ -2,6 +2,7 @@ package com.alensw.Jandan;
 
 import android.app.Fragment;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Message;
@@ -20,6 +21,7 @@ import java.util.Map;
  * Created by yw07 on 14-12-1.
  */
 public class PicFragment extends Fragment {
+	private static final String TAG = "PicFragment";
 	protected ListView mListView;
 	SimpleAdapter mAdapter;
 
@@ -37,8 +39,8 @@ public class PicFragment extends Fragment {
 				R.layout.picfragment, container, false);
 		mListView = (ListView)  rootView.findViewById(R.id.pic_list);
 		mAdapter = new SimpleAdapter(getActivity(), items, R.layout.pic_item,
-				new String[]{"updater", "time", "text", "image", "xx", "oo"},
-				new int[]{R.id.updater, R.id.time, R.id.text, R.id.image, R.id.xx, R.id.oo}){
+				new String[]{"updater", "time", "text", "image", "isgif", "xx", "oo"},
+				new int[]{R.id.updater, R.id.time, R.id.text, R.id.image, R.id.img_mask, R.id.xx, R.id.oo}){
 			@Override
 			public View getView(int position, View convertView,ViewGroup parent) {
 				final View view=super.getView(position, convertView, parent);
@@ -65,11 +67,15 @@ public class PicFragment extends Fragment {
 					View view,
 					Object data,
 					String textRepresentation) {
-				if ((view instanceof ImageView) && (data instanceof Bitmap)) {
-					ImageView imageView = (ImageView) view;
-					Bitmap bmp = (Bitmap) data;
-					imageView.setImageBitmap(bmp);
-					return true;
+				if (view instanceof ImageView) {
+					if  (data instanceof Bitmap) {
+						ImageView imageView = (ImageView) view;
+						Bitmap bmp = (Bitmap) data;
+						Log.d(TAG, "view width : " + imageView.getWidth());
+						float scaled = (float) imageView.getWidth() / bmp.getWidth();
+						imageView.setImageBitmap(JandanParser.createScaledBitmap(bmp, scaled));
+						return true;
+					}
 				}
 				return false;
 			}

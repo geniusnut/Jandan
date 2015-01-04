@@ -3,10 +3,7 @@ package com.alensw.Jandan;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
+import android.graphics.*;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Message;
@@ -36,7 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class JandanParser {
-    final String TAG = "JandanParser";
+    final static String TAG = "JandanParser";
 
     final Context context;
     Document document ;
@@ -62,7 +59,7 @@ public class JandanParser {
     public JandanParser(Context context){
         this.context = context;
         mCache = new FileCache(context);
-        mExecutor = new ThreadPoolExecutor(2, 25, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(25));
+        mExecutor = new ThreadPoolExecutor(2, 64, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(25));
     }
 
     public List<Map<String, Object>> JandanHomePage(int Page){
@@ -271,28 +268,35 @@ public class JandanParser {
                     Log.e(TAG, "futureTask get : " + e);
                 }
                 if (file != null) {
-                    Bitmap bitmap;
-                    bitmap = BitmapFactory.decodeFile(file.getPath());
 
-                    if (bitmap != null) {
-                        Log.d(TAG, "bitmap : " + bitmap.getWidth() + "   " + bitmap.getHeight());
-                        if (bitmap.getWidth() <= 600) {
-                            float scale = 600/bitmap.getWidth();
-                            item.put("image", createScaledBitmap(bitmap, scale));
-                        } else if (bitmap.getHeight() >= 4096) {
-                            item.put("image", Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth() / (bitmap.getHeight() / 4096), 4096));
-                        } else {
-                            item.put("image", bitmap);
-                        }
-                        listener.OnImageChanged();
-                    }
+
+                    item.put("image", createThumbnail(file.getPath()));
+//                    Bitmap bitmap;
+//                    bitmap = BitmapFactory.decodeFile(file.getPath());
+//                    if (bitmap != null) {
+//                        Log.d(TAG, "bitmap : " + bitmap.getWidth() + "   " + bitmap.getHeight());
+//                        if (bitmap.getWidth() <= 600) {
+//                            float scale = 600/bitmap.getWidth();
+//                            item.put("image", createScaledBitmap(bitmap, scale));
+//                        } else if (bitmap.getHeight() >= 4096) {
+//                            item.put("image", Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth() / (bitmap.getHeight() / 4096), 4096));
+//                        } else {
+//                            item.put("image", bitmap);
+//                        }
+//                        listener.OnImageChanged();
+//                    }
+                    listener.OnImageChanged();
                 }
             }
 
             pattern = Pattern.compile("org_src=\"(.+?)\"");
             matcher = pattern.matcher(i.toString());
+            item.put("isgif", false);
             if (matcher.find()) {
+                Log.d(TAG, "org_url : " + matcher.group(1));
                 values.put(NodeColumns.ORG_URL, matcher.group(1));
+                if (matcher.group(1).endsWith("gif"))
+                    item.put("isgif", true);
             }
             if (values.size() > 0)
                 mCache.updateCache(values);
@@ -473,6 +477,25 @@ public class JandanParser {
     }
 
 
+    public Bitmap createThumbnail(String path) {
+        Log.d(TAG, "");
+        Bitmap bitmap;
+        bitmap = BitmapFactory.decodeFile(path);
+        //  Log.d(TAG, "bitmap height = " + bitmap.getHeight());
+        if (bitmap.getHeight() > 4096) {
+            BitmapRegionDecoder regionDecoder = null;
+            try {
+                regionDecoder = BitmapRegionDecoder.newInstance(path, false);
+            } catch (Throwable e) {
+                Log.e(TAG, "");
+            }
+            Rect rect = new Rect();
+            rect.right = bitmap.getWidth();
+            rect.bottom = (int) (rect.right * 0.62);
+            return regionDecoder.decodeRegion(rect, null);
+        }
+        return bitmap;
+    }
     public static Bitmap createScaledBitmap(Bitmap bitmap, float scale) {
         Bitmap newBmp = null;
         Bitmap.Config config = Bitmap.Config.ARGB_8888;
