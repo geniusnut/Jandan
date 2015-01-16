@@ -1,6 +1,7 @@
 package com.alensw.Jandan;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.Image;
 import android.os.AsyncTask;
@@ -81,6 +82,14 @@ public class PicFragment extends Fragment {
 			}
 		});
 		mListView.setAdapter(mAdapter);
+		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+				Intent intent = new Intent(view.getContext(), PicActivity.class);
+				startActivity(intent);
+			}
+		});
+
 		mListView.setOnScrollListener(new AbsListView.OnScrollListener(){
 			int vPosition = 0;
 			@Override
