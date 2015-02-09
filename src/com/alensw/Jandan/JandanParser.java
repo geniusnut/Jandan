@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.*;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Message;
 import android.util.Log;
@@ -252,52 +253,27 @@ public class JandanParser {
             }
 
             listener.OnImageChanged();
-            //imageHashMap<String, Object>()
-            //pattern = Pattern.compile("src=\"(\\S*)[^ ][jpg]\"");
             pattern = Pattern.compile("img src=\"(.+?)\"");
             matcher = pattern.matcher(i.toString());
             if (matcher.find()){
                 item.put("image",R.drawable.loading);
                 values.put(NodeColumns.URL, matcher.group(1));
-                final Matcher finalMatcher = matcher;
-                Future<?> future = mExecutor.submit(new dlTask(values.getAsString("url"), values.getAsString("_id")));
-                File file = null;
-                try {
-                    file = (File) future.get();
-                } catch (Throwable e) {
-                    Log.e(TAG, "futureTask get : " + e);
-                }
-                if (file != null) {
-
-
-                    item.put("image", createThumbnail(file.getPath()));
-//                    Bitmap bitmap;
-//                    bitmap = BitmapFactory.decodeFile(file.getPath());
-//                    if (bitmap != null) {
-//                        Log.d(TAG, "bitmap : " + bitmap.getWidth() + "   " + bitmap.getHeight());
-//                        if (bitmap.getWidth() <= 600) {
-//                            float scale = 600/bitmap.getWidth();
-//                            item.put("image", createScaledBitmap(bitmap, scale));
-//                        } else if (bitmap.getHeight() >= 4096) {
-//                            item.put("image", Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth() / (bitmap.getHeight() / 4096), 4096));
-//                        } else {
-//                            item.put("image", bitmap);
-//                        }
-//                        listener.OnImageChanged();
-//                    }
-                    listener.OnImageChanged();
-                }
             }
 
             pattern = Pattern.compile("org_src=\"(.+?)\"");
             matcher = pattern.matcher(i.toString());
             item.put("isgif", false);
             if (matcher.find()) {
-                Log.d(TAG, "org_url : " + matcher.group(1));
+                // Log.d(TAG, "org_url : " + matcher.group(1));
                 values.put(NodeColumns.ORG_URL, matcher.group(1));
-                if (matcher.group(1).endsWith("gif"))
+                if (matcher.group(1).endsWith("gif")) {
+                    item.put("url", Uri.parse(matcher.group(1)));
                     item.put("isgif", true);
+                }
             }
+
+            final FutureTask<File> futureTask = new dlTask1(new dlTask(values.getAsString("url"), values.getAsString("_id")), item);
+            Future<?> future = mExecutor.submit(futureTask);
             if (values.size() > 0)
                 mCache.updateCache(values);
 
@@ -309,7 +285,38 @@ public class JandanParser {
         return items;
     }
 
-    private class dlTask implements Callable<File> {
+    private class dlTask1 extends FutureTask<File> {
+        Map<String, Object> mItem;
+        public dlTask1(dlTask dlTask, Map<String, Object> item) {
+            super(dlTask);
+            mItem = item;
+        }
+
+        @Override
+        public boolean cancel(boolean mayInterrupt) {
+            final boolean ret = super.cancel(mayInterrupt);
+            if (ret) {
+
+            }
+            return ret;
+        }
+        @Override
+        public void done() {
+            try {
+                File file = get();
+                mItem.put("image", createThumbnail(file.getPath()));
+                if (mItem.get("isgif") == false)
+                    mItem.put("url", Uri.fromFile(file));
+                listener.OnImageChanged();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public class dlTask implements Callable<File> {
         private final String mUrl;
         private final String mId;
         public dlTask(String url, String id) {
@@ -485,6 +492,7 @@ public class JandanParser {
         float whScale = (float) bitmap.getHeight()/bitmap.getWidth();
         if ( whScale > 4) {
             BitmapRegionDecoder regionDecoder = null;
+            bitmap.recycle();
             try {
                 regionDecoder = BitmapRegionDecoder.newInstance(path, false);
             } catch (Throwable e) {

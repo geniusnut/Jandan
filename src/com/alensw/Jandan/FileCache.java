@@ -12,6 +12,7 @@ import org.w3c.dom.Node;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -24,7 +25,7 @@ public class FileCache extends SQLiteOpenHelper {
 	protected static final String TABLE_CACHE = "cache";
 	public static final String TABLE_COMMENTS = "comments";
 	protected Context mContext;
-	protected File mCacheDir;
+	static public File mCacheDir = buildPath(Environment.getExternalStorageDirectory(), "Android", "data", "com.alensw.Jandan", "cache");
 	protected static final String SQL_ID_EQUAL = Document.COLUMN_DOCUMENT_ID + "=?";
 	private static final String DATABASE_CREATE = "create table "
 			+ TABLE_CACHE + "("
@@ -36,7 +37,6 @@ public class FileCache extends SQLiteOpenHelper {
 
 	public FileCache(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		mCacheDir = buildPath(Environment.getExternalStorageDirectory(), "Android", "data", context.getPackageName(), "cache");
 		mCacheDir.mkdirs();
 		Log.d(TAG, mCacheDir + " : " + mCacheDir.isDirectory());
 		//mContext = context;
@@ -80,7 +80,7 @@ public class FileCache extends SQLiteOpenHelper {
 		return null;
 	}
 
-	public File generateCacheFile(String id) {
+	public static File generateCacheFile(String id) {
 		return new File(mCacheDir,id);
 	}
 

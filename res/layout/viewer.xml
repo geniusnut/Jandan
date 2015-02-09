@@ -1,14 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ProgressWheel="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.alensw.ui.PictureView
+    <com.alensw.ui.TouchImageView
         android:id="@+id/image"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
+    <com.alensw.gif.GifImageView
+        android:id="@+id/gifImage"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+    <com.alensw.ui.ProgressWheel
+        android:id="@+id/progressBarTwo"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        ProgressWheel:text="Click\none of the\nbuttons"
+        ProgressWheel:textColor="#222222"
+        ProgressWheel:textSize="14sp"
+        ProgressWheel:rimColor="#44000000"
+        ProgressWheel:barLength="60dp"
+        ProgressWheel:barColor="#339BB9"
+        ProgressWheel:barWidth="2dp"
+        ProgressWheel:rimWidth="1dp"
+        ProgressWheel:spinSpeed="3dp"
+        />
 
 </RelativeLayout>

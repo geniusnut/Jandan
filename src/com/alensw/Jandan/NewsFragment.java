@@ -3,6 +3,7 @@ package com.alensw.Jandan;
 import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -52,6 +53,7 @@ public class NewsFragment extends Fragment {
 				android.R.color.holo_orange_light,
 				android.R.color.holo_red_light);
 		mListView = (ListView) rootView.findViewById(R.id.news_list);
+
 		mAdapter = new SimpleAdapter(getActivity(), items, R.layout.news_item1,
 				new String[]{"link", "image", "title", "by", "tag", "cont"},
 				new int[]{R.id.link, R.id.image, R.id.title, R.id.by, R.id.tag, R.id.cont});
@@ -68,6 +70,9 @@ public class NewsFragment extends Fragment {
 			}
 		});
 		mListView.setAdapter(mAdapter);
+
+
+
 		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -167,4 +172,50 @@ public class NewsFragment extends Fragment {
 			isParsing = false;
 		}
 	}
+
+	protected final BaseAdapter newsAdapter = new BaseAdapter() {
+		class ViewHolder {
+			public TextView link;
+			public ImageView image;
+			public TextView title;
+			public TextView by;
+			public TextView tag;
+			public TextView cont;
+		}
+		@Override
+		public int getCount() {
+			return 0;
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return 0;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			ViewHolder viewHolder;
+			if (convertView == null) {
+				LayoutInflater inflater = getActivity().getLayoutInflater();
+				convertView = inflater.inflate(R.layout.news_item1, null);
+				viewHolder = new ViewHolder();
+				viewHolder.link = (TextView) convertView.findViewById(R.id.link);
+				viewHolder.image = (ImageView) convertView.findViewById(R.id.image);
+				viewHolder.title = (TextView) convertView.findViewById(R.id.title);
+				viewHolder.by = (TextView) convertView.findViewById(R.id.by);
+				viewHolder.tag = (TextView) convertView.findViewById(R.id.tag);
+				convertView.setTag(viewHolder);
+			} else {
+				viewHolder = (ViewHolder) convertView.getTag();
+			}
+			final Map<String,Object> item = items.get(position);
+			viewHolder.title.setText((String)item.get("title"));
+			return convertView;
+		}
+	};
 }

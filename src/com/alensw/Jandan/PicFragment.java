@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.Image;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Message;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +87,10 @@ public class PicFragment extends Fragment {
 		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-				Intent intent = new Intent(view.getContext(), PicActivity.class);
+				Map<String, Object> item = (Map<String, Object>) mAdapter.getItem(position);
+				Intent intent = new Intent(null, (Uri) item.get("url"),view.getContext(), PicActivity.class);
+				intent.putExtra(PicActivity.EXTRA_FILENAME, (String) item.get("id"));
+				intent.putExtra(PicActivity.EXTRA_GIF, (Boolean) item.get("isgif"));
 				startActivity(intent);
 			}
 		});
