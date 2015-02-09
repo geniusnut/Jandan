@@ -258,21 +258,22 @@ public class JandanParser {
             if (matcher.find()){
                 item.put("image",R.drawable.loading);
                 values.put(NodeColumns.URL, matcher.group(1));
-                final Matcher finalMatcher = matcher;
-
-                final FutureTask<File> futureTask = new dlTask1(new dlTask(values.getAsString("url"), values.getAsString("_id")), item);
-                Future<?> future = mExecutor.submit(futureTask);
             }
 
             pattern = Pattern.compile("org_src=\"(.+?)\"");
             matcher = pattern.matcher(i.toString());
             item.put("isgif", false);
             if (matcher.find()) {
-                Log.d(TAG, "org_url : " + matcher.group(1));
+                // Log.d(TAG, "org_url : " + matcher.group(1));
                 values.put(NodeColumns.ORG_URL, matcher.group(1));
-                if (matcher.group(1).endsWith("gif"))
+                if (matcher.group(1).endsWith("gif")) {
+                    item.put("url", Uri.parse(matcher.group(1)));
                     item.put("isgif", true);
+                }
             }
+
+            final FutureTask<File> futureTask = new dlTask1(new dlTask(values.getAsString("url"), values.getAsString("_id")), item);
+            Future<?> future = mExecutor.submit(futureTask);
             if (values.size() > 0)
                 mCache.updateCache(values);
 
@@ -304,7 +305,8 @@ public class JandanParser {
             try {
                 File file = get();
                 mItem.put("image", createThumbnail(file.getPath()));
-                mItem.put("url", Uri.fromFile(file));
+                if (mItem.get("isgif") == false)
+                    mItem.put("url", Uri.fromFile(file));
                 listener.OnImageChanged();
             } catch (InterruptedException e) {
                 e.printStackTrace();

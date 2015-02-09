@@ -3,6 +3,7 @@ package com.alensw.Jandan;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
@@ -11,11 +12,13 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import com.alensw.gif.GifImageView;
 import com.alensw.ui.PictureView;
 import com.alensw.ui.ProgressWheel;
 import com.alensw.ui.TouchImageView;
@@ -25,6 +28,7 @@ import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
@@ -32,65 +36,61 @@ import java.util.concurrent.FutureTask;
  * Created by yw07 on 14-12-18.
  */
 public class PicActivity extends ActionBarActivity {
+	public static final String EXTRA_FILENAME = "filename";
+	public static final String EXTRA_GIF = "isgif";
+
 	private TouchImageView mPictureView;
+	private GifImageView mGifView;
 	private View mFullScreenAnchorView;
 	private TextView mMessageView;
 	private ProgressBar mProgressWheel;
 	private ProgressWheel mProgressWheel0;
 	public ProgressListener mProgressListener;
+
 	private boolean running;
 	int progress = 0;
 	private Uri mUri;
 	public Bitmap mBitmap = null;
+	private Boolean isGif;
+	private GifLoader gifLoader;
 	@Override
 	public void onCreate(Bundle savedBundle) {
 		super.onCreate(savedBundle);
 		setContentView(R.layout.viewer);
-		mPictureView = (TouchImageView) findViewById(R.id.image);
-		mPictureView.setMaxZoom(20);
-		mPictureView.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				toggleFullScreen();
-			}
 
-		});
-		mProgressWheel0 = (ProgressWheel) findViewById(R.id.progressBarTwo);
-		mProgressListener = new ProgressListener(mProgressWheel0);
-
-		mProgressWheel0.setText("Loading");
 		if (savedBundle == null) {
 			mUri = getIntent().getData();
+			final Bundle extras = getIntent().getExtras();
 			//mUri = "/sdcard/Android/data/com.alensw.Jandan/cache/2571613.jpg";
-			FutureTask<String> future =
-					new FutureTask<String>(new Callable<String>() {
-						long progress = 0;
-						public String call() throws IOException {
-							InputStream is = null;
-							File file = FileCache.generateCacheFile("abc.gif");
-							FileOutputStream os = new FileOutputStream(file);
-							try {
-								URL url = new URL(mUri.getPath());
-								URLConnection conn = url.openConnection();
-								is = conn.getInputStream();
-								long length = is.available();
-								final byte[] data = new byte[8192];
-								int bytes = 0;
-								while ((bytes = is.read(data)) >= 0) {
-									if (bytes > 0) {
-										os.write(data, 0, bytes);
-										progress += bytes;
-										mProgressListener.onTransferProgress(0, bytes, length, null);
-									}
-								}
-								//listener.OnImageChanged();
-							} catch (IOException e) {
-								return null;
-							} finally {
-								is.close();
-							}
-							return file.getPath();
-						}});
+			isGif = extras.getBoolean(EXTRA_GIF);
+			if (!isGif) {
+				mPictureView = (TouchImageView) findViewById(R.id.image);
+				mPictureView.setMaxZoom(20);
+				mPictureView.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						toggleFullScreen();
+					}
+
+				});
+			}
+			else {
+				String path = extras.getString(EXTRA_FILENAME) + ".gif";
+				File file = FileCache.generateCacheFile(path);
+				if (!file.exists()) {
+					mProgressWheel0 = (ProgressWheel) findViewById(R.id.progressBarTwo);
+					mProgressListener = new ProgressListener(mProgressWheel0);
+					mProgressWheel0.setText("Loading");
+					mProgressWheel0.setVisibility(View.VISIBLE);
+
+					gifLoader = new GifLoader();
+					gifLoader.execute(mUri.toString(), path);
+				} else {
+					mUri = Uri.fromFile(file);
+				}
+
+				mGifView = (GifImageView) findViewById(R.id.gifImage);
+			}
 		}
 
 
@@ -115,6 +115,43 @@ public class PicActivity extends ActionBarActivity {
 
 	}
 
+	private class GifLoader extends AsyncTask<String, Integer, Uri> {
+		private int mLength;
+		protected Uri doInBackground(String... params) {
+			InputStream is = null;
+			try {
+				File file = FileCache.generateCacheFile(params[1] + ".gif");
+				FileOutputStream os = new FileOutputStream(file);
+
+				URL url = new URL(params[0]);
+				URLConnection conn = url.openConnection();
+				is = conn.getInputStream();
+				mLength = is.available();
+				final byte[] data = new byte[8192];
+				int bytes = 0;
+				while ((bytes = is.read(data)) >= 0) {
+					if (bytes > 0) {
+						os.write(data, 0, bytes);
+						progress += bytes;
+						publishProgress(progress);
+					}
+				}
+				is.close();
+				return Uri.fromFile(file);
+			} catch (IOException e) {
+				return null;
+			}
+		}
+		@Override
+		protected void onProgressUpdate(Integer... progress) {
+			mProgressListener.onTransferProgress(progress[0], mLength);
+		}
+		protected void onPostExecute(Uri result) {
+			mProgressWheel0.setVisibility(View.GONE);
+			Log.d("PicActivity", "mUri : " + mUri);
+		}
+	}
+
 	private class ProgressListener implements OnDatatransferProgressListener {
 		int mLastPercent = 0;
 		WeakReference<ProgressWheel> mProgressBar = null;
@@ -124,7 +161,7 @@ public class PicActivity extends ActionBarActivity {
 		}
 
 		@Override
-		public void onTransferProgress(long progressRate, long totalTransferredSoFar, long totalToTransfer, String filename) {
+		public void onTransferProgress(long totalTransferredSoFar, long totalToTransfer) {
 			int percent = (int)(100.0*((double)totalTransferredSoFar)/((double)totalToTransfer));
 			if (percent != mLastPercent) {
 				ProgressWheel pb = mProgressBar.get();
@@ -172,10 +209,10 @@ public class PicActivity extends ActionBarActivity {
 		if (mUri != null) {
 			BitmapLoader bl = new BitmapLoader(mPictureView, mMessageView, mProgressWheel);
 			// "/sdcard/Android/data/com.alensw.Jandan/cache/2571613.jpg" for test very long picture
-			if (ContentResolver.SCHEME_FILE.equals(mUri.getScheme()))
+			if (!isGif)
 				bl.execute(mUri.getPath());
-			else if ("http".equals(mUri.getScheme())) {
-				bl.execute(mUri.getPath());
+			else {
+				mGifView.setImageURI(mUri);
 			}
 		}
 	}

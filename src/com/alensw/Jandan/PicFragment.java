@@ -89,6 +89,8 @@ public class PicFragment extends Fragment {
 			public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 				Map<String, Object> item = (Map<String, Object>) mAdapter.getItem(position);
 				Intent intent = new Intent(null, (Uri) item.get("url"),view.getContext(), PicActivity.class);
+				intent.putExtra(PicActivity.EXTRA_FILENAME, (String) item.get("id"));
+				intent.putExtra(PicActivity.EXTRA_GIF, (Boolean) item.get("isgif"));
 				startActivity(intent);
 			}
 		});

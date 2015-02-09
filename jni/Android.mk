@@ -4,7 +4,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_LDLIBS    := -llog
-LOCAL_MODULE    := giflib
+LOCAL_MODULE    := gif
 LOCAL_LDFLAGS += -ljnigraphics
 LOCAL_SRC_FILES := \
 	gif.c \
