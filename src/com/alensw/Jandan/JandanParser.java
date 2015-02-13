@@ -4,13 +4,8 @@ package com.alensw.Jandan;
 import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.*;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,7 +15,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -28,8 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -82,8 +74,9 @@ public class JandanParser {
         Elements posts = document.getElementsByClass("post");
 
         for(Element i:posts){
-            final Map<String, Object> item = new HashMap<String, Object>();
+            final Map<String, Object> item = new HashMap<>();
 
+            //Log.d(TAG, "POSTS : " + posts);
             Elements thumbs_b = i.getElementsByClass("thumbs_b");
 
             //link
@@ -96,7 +89,6 @@ public class JandanParser {
             //image
             pattern = Pattern.compile("src=\"(.*?)\"");
             matcher = pattern.matcher(thumbs_b.toString());
-            //Log.d(TAG, "thumbs_b = " + thumbs_b);
             if (matcher.find()) {
                 item.put("image",R.drawable.loading);
                 final String thumbUrl = matcher.group(1);
@@ -134,16 +126,17 @@ public class JandanParser {
                 item.put("cont","0");
             }
 
-            Elements time_s = i.getElementsByClass("time_s");
+
             //Log.d("JandanParser", "time_s : " + time_s);
             //by
             pattern = Pattern.compile("author.+?>(.+?)</a>");
-            matcher = pattern.matcher(time_s.toString());
+            matcher = pattern.matcher(indexs.toString());
             if (matcher.find()) {
                 item.put("by",matcher.group(1));
             }
 
             //tag
+            Elements time_s = i.getElementsByClass("time_s");
             pattern = Pattern.compile("\"tag\">(.*)</a>");
             matcher = pattern.matcher(time_s.toString());
             if (matcher.find()){
@@ -272,8 +265,11 @@ public class JandanParser {
                 }
             }
 
-            final FutureTask<File> futureTask = new dlTask1(new dlTask(values.getAsString("url"), values.getAsString("_id")), item);
-            Future<?> future = mExecutor.submit(futureTask);
+            if (values.getAsString("_id") != null) {
+                final FutureTask<File> futureTask = new dlTask1(new dlTask(values.getAsString("url"), values.getAsString("_id")), item);
+                Future<?> future = mExecutor.submit(futureTask);
+            }
+
             if (values.size() > 0)
                 mCache.updateCache(values);
 
@@ -327,6 +323,8 @@ public class JandanParser {
         @Override
         public File call() throws Exception {
             File file = mCache.generateCacheFile(mId);
+            if (file.exists())
+                return file;
             InputStream is = null;
             FileOutputStream os = new FileOutputStream(file);
             try {
@@ -343,6 +341,7 @@ public class JandanParser {
             } catch (IOException e) {
                 return null;
             } finally {
+                os.close();
                 is.close();
             }
             return file;
@@ -465,8 +464,8 @@ public class JandanParser {
     }
 
     private Bitmap getBitMap(String strUrl) {
-        Bitmap bitmap = null;
-        InputStream is = null;
+        Bitmap bitmap;
+        InputStream is;
         //Log.d(TAG, "getBitmap url = " + strUrl);
         try {
             URL url = new URL(strUrl);

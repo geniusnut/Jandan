@@ -1,17 +1,13 @@
 package com.alensw.Jandan;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
+import android.os.*;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
@@ -27,10 +23,6 @@ import java.io.*;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 
 /**
  * Created by yw07 on 14-12-18.
@@ -46,6 +38,7 @@ public class PicActivity extends ActionBarActivity {
 	private ProgressBar mProgressWheel;
 	private ProgressWheel mProgressWheel0;
 	public ProgressListener mProgressListener;
+	private Toolbar toolbar;
 
 	private boolean running;
 	int progress = 0;
@@ -57,6 +50,12 @@ public class PicActivity extends ActionBarActivity {
 	public void onCreate(Bundle savedBundle) {
 		super.onCreate(savedBundle);
 		setContentView(R.layout.viewer);
+		toolbar = (Toolbar) findViewById(R.id.toolbar);
+		if (toolbar != null) {
+			setSupportActionBar(toolbar);
+			toolbar.getBackground().setAlpha(0);
+		}
+		toolbar.setLogo(R.drawable.jandan);
 
 		if (savedBundle == null) {
 			mUri = getIntent().getData();
@@ -80,7 +79,8 @@ public class PicActivity extends ActionBarActivity {
 				if (!file.exists()) {
 					mProgressWheel0 = (ProgressWheel) findViewById(R.id.progressBarTwo);
 					mProgressListener = new ProgressListener(mProgressWheel0);
-					mProgressWheel0.setText("Loading");
+					//mProgressWheel0.setText("Loading");
+					mProgressWheel0.resetCount();
 					mProgressWheel0.setVisibility(View.VISIBLE);
 
 					gifLoader = new GifLoader();
@@ -98,42 +98,65 @@ public class PicActivity extends ActionBarActivity {
 			mFullScreenAnchorView = getWindow().getDecorView();
 			// to keep our UI controls visibility in line with system bars
 			// visibility
-//			mFullScreenAnchorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-//				@SuppressLint("InlinedApi")
-//				@Override
-//				public void onSystemUiVisibilityChange(int flags) {
-//					boolean visible = (flags & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0;
-//					ActionBar actionBar = getSupportActionBar();
-//					if (visible) {
-//						actionBar.show();
-//					} else {
-//						actionBar.hide();
-//					}
-//				}
-//			});
+			mFullScreenAnchorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+				@SuppressLint("InlinedApi")
+				@Override
+				public void onSystemUiVisibilityChange(int flags) {
+					boolean visible = (flags & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0;
+					if (visible) {
+						toolbar.setVisibility(View.VISIBLE);
+					} else {
+						toolbar.setVisibility(View.INVISIBLE);
+					}
+				}
+			});
 		}
+	}
 
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+
+		// Trigger the initial hide() shortly after the activity has been
+		// created, to briefly hint to the user that UI controls
+		// are available
+		delayedHide(200);
+	}
+
+	Handler mHideSystemUiHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			if (isHoneycombOrHigher()) {
+				hideSystemUI(mFullScreenAnchorView);
+			}
+			getSupportActionBar().hide();
+		}
+	};
+
+	private void delayedHide(int delayMillis) {
+		mHideSystemUiHandler.removeMessages(0);
+		mHideSystemUiHandler.sendEmptyMessageDelayed(0, delayMillis);
 	}
 
 	private class GifLoader extends AsyncTask<String, Integer, Uri> {
-		private int mLength;
+		private Long mLength;
 		protected Uri doInBackground(String... params) {
-			InputStream is = null;
+			InputStream is;
 			try {
-				File file = FileCache.generateCacheFile(params[1] + ".gif");
+				File file = FileCache.generateCacheFile(params[1]);
 				FileOutputStream os = new FileOutputStream(file);
 
 				URL url = new URL(params[0]);
 				URLConnection conn = url.openConnection();
 				is = conn.getInputStream();
-				mLength = is.available();
+				mLength = Long.parseLong(conn.getHeaderField("Content-Length"));
 				final byte[] data = new byte[8192];
-				int bytes = 0;
+				int bytes;
 				while ((bytes = is.read(data)) >= 0) {
 					if (bytes > 0) {
 						os.write(data, 0, bytes);
 						progress += bytes;
-						publishProgress(progress);
+						int percent = (int) (100.0 * ((double) progress) / ((double) mLength));
+						publishProgress(percent);
 					}
 				}
 				is.close();
@@ -144,10 +167,12 @@ public class PicActivity extends ActionBarActivity {
 		}
 		@Override
 		protected void onProgressUpdate(Integer... progress) {
-			mProgressListener.onTransferProgress(progress[0], mLength);
+			mProgressListener.onTransferProgress(progress[0]);
 		}
+
 		protected void onPostExecute(Uri result) {
 			mProgressWheel0.setVisibility(View.GONE);
+			mGifView.setImageURI(result);
 			Log.d("PicActivity", "mUri : " + mUri);
 		}
 	}
@@ -157,16 +182,16 @@ public class PicActivity extends ActionBarActivity {
 		WeakReference<ProgressWheel> mProgressBar = null;
 
 		ProgressListener(ProgressWheel progressBar) {
-			mProgressBar = new WeakReference<ProgressWheel>(progressBar);
+			mProgressBar = new WeakReference<>(progressBar);
 		}
 
 		@Override
-		public void onTransferProgress(long totalTransferredSoFar, long totalToTransfer) {
-			int percent = (int)(100.0*((double)totalTransferredSoFar)/((double)totalToTransfer));
+		public void onTransferProgress(int percent) {
 			if (percent != mLastPercent) {
 				ProgressWheel pb = mProgressBar.get();
 				if (pb != null) {
-					pb.setProgress(percent);
+					pb.setProgress((int) (((double) percent) * 3.6));
+					pb.setText(percent + "%");
 					pb.postInvalidate();
 				}
 			}
@@ -249,9 +274,9 @@ public class PicActivity extends ActionBarActivity {
 		 * @param imageView     Target {@link android.widget.ImageView} where the bitmap will be loaded into.
 		 */
 		public BitmapLoader(PictureView imageView, TextView messageView, ProgressBar progressWheel) {
-			mImageViewRef = new WeakReference<PictureView>(imageView);
-			mMessageViewRef = new WeakReference<TextView>(messageView);
-			mProgressWheelRef = new WeakReference<ProgressBar>(progressWheel);
+			mImageViewRef = new WeakReference<>(imageView);
+			mMessageViewRef = new WeakReference<>(messageView);
+			mProgressWheelRef = new WeakReference<>(progressWheel);
 		}
 
 
@@ -414,6 +439,28 @@ public class PicActivity extends ActionBarActivity {
 		return BitmapFactory.decodeFile(storagePath, options);
 
 	}
+
+	@SuppressLint("InlinedApi")
+	private void hideSystemUI(View anchorView) {
+		anchorView.setSystemUiVisibility(
+				View.SYSTEM_UI_FLAG_HIDE_NAVIGATION         // hides NAVIGATION BAR; Android >= 4.0
+						| View.SYSTEM_UI_FLAG_FULLSCREEN              // hides STATUS BAR;     Android >= 4.1
+						| View.SYSTEM_UI_FLAG_IMMERSIVE               // stays interactive;    Android >= 4.4
+						| View.SYSTEM_UI_FLAG_LAYOUT_STABLE           // draw full window;     Android >= 4.1
+						| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN       // draw full window;     Android >= 4.1
+						| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION  // draw full window;     Android >= 4.1
+		);
+	}
+
+	@SuppressLint("InlinedApi")
+	private void showSystemUI(View anchorView) {
+		anchorView.setSystemUiVisibility(
+				View.SYSTEM_UI_FLAG_LAYOUT_STABLE           // draw full window;     Android >= 4.1
+						| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN       // draw full window;     Android >= 4.1
+						| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION  // draw full window;     Android >= 4.1
+		);
+	}
+
 	private boolean isHoneycombOrHigher() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			return true;

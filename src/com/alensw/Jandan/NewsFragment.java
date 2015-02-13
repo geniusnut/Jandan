@@ -3,12 +3,10 @@ package com.alensw.Jandan;
 import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by yw07 on 14-12-1.
- */
 public class NewsFragment extends Fragment {
 	private final String TAG = "NewsFragment";
 	protected ListView mListView;
@@ -32,7 +27,7 @@ public class NewsFragment extends Fragment {
 	protected boolean isParsing = false;
 	protected Handler mHandler;
 	int page = 0;
-	protected List<Map<String, Object>> items = new ArrayList<Map<String,Object>>();
+	protected List<Map<String, Object>> items = new ArrayList<>();
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,7 +43,7 @@ public class NewsFragment extends Fragment {
 				new NewsLoader().execute(++page);
 			}
 		});
-		swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
+		swipeLayout.setColorSchemeColors(android.R.color.holo_blue_bright,
 				android.R.color.holo_green_light,
 				android.R.color.holo_orange_light,
 				android.R.color.holo_red_light);
@@ -69,7 +64,7 @@ public class NewsFragment extends Fragment {
 				return false;
 			}
 		});
-		mListView.setAdapter(mAdapter);
+		mListView.setAdapter(newsAdapter);
 
 
 
@@ -134,30 +129,19 @@ public class NewsFragment extends Fragment {
 				mHandler.post(new Runnable() {
 					@Override
 					public void run() {
-						mAdapter.notifyDataSetChanged();
+						//mAdapter.notifyDataSetChanged();
+						newsAdapter.notifyDataSetChanged();
 					}
 				});
 			}
 		});
 	}
 
-	private class notifyDataSetChanged extends AsyncTask<Void, Void, Void>{
-		@Override
-		protected Void doInBackground(Void... voids) {
-			return null;
-		}
-		protected void onPostExecute(Void voids){
-			mAdapter.notifyDataSetChanged();
-		}
-	}
-
 	private class NewsLoader extends AsyncTask<Integer, Void, List<Map<String, Object>>> {
 		@Override
 		protected List<Map<String, Object>> doInBackground(Integer... page) {
 			isParsing = true;
-			List<Map<String, Object>> list = mParser.JandanHomePage(page[0]);
-			return list;
-
+			return mParser.JandanHomePage(page[0]);
 		}
 
 		protected void onPostExecute(List<Map<String, Object>> result) {
@@ -167,7 +151,7 @@ public class NewsFragment extends Fragment {
 			if (page == 1)
 				items.clear();
 			items.addAll(result);
-			mAdapter.notifyDataSetChanged();
+			newsAdapter.notifyDataSetChanged();
 			swipeLayout.setRefreshing(false);
 			isParsing = false;
 		}
@@ -184,12 +168,12 @@ public class NewsFragment extends Fragment {
 		}
 		@Override
 		public int getCount() {
-			return 0;
+			return items.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return null;
+			return items.get(position);
 		}
 
 		@Override
@@ -209,12 +193,19 @@ public class NewsFragment extends Fragment {
 				viewHolder.title = (TextView) convertView.findViewById(R.id.title);
 				viewHolder.by = (TextView) convertView.findViewById(R.id.by);
 				viewHolder.tag = (TextView) convertView.findViewById(R.id.tag);
+				viewHolder.cont = (TextView) convertView.findViewById(R.id.cont);
 				convertView.setTag(viewHolder);
 			} else {
 				viewHolder = (ViewHolder) convertView.getTag();
 			}
 			final Map<String,Object> item = items.get(position);
+			//new String[]{"link", "image", "title", "by", "tag", "cont"},
 			viewHolder.title.setText((String)item.get("title"));
+			viewHolder.by.setText((String) item.get("by"));
+			viewHolder.link.setText((String) item.get("link"));
+			viewHolder.tag.setText((String) item.get("tag"));
+			viewHolder.cont.setText((String) item.get("cont"));
+			viewHolder.image.setImageBitmap((Bitmap) item.get("image"));
 			return convertView;
 		}
 	};

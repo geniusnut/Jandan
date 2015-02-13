@@ -3,33 +3,26 @@ package com.alensw.Jandan;
 import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
-/**
- * Created by yw07 on 14-12-1.
- */
 public class PicFragment extends Fragment {
 	private static final String TAG = "PicFragment";
 	protected ListView mListView;
 	SimpleAdapter mAdapter;
 
 	public PicLoader mPicLoader;
-	List<Map<String, Object>> items = new ArrayList<Map<String,Object>>();
+	ArrayList<Map<String, Object>> items = new ArrayList<>();
 
 	FileCache mPicCache;
 	JandanParser mParser;
@@ -176,4 +169,26 @@ public class PicFragment extends Fragment {
 		}
 	}
 
+	private final class picAdapter extends BaseAdapter {
+
+		@Override
+		public int getCount() {
+			return 0;
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return 0;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			return null;
+		}
+	}
 }

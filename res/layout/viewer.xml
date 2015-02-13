@@ -33,4 +33,5 @@
         ProgressWheel:spinSpeed="3dp"
         />
 
+    <include layout="@layout/toolbar" />
 </RelativeLayout>
