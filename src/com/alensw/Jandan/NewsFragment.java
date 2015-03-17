@@ -1,8 +1,12 @@
 package com.alensw.Jandan;
 
 import android.app.Fragment;
+import android.content.ClipData;
+import android.content.ClipDescription;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,10 +15,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import com.alensw.ui.BadgeView;
+import com.larvalabs.svgandroid.SVG;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class NewsFragment extends Fragment {
 	private final String TAG = "NewsFragment";
@@ -23,11 +30,13 @@ public class NewsFragment extends Fragment {
 	protected JandanParser mParser;
 
 	public static NewsLoader mNewsLoader;
-	protected SimpleAdapter mAdapter;
 	protected boolean isParsing = false;
 	protected Handler mHandler;
 	int page = 0;
 	protected List<Map<String, Object>> items = new ArrayList<>();
+	protected ConcurrentHashMap<String, Bitmap> mCovers;
+
+	private NewsFile mNewsFile = new NewsFile();
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,31 +52,13 @@ public class NewsFragment extends Fragment {
 				new NewsLoader().execute(++page);
 			}
 		});
-		swipeLayout.setColorSchemeColors(android.R.color.holo_blue_bright,
+		swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
 				android.R.color.holo_green_light,
 				android.R.color.holo_orange_light,
 				android.R.color.holo_red_light);
+
 		mListView = (ListView) rootView.findViewById(R.id.news_list);
-
-		mAdapter = new SimpleAdapter(getActivity(), items, R.layout.news_item1,
-				new String[]{"link", "image", "title", "by", "tag", "cont"},
-				new int[]{R.id.link, R.id.image, R.id.title, R.id.by, R.id.tag, R.id.cont});
-		mAdapter.setViewBinder(new SimpleAdapter.ViewBinder() {
-			@Override
-			public boolean setViewValue(View view, Object data, String textRepresentation) {
-				if ((view instanceof ImageView) && (data instanceof Bitmap)) {
-					ImageView imageView = (ImageView) view;
-					Bitmap bmp = (Bitmap) data;
-					imageView.setImageBitmap(bmp);
-					return true;
-				}
-				return false;
-			}
-		});
 		mListView.setAdapter(newsAdapter);
-
-
-
 		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -95,7 +86,7 @@ public class NewsFragment extends Fragment {
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 				if (mListView.getFirstVisiblePosition() > 0) {
 					if (mListView.getFirstVisiblePosition() != vPosition) {
-						if (mAdapter.getCount() - 8 <= mListView.getFirstVisiblePosition()) {
+						if (newsAdapter.getCount() - 8 <= mListView.getFirstVisiblePosition()) {
 							if (!isParsing) {
 								//mNewsLoader.execute(++page);
 								new NewsLoader().execute(++page);
@@ -106,6 +97,7 @@ public class NewsFragment extends Fragment {
 				}
 			}
 		});
+
 		return rootView;
 	}
 	@Override
@@ -119,17 +111,25 @@ public class NewsFragment extends Fragment {
 
 		mHandler = new Handler();
 		mParser = new JandanParser(getActivity().getApplicationContext());
+		mCovers = new ConcurrentHashMap<>(64);
+
+		if (mNewsFile.load(getActivity(), NewsFile.NES_FILE_NAME)) {
+			final ArrayList<News> news = new ArrayList<>(mNewsFile.size());
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					newsAdapter.notifyDataSetChanged();
+				}
+			});
+		}
 		mNewsLoader = new NewsLoader();
 		mNewsLoader.execute(++page);
 		mParser.setOnImageChangedlistener(new JandanParser.OnImageChangedlistener() {
 			@Override
 			public void OnImageChanged() {
-				//mAdapter.notifyDataSetChanged();
-				//new notifyDataSetChanged().execute();
 				mHandler.post(new Runnable() {
 					@Override
 					public void run() {
-						//mAdapter.notifyDataSetChanged();
 						newsAdapter.notifyDataSetChanged();
 					}
 				});
@@ -137,20 +137,26 @@ public class NewsFragment extends Fragment {
 		});
 	}
 
-	private class NewsLoader extends AsyncTask<Integer, Void, List<Map<String, Object>>> {
+	@Override
+	public void onStop() {
+		super.onStop();
+		mNewsFile.save();
+	}
+
+	private class NewsLoader extends AsyncTask<Integer, Void, ArrayList<News>> {
 		@Override
-		protected List<Map<String, Object>> doInBackground(Integer... page) {
+		protected ArrayList<News> doInBackground(Integer... page) {
 			isParsing = true;
-			return mParser.JandanHomePage(page[0]);
+			return mParser.JandanHomePage(page[0], mCovers);
 		}
 
-		protected void onPostExecute(List<Map<String, Object>> result) {
+		protected void onPostExecute(ArrayList<News> result) {
 			if(result.isEmpty()){
 				//Toast.makeText(, "载入出错了！请稍后再试。", Toast.LENGTH_SHORT).show();
 			}
 			if (page == 1)
-				items.clear();
-			items.addAll(result);
+				mNewsFile.clear();
+			mNewsFile.addAll(result);
 			newsAdapter.notifyDataSetChanged();
 			swipeLayout.setRefreshing(false);
 			isParsing = false;
@@ -158,6 +164,7 @@ public class NewsFragment extends Fragment {
 	}
 
 	protected final BaseAdapter newsAdapter = new BaseAdapter() {
+		private final int droidGreen = Color.parseColor("#A4C639");
 		class ViewHolder {
 			public TextView link;
 			public ImageView image;
@@ -165,15 +172,16 @@ public class NewsFragment extends Fragment {
 			public TextView by;
 			public TextView tag;
 			public TextView cont;
+			public BadgeView badge;
 		}
 		@Override
 		public int getCount() {
-			return items.size();
+			return mNewsFile.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return items.get(position);
+			return mNewsFile.get(position);
 		}
 
 		@Override
@@ -194,19 +202,65 @@ public class NewsFragment extends Fragment {
 				viewHolder.by = (TextView) convertView.findViewById(R.id.by);
 				viewHolder.tag = (TextView) convertView.findViewById(R.id.tag);
 				viewHolder.cont = (TextView) convertView.findViewById(R.id.cont);
+				viewHolder.badge = new BadgeView(getActivity(), viewHolder.title);
+
+
+				//viewHolder.badge.setBadgeMargin(100);
+				Drawable iconCircle = SVG.getDrawable(getResources(), R.raw.ic_button_radio_on,
+						0xCCFF0000 | 0xc0000000);
+				viewHolder.badge.setBackgroundDrawable(iconCircle);
+
+				viewHolder.badge.setOnLongClickListener(new MyClickListener());
+				viewHolder.badge.setTag("1");
 				convertView.setTag(viewHolder);
 			} else {
 				viewHolder = (ViewHolder) convertView.getTag();
 			}
-			final Map<String,Object> item = items.get(position);
-			//new String[]{"link", "image", "title", "by", "tag", "cont"},
-			viewHolder.title.setText((String)item.get("title"));
-			viewHolder.by.setText((String) item.get("by"));
-			viewHolder.link.setText((String) item.get("link"));
-			viewHolder.tag.setText((String) item.get("tag"));
-			viewHolder.cont.setText((String) item.get("cont"));
-			viewHolder.image.setImageBitmap((Bitmap) item.get("image"));
+
+			if (position % 3 == 0) {
+				viewHolder.badge.show();
+			} else {
+				viewHolder.badge.hide();
+			}
+
+			final News item = mNewsFile.get(position);
+			viewHolder.title.setText(item.mTitle);
+			viewHolder.by.setText(item.mAuthor);
+			viewHolder.link.setText(item.mLink);
+			viewHolder.tag.setText(item.mTag);
+			viewHolder.cont.setText(String.valueOf(item.mCont));
+
+			Bitmap cover = mCovers.get(item.mCover);
+			if (cover != null) {
+				viewHolder.image.setImageBitmap(cover);
+			} else {
+				viewHolder.image.setImageDrawable(getResources().getDrawable(R.drawable.loading));
+			}
 			return convertView;
 		}
 	};
+
+	private final class MyClickListener implements View.OnLongClickListener {
+		// called when the item is long-clicked
+		@Override
+		public boolean onLongClick(View view) {
+			// TODO Auto-generated method stub
+
+			// create it from the object's tag
+			ClipData.Item item = new ClipData.Item((CharSequence) view.getTag());
+
+			String[] mimeTypes = {ClipDescription.MIMETYPE_TEXT_PLAIN};
+			ClipData data = new ClipData(view.getTag().toString(), mimeTypes, item);
+			View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
+
+			view.startDrag(data, //data to be dragged
+					shadowBuilder, //drag shadow
+					view, //local data about the drag and drop operation
+					0   //no needed flags
+			);
+			view.setVisibility(View.INVISIBLE);
+			return true;
+		}
+	}
+
 }

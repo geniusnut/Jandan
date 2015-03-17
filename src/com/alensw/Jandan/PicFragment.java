@@ -20,6 +20,7 @@ public class PicFragment extends Fragment {
 	private static final String TAG = "PicFragment";
 	protected ListView mListView;
 	SimpleAdapter mAdapter;
+	PicAdapter picAdapter;
 
 	public PicLoader mPicLoader;
 	ArrayList<Map<String, Object>> items = new ArrayList<>();
@@ -34,6 +35,7 @@ public class PicFragment extends Fragment {
 		final ViewGroup rootView = (ViewGroup) inflater.inflate(
 				R.layout.picfragment, container, false);
 		mListView = (ListView)  rootView.findViewById(R.id.pic_list);
+		picAdapter = new PicAdapter();
 		mAdapter = new SimpleAdapter(getActivity(), items, R.layout.pic_item,
 				new String[]{"updater", "time", "text", "image", "isgif", "xx", "oo"},
 				new int[]{R.id.updater, R.id.time, R.id.text, R.id.image, R.id.img_mask, R.id.xx, R.id.oo}){
@@ -76,11 +78,11 @@ public class PicFragment extends Fragment {
 				return false;
 			}
 		});
-		mListView.setAdapter(mAdapter);
+		mListView.setAdapter(picAdapter);
 		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-				Map<String, Object> item = (Map<String, Object>) mAdapter.getItem(position);
+				Map<String, Object> item = (Map<String, Object>) picAdapter.getItem(position);
 				Intent intent = new Intent(null, (Uri) item.get("url"),view.getContext(), PicActivity.class);
 				intent.putExtra(PicActivity.EXTRA_FILENAME, (String) item.get("id"));
 				intent.putExtra(PicActivity.EXTRA_GIF, (Boolean) item.get("isgif"));
@@ -99,7 +101,7 @@ public class PicFragment extends Fragment {
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 				if (mListView.getFirstVisiblePosition() > 0) {
 					if (mListView.getFirstVisiblePosition() != vPosition) {
-						if (mAdapter.getCount() - 8 <= mListView.getFirstVisiblePosition()) {
+						if (picAdapter.getCount() - 8 <= mListView.getFirstVisiblePosition()) {
 							if (!isParsing) {
 								//mNewsLoader.execute(++page);
 								new PicLoader().execute(++picPage);
@@ -120,7 +122,7 @@ public class PicFragment extends Fragment {
 			return null;
 		}
 		protected void onPostExecute(Void voids){
-			mAdapter.notifyDataSetChanged();
+			picAdapter.notifyDataSetChanged();
 		}
 	}
 
@@ -160,25 +162,35 @@ public class PicFragment extends Fragment {
 				//Toast.makeText(, "载入出错了！请稍后再试。", Toast.LENGTH_SHORT).show();
 			}
 			items.addAll(result);
-			mAdapter.notifyDataSetChanged();
+			picAdapter.notifyDataSetChanged();
 			isParsing = false;
-			if (mAdapter.getCount() < 10) {
+			if (picAdapter.getCount() < 10) {
 				new PicLoader().execute(picPage);
 				picPage ++;
 			}
 		}
 	}
 
-	private final class picAdapter extends BaseAdapter {
+	private final class PicAdapter extends BaseAdapter {
+		class ViewHolder {
+			public TextView updater;
+			public ImageView image;
+			public TextView text;
+			public TextView time;
+			public TextView xx;
+			public TextView oo;
+			public TextView cont;
+		}
 
+		//new String[]{"updater", "time", "text", "image", "isgif", "xx", "oo"},
 		@Override
 		public int getCount() {
-			return 0;
+			return items.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return null;
+			return items.get(position);
 		}
 
 		@Override
@@ -188,7 +200,29 @@ public class PicFragment extends Fragment {
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			return null;
+			ViewHolder viewHolder;
+			if (convertView == null) {
+				LayoutInflater inflater = getActivity().getLayoutInflater();
+				convertView = inflater.inflate(R.layout.pic_item, null);
+				viewHolder = new ViewHolder();
+				viewHolder.updater = (TextView) convertView.findViewById(R.id.updater);
+				viewHolder.text = (TextView) convertView.findViewById(R.id.text);
+				viewHolder.oo = (TextView) convertView.findViewById(R.id.oo);
+				viewHolder.xx = (TextView) convertView.findViewById(R.id.xx);
+				viewHolder.time = (TextView) convertView.findViewById(R.id.time);
+				viewHolder.image = (ImageView) convertView.findViewById(R.id.image);
+				convertView.setTag(viewHolder);
+			} else
+				viewHolder = (ViewHolder) convertView.getTag();
+
+			final Map<String, Object> item = items.get(position);
+			viewHolder.updater.setText((String) item.get("updater"));
+			if (item.get("image") != null) {
+				Bitmap image = JandanParser.createThumbnail((String) item.get("image"));
+				float scaled = (float) viewHolder.image.getWidth() / image.getWidth();
+				viewHolder.image.setImageBitmap(JandanParser.createScaledBitmap(image, scaled));
+			}
+			return convertView;
 		}
 	}
 }

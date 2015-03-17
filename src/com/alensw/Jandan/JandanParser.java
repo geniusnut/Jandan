@@ -55,10 +55,10 @@ public class JandanParser {
         mExecutor = new ThreadPoolExecutor(2, 64, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(25));
     }
 
-    public List<Map<String, Object>> JandanHomePage(int Page){
+    public ArrayList<News> JandanHomePage(int Page, final ConcurrentHashMap<String, Bitmap> mCovers) {
 
         Log.d("HOMEPAGE",""+Page);
-        List<Map<String, Object>> items = new ArrayList<Map<String,Object>>();
+        ArrayList<News> news = new ArrayList<News>();
 
         try {
             document = Jsoup.connect(Home_URL +Page)
@@ -68,13 +68,14 @@ public class JandanParser {
         }
         catch (Exception e){
             Log.e(TAG,e.toString());
-            return items;
+            return news;
         }
 
         Elements posts = document.getElementsByClass("post");
 
         for(Element i:posts){
-            final Map<String, Object> item = new HashMap<>();
+            final News item = new News();
+
 
             //Log.d(TAG, "POSTS : " + posts);
             Elements thumbs_b = i.getElementsByClass("thumbs_b");
@@ -83,23 +84,25 @@ public class JandanParser {
             Pattern pattern = Pattern.compile("http://(.*)html");
             Matcher matcher = pattern.matcher(thumbs_b.toString());
             if (matcher.find()){
-                item.put("link",matcher.group());
+                item.mLink = matcher.group();
             }
 
             //image
             pattern = Pattern.compile("src=\"(.*?)\"");
             matcher = pattern.matcher(thumbs_b.toString());
             if (matcher.find()) {
-                item.put("image",R.drawable.loading);
                 final String thumbUrl = matcher.group(1);
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        item.put("image", getBitMap(thumbUrl));
-                        listener.OnImageChanged();
-                    }
-                }).start();
+                item.mCover = thumbUrl;
 
+                if (mCovers.contains(thumbUrl)) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mCovers.put(thumbUrl, getBitMap(item.mCover));
+                            listener.OnImageChanged();
+                        }
+                    }).start();
+                }
             }
 
             Elements indexs = i.getElementsByClass("indexs");
@@ -108,22 +111,22 @@ public class JandanParser {
             pattern = Pattern.compile("l\">(.*)</a>");
             matcher = pattern.matcher(indexs.toString());
             if (matcher.find()){
-                item.put("title",matcher.group(1));
+                item.mTitle = matcher.group(1);
             }
             Elements title2 = i.getElementsByClass("title2");
             pattern = Pattern.compile("title=\"(.+?)\"");
             matcher = pattern.matcher(title2.toString());
             if (matcher.find()){
-                item.put("title", matcher.group(1));
+                item.mTitle = matcher.group(1);
             }
 
             //cont
             pattern = Pattern.compile(">([0-9]*)</span>");
             matcher = pattern.matcher(indexs.toString());
             if (matcher.find()){
-                item.put("cont",matcher.group(1));
+                item.mCont = Integer.valueOf(matcher.group(1));
             }else {
-                item.put("cont","0");
+                item.mCont = 0;
             }
 
 
@@ -132,7 +135,9 @@ public class JandanParser {
             pattern = Pattern.compile("author.+?>(.+?)</a>");
             matcher = pattern.matcher(indexs.toString());
             if (matcher.find()) {
-                item.put("by",matcher.group(1));
+                item.mAuthor = matcher.group(1);
+            } else {
+                item.mAuthor = "";
             }
 
             //tag
@@ -140,19 +145,19 @@ public class JandanParser {
             pattern = Pattern.compile("\"tag\">(.*)</a>");
             matcher = pattern.matcher(time_s.toString());
             if (matcher.find()){
-                item.put("tag",matcher.group(1));
+                item.mTag = matcher.group(1);
             }else {
-                item.put("tag","");
+                item.mTag = "";
             }
 
 
             //add item to items
-            if(item.get("title") != null) {
-                items.add(item);
+            if (item.mTitle != null) {
+                news.add(item);
             }
         }
         //Log.e(TAG,items.toString());
-        return items;
+        return news;
     }
 
 
@@ -300,7 +305,8 @@ public class JandanParser {
         public void done() {
             try {
                 File file = get();
-                mItem.put("image", createThumbnail(file.getPath()));
+                //mItem.put("image", createThumbnail(file.getPath()));
+                mItem.put("image", file.getPath());
                 if (mItem.get("isgif") == false)
                     mItem.put("url", Uri.fromFile(file));
                 listener.OnImageChanged();
@@ -483,7 +489,7 @@ public class JandanParser {
     }
 
 
-    public Bitmap createThumbnail(String path) {
+    public static Bitmap createThumbnail(String path) {
         Log.d(TAG, "");
         Bitmap bitmap;
         bitmap = BitmapFactory.decodeFile(path);
@@ -504,6 +510,7 @@ public class JandanParser {
         }
         return bitmap;
     }
+
     public static Bitmap createScaledBitmap(Bitmap bitmap, float scale) {
         Bitmap newBmp = null;
         Bitmap.Config config = Bitmap.Config.ARGB_8888;

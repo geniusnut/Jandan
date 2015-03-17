@@ -2,22 +2,20 @@ package com.alensw.Jandan;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
-import android.app.Activity;
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.*;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
-import android.support.v7.app.ActionBarDrawerToggle;
-
-import android.support.v4.app.FragmentActivity;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
+import com.alensw.ui.BadgeView;
 import com.larvalabs.svgandroid.SVG;
 
 import java.util.ArrayList;
@@ -35,10 +33,10 @@ public class JandanActivity extends ActionBarActivity implements
 	private Toolbar toolbar;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle toggle=null;
+	private BadgeView mBadgeView;
 	protected ListView mListView;
 	protected SimpleAdapter mAdapter;
 	protected JandanParser mParser;
-	public static NewsLoader mNewsLoader;
 	private Handler mHandler = new Handler(Looper.getMainLooper());
 	protected boolean isParsing = false;
 	int page = 0;
@@ -51,12 +49,23 @@ public class JandanActivity extends ActionBarActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+		final SharedPreferences.Editor editor = pref.edit();
+		editor.putBoolean("news", false);
+		editor.apply();
+
 		toolbar = (Toolbar) findViewById(R.id.toolbar);
 		if (toolbar != null) {
 			toolbar.setTitle("煎蛋");
 			setSupportActionBar(toolbar);
 		}
 		toolbar.setLogo(R.drawable.jandan);
+		View NavView = getNavButtonView(toolbar);
+		mBadgeView = new BadgeView(this, NavView);
+		mBadgeView.setBackground(SVG.getDrawable(getResources(), R.raw.ic_dot));
+		mBadgeView.setBadgePosition(1);
+		mBadgeView.setBadgeMargin(0, 0);
+		mBadgeView.show();
 
 		if (getFragmentManager().findFragmentById(R.id.content) == null) {
 			showNews();
@@ -64,6 +73,14 @@ public class JandanActivity extends ActionBarActivity implements
 		initDrawer();
 		Log.d("JandanActivity", "initDrawer()");
 
+	}
+
+	private ImageButton getNavButtonView(Toolbar toolbar) {
+		for (int i = 0; i < toolbar.getChildCount(); i++)
+			if (toolbar.getChildAt(i) instanceof ImageButton)
+				return (ImageButton) toolbar.getChildAt(i);
+
+		return null;
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -139,6 +156,12 @@ public class JandanActivity extends ActionBarActivity implements
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				if (position == 0) {
+					final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(view.getContext());
+					final SharedPreferences.Editor editor = pref.edit();
+					editor.putBoolean("news", true);
+					editor.apply();
+					if (pref.getBoolean("news", false))
+						mBadgeView.hide();
 					showNews();
 				} else if (position == 1) {
 					showPic();
@@ -195,27 +218,6 @@ public class JandanActivity extends ActionBarActivity implements
 		ooxxMap.put("title", "妹子图");
 		ooxxMap.put("info", "");
 		list.add(ooxxMap);
-	}
-
-	private class NewsLoader extends AsyncTask<Integer, Void, List<Map<String, Object>>> {
-		@Override
-		protected List<Map<String, Object>> doInBackground(Integer... page) {
-			isParsing = true;
-			List<Map<String, Object>> list = mParser.JandanHomePage(page[0]);
-			if (page[0] == 1){
-				items.clear();
-			}
-			return list;
-
-		}
-		protected void onPostExecute(List<Map<String, Object>> result) {
-			if(result.isEmpty()){
-				//Toast.makeText(, "载入出错了！请稍后再试。", Toast.LENGTH_SHORT).show();
-			}
-			items.addAll(result);
-			mAdapter.notifyDataSetChanged();
-			isParsing = false;
-		}
 	}
 
 	private void setActionBar() {
