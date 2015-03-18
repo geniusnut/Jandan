@@ -206,7 +206,7 @@ public class NewsFragment extends Fragment {
 
 
 				//viewHolder.badge.setBadgeMargin(100);
-				Drawable iconCircle = SVG.getDrawable(getResources(), R.raw.ic_button_radio_on,
+				Drawable iconCircle = SVG.getDrawable(getResources(), R.raw.ic_dot,
 						0xCCFF0000 | 0xc0000000);
 				viewHolder.badge.setBackgroundDrawable(iconCircle);
 
