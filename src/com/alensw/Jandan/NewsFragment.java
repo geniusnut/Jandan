@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,12 +32,14 @@ public class NewsFragment extends Fragment {
 
 	public static NewsLoader mNewsLoader;
 	protected boolean isParsing = false;
+	protected boolean mNeedReload = true;
 	protected Handler mHandler;
 	int page = 0;
 	protected List<Map<String, Object>> items = new ArrayList<>();
 	protected ConcurrentHashMap<String, Bitmap> mCovers;
 
 	private NewsFile mNewsFile = new NewsFile();
+	private ImageLoader mImageLoader;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,6 +52,7 @@ public class NewsFragment extends Fragment {
 			@Override
 			public void onRefresh() {
 				page = 0;
+				Log.d(TAG, "swipe refresh layout.");
 				new NewsLoader().execute(++page);
 			}
 		});
@@ -64,19 +68,20 @@ public class NewsFragment extends Fragment {
 			public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 				TextView link = (TextView) view.findViewById(R.id.link);
 				TextView title = (TextView) view.findViewById(R.id.title);
-				TextView comm = (TextView)view.findViewById(R.id.cont);
+				TextView comm = (TextView) view.findViewById(R.id.cont);
 				String acomm = comm.getText().toString();
 				String atitle = title.getText().toString();
 				String alink = link.getText().toString();
 				Intent intent = new Intent(view.getContext(), PostActivity.class);
-				intent.putExtra("link",alink);
-				intent.putExtra("comm",acomm);
-				intent.putExtra(Intent.EXTRA_TITLE,atitle);
+				intent.putExtra("link", alink);
+				intent.putExtra("comm", acomm);
+				intent.putExtra(Intent.EXTRA_TITLE, atitle);
 				startActivity(intent);
 			}
 		});
-		mListView.setOnScrollListener(new AbsListView.OnScrollListener(){
+		mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
 			int vPosition = 0;
+
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 
@@ -89,6 +94,7 @@ public class NewsFragment extends Fragment {
 						if (newsAdapter.getCount() - 8 <= mListView.getFirstVisiblePosition()) {
 							if (!isParsing) {
 								//mNewsLoader.execute(++page);
+								Log.d(TAG, "onScroll start refresh");
 								new NewsLoader().execute(++page);
 							}
 						}
@@ -111,19 +117,6 @@ public class NewsFragment extends Fragment {
 
 		mHandler = new Handler();
 		mParser = new JandanParser(getActivity().getApplicationContext());
-		mCovers = new ConcurrentHashMap<>(64);
-
-		if (mNewsFile.load(getActivity(), NewsFile.NES_FILE_NAME)) {
-			final ArrayList<News> news = new ArrayList<>(mNewsFile.size());
-			mHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					newsAdapter.notifyDataSetChanged();
-				}
-			});
-		}
-		mNewsLoader = new NewsLoader();
-		mNewsLoader.execute(++page);
 		mParser.setOnImageChangedlistener(new JandanParser.OnImageChangedlistener() {
 			@Override
 			public void OnImageChanged() {
@@ -135,6 +128,29 @@ public class NewsFragment extends Fragment {
 				});
 			}
 		});
+		mCovers = new ConcurrentHashMap<>(64);
+		mImageLoader = new ImageLoader(getActivity());
+
+		if (mNewsFile.load(getActivity(), NewsFile.NES_FILE_NAME)) {
+			final ArrayList<News> news = new ArrayList<>(mNewsFile.size());
+			mNeedReload = false;
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					newsAdapter.notifyDataSetChanged();
+				}
+			});
+			requestLoad(); // Try to load all covers or just only try to load the cover visible in the listview.
+		}
+		if (mNeedReload) {
+			mNewsLoader = new NewsLoader();
+			Log.d(TAG, "start loading");
+			mNewsLoader.execute(++page);
+		}
+	}
+
+	private void requestLoad() {
+
 	}
 
 	@Override
@@ -230,13 +246,24 @@ public class NewsFragment extends Fragment {
 			viewHolder.tag.setText(item.mTag);
 			viewHolder.cont.setText(String.valueOf(item.mCont));
 
-			Bitmap cover = mCovers.get(item.mCover);
-			if (cover != null) {
-				viewHolder.image.setImageBitmap(cover);
-			} else {
-				viewHolder.image.setImageDrawable(getResources().getDrawable(R.drawable.loading));
-			}
+			setImageToView(viewHolder.image, item.mCover);
 			return convertView;
+		}
+	};
+
+	private void setImageToView(ImageView imageView, final String thumbUrl) {
+		Bitmap cover = mCovers.get(thumbUrl);
+		if (cover != null) {
+			imageView.setImageBitmap(cover);
+		} else {
+			mImageLoader.request(thumbUrl, imageView, mImageLoaderCallback);
+		}
+	}
+
+	private final ImageLoader.Callback mImageLoaderCallback = new ImageLoader.Callback() {
+		@Override
+		public void onLoaded(String thumbUrl, Bitmap bitmap) {
+			mCovers.put(thumbUrl, bitmap);
 		}
 	};
 

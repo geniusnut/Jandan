@@ -94,7 +94,7 @@ public class JandanParser {
                 final String thumbUrl = matcher.group(1);
                 item.mCover = thumbUrl;
 
-                if (mCovers.contains(thumbUrl)) {
+                if (!mCovers.contains(thumbUrl)) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -469,7 +469,7 @@ public class JandanParser {
         return items;
     }
 
-    private Bitmap getBitMap(String strUrl) {
+    public static Bitmap getBitMap(String strUrl) {
         Bitmap bitmap;
         InputStream is;
         //Log.d(TAG, "getBitmap url = " + strUrl);

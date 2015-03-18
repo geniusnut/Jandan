@@ -29,7 +29,7 @@ public class NewsFile extends ListFile<News> {
 		news.mAuthor = dis.readUTF();
 		news.mTag = dis.readUTF();
 		news.mCont = dis.readInt();
-		return null;
+		return news;
 	}
 
 	@Override
