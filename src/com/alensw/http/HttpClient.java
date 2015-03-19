@@ -29,7 +29,9 @@ public class HttpClient {
 			conn.setRequestProperty("Accept-Encoding", "gzip, identity");
 
 			InputStream is = conn.getInputStream();
-			if (conn.getContentEncoding().equals("gzip")) {
+			String charset = conn.getContentEncoding();
+			if (charset != null) {
+				if (charset.equals("gzip"))
 				is = new GZIPInputStream(is, BLOCK_SIZE);
 			}
 			bos = new ByteArrayOutputStream(1024 * 256);
@@ -41,7 +43,7 @@ public class HttpClient {
 				}
 			}
 			return new String(bos.toByteArray(), "UTF-8");
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 

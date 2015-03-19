@@ -22,24 +22,24 @@ public class NewsFile extends ListFile<Post> {
 
 	@Override
 	public Post readEntry(DataInputStream dis) throws Throwable {
-		final Post news = new Post();
-		news.mLink = dis.readUTF();
-		news.mTitle = dis.readUTF();
-		news.mCover = dis.readUTF();
-		news.mAuthor = dis.readUTF();
-		news.mTag = dis.readUTF();
-		news.mCont = dis.readInt();
-		return news;
+		final Post post = new Post();
+		post.mLink = dis.readUTF();
+		post.mTitle = dis.readUTF();
+		post.mCover = dis.readUTF();
+		post.mAuthor = dis.readUTF();
+		post.mTag = dis.readUTF();
+		post.mCont = dis.readInt();
+		return post;
 	}
 
 	@Override
-	public void writeEntry(DataOutputStream dos, Post news) throws Throwable {
+	public void writeEntry(DataOutputStream dos, Post post) throws Throwable {
 
-		dos.writeUTF(news.mLink);
-		dos.writeUTF(news.mTitle);
-		dos.writeUTF(news.mCover);
-		dos.writeUTF(news.mAuthor);
-		dos.writeUTF(news.mTag);
-		dos.writeInt(news.mCont);
+		dos.writeUTF(post.mLink);
+		dos.writeUTF(post.mTitle);
+		dos.writeUTF(post.mCover);
+		dos.writeUTF(post.mAuthor);
+		dos.writeUTF(post.mTag);
+		dos.writeInt(post.mCont);
 	}
 }

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Jandan.iml" filepath="$PROJECT_DIR$/Jandan.iml" />
+      <module fileurl="file://D:/Android/android-sdk/extras/android/support/v7/appcompat/android-support-v7-appcompat.iml" filepath="D:/Android/android-sdk/extras/android/support/v7/appcompat/android-support-v7-appcompat.iml" />
       <module fileurl="file://$USER_HOME$/android-sdk-linux/extras/android/support/v7/appcompat/android-support-v7-appcompat.iml" filepath="$USER_HOME$/android-sdk-linux/extras/android/support/v7/appcompat/android-support-v7-appcompat.iml" />
     </modules>
   </component>

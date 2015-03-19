@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import com.alensw.http.PostParser;
 import com.alensw.ui.BadgeView;
 import com.larvalabs.svgandroid.SVG;
 
@@ -30,6 +31,7 @@ public class NewsFragment extends Fragment {
 	protected SwipeRefreshLayout swipeLayout;
 	protected JandanParser mParser;
 
+
 	public static NewsLoader mNewsLoader;
 	protected boolean isParsing = false;
 	protected boolean mNeedReload = true;
@@ -38,6 +40,7 @@ public class NewsFragment extends Fragment {
 	protected List<Map<String, Object>> items = new ArrayList<>();
 	protected ConcurrentHashMap<String, Bitmap> mCovers;
 
+	private PostParser mPostParser;
 	private NewsFile mNewsFile = new NewsFile();
 	private ImageLoader mImageLoader;
 
@@ -117,6 +120,7 @@ public class NewsFragment extends Fragment {
 
 		mHandler = new Handler();
 		mParser = new JandanParser(getActivity().getApplicationContext());
+		mPostParser = new PostParser();
 		mParser.setOnImageChangedlistener(new JandanParser.OnImageChangedlistener() {
 			@Override
 			public void OnImageChanged() {
@@ -164,6 +168,7 @@ public class NewsFragment extends Fragment {
 		@Override
 		protected ArrayList<Post> doInBackground(Integer... page) {
 			isParsing = true;
+			mPostParser.parse(page[0], mCovers);
 			return mParser.JandanHomePage(page[0], mCovers);
 		}
 
@@ -223,7 +228,7 @@ public class NewsFragment extends Fragment {
 
 
 				//viewHolder.badge.setBadgeMargin(100);
-				Drawable iconCircle = SVG.getDrawable(getResources(), R.raw.ic_button_radio_on,
+				Drawable iconCircle = SVG.getDrawable(getResources(), R.raw.ic_dot,
 						0xCCFF0000 | 0xc0000000);
 				viewHolder.badge.setBackgroundDrawable(iconCircle);
 
