@@ -21,9 +21,16 @@ public class Utilities {
 		return buf.toString();
 	}
 
-	public static String md5(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-		MessageDigest md = MessageDigest.getInstance("MD5");
-		md.update(text.getBytes("iso-8859-1"), 0, text.length());
+	public static String md5(String text) {
+		MessageDigest md = null;
+		try {
+			md = MessageDigest.getInstance("MD5");
+			md.update(text.getBytes("iso-8859-1"), 0, text.length());
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 		byte[] sha1hash = md.digest();
 		return convertToHex(sha1hash);
 	}

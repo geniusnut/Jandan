@@ -131,9 +131,10 @@ public class NewsFragment extends Fragment {
 		mCovers = new ConcurrentHashMap<>(64);
 		mImageLoader = new ImageLoader(getActivity());
 
-		if (mNewsFile.load(getActivity(), NewsFile.NES_FILE_NAME)) {
-			final ArrayList<News> news = new ArrayList<>(mNewsFile.size());
+		if (mNewsFile.load(getActivity(), NewsFile.NEWS_FILE_NAME)) {
+			final ArrayList<Post> news = new ArrayList<>(mNewsFile.size());
 			mNeedReload = false;
+			page = mNewsFile.size() / 24;
 			mHandler.post(new Runnable() {
 				@Override
 				public void run() {
@@ -159,14 +160,14 @@ public class NewsFragment extends Fragment {
 		mNewsFile.save();
 	}
 
-	private class NewsLoader extends AsyncTask<Integer, Void, ArrayList<News>> {
+	private class NewsLoader extends AsyncTask<Integer, Void, ArrayList<Post>> {
 		@Override
-		protected ArrayList<News> doInBackground(Integer... page) {
+		protected ArrayList<Post> doInBackground(Integer... page) {
 			isParsing = true;
 			return mParser.JandanHomePage(page[0], mCovers);
 		}
 
-		protected void onPostExecute(ArrayList<News> result) {
+		protected void onPostExecute(ArrayList<Post> result) {
 			if(result.isEmpty()){
 				//Toast.makeText(, "载入出错了！请稍后再试。", Toast.LENGTH_SHORT).show();
 			}
@@ -239,7 +240,7 @@ public class NewsFragment extends Fragment {
 				viewHolder.badge.hide();
 			}
 
-			final News item = mNewsFile.get(position);
+			final Post item = mNewsFile.get(position);
 			viewHolder.title.setText(item.mTitle);
 			viewHolder.by.setText(item.mAuthor);
 			viewHolder.link.setText(item.mLink);

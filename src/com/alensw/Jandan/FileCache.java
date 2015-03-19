@@ -8,12 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.provider.DocumentsContract.Document;
 import android.util.Log;
-import org.w3c.dom.Node;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Created by yw07 on 14-12-11.
@@ -81,7 +77,7 @@ public class FileCache extends SQLiteOpenHelper {
 	}
 
 	public static File generateCacheFile(String id) {
-		return new File(mCacheDir,id);
+		return new File(mCacheDir, id);
 	}
 
 	public static File buildPath(File base, String... segments) {

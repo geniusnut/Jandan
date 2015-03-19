@@ -55,10 +55,10 @@ public class JandanParser {
         mExecutor = new ThreadPoolExecutor(2, 64, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(25));
     }
 
-    public ArrayList<News> JandanHomePage(int Page, final ConcurrentHashMap<String, Bitmap> mCovers) {
+    public ArrayList<Post> JandanHomePage(int Page, final ConcurrentHashMap<String, Bitmap> mCovers) {
 
         Log.d("HOMEPAGE",""+Page);
-        ArrayList<News> news = new ArrayList<News>();
+        ArrayList<Post> news = new ArrayList<Post>();
 
         try {
             document = Jsoup.connect(Home_URL +Page)
@@ -74,7 +74,7 @@ public class JandanParser {
         Elements posts = document.getElementsByClass("post");
 
         for(Element i:posts){
-            final News item = new News();
+            final Post item = new Post();
 
 
             //Log.d(TAG, "POSTS : " + posts);
@@ -161,9 +161,9 @@ public class JandanParser {
     }
 
 
-    public List<Map<String, Object>> JandanPicPage(int Page){
+    public ArrayList<Pic> JandanPicPage(int Page) {
 
-        List<Map<String, Object>> items = new ArrayList<Map<String,Object>>();
+        ArrayList<Pic> items = new ArrayList<Pic>();
         ContentValues values = new ContentValues(6);
 
         //page
@@ -279,9 +279,9 @@ public class JandanParser {
                 mCache.updateCache(values);
 
             //add item to items
-            if(item.get("image") != null) {
-                items.add(item);
-            }
+//            if(item.get("image") != null) {
+//                items.add(item);
+//            }
         }
         return items;
     }

@@ -6,14 +6,13 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class PicFragment extends Fragment {
@@ -25,60 +24,20 @@ public class PicFragment extends Fragment {
 	public PicLoader mPicLoader;
 	ArrayList<Map<String, Object>> items = new ArrayList<>();
 
-	FileCache mPicCache;
-	JandanParser mParser;
-	int picPage = 0;
-	boolean isParsing = false;
+	private FileCache mPicCache;
+	private JandanParser mParser;
+	private int picPage = 0;
+	private boolean isParsing = false;
+	private PicFile mPicFile;
+	private LruCache<String, Bitmap> mLruCache;
+	private ImageLoader mImageLoader;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 		final ViewGroup rootView = (ViewGroup) inflater.inflate(
 				R.layout.picfragment, container, false);
 		mListView = (ListView)  rootView.findViewById(R.id.pic_list);
-		picAdapter = new PicAdapter();
-		mAdapter = new SimpleAdapter(getActivity(), items, R.layout.pic_item,
-				new String[]{"updater", "time", "text", "image", "isgif", "xx", "oo"},
-				new int[]{R.id.updater, R.id.time, R.id.text, R.id.image, R.id.img_mask, R.id.xx, R.id.oo}){
-			@Override
-			public View getView(int position, View convertView,ViewGroup parent) {
-				final View view=super.getView(position, convertView, parent);
-				LinearLayout abtnXX = (LinearLayout) view.findViewById(R.id.btn_XX);
-				LinearLayout abtnOO = (LinearLayout) view.findViewById(R.id.btn_OO);
-				abtnXX.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						Toast.makeText(getActivity(), "XX", Toast.LENGTH_SHORT).show();
-					}
-				});
-				abtnOO.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						Toast.makeText(getActivity(),"OO",Toast.LENGTH_SHORT).show();
-					}
-				});
-				return view;
-			}
-		};
-		mAdapter.setViewBinder(new SimpleAdapter.ViewBinder() {
-			@Override
-			public boolean setViewValue(
-					View view,
-					Object data,
-					String textRepresentation) {
-				if (view instanceof ImageView) {
-					if  (data instanceof Bitmap) {
-						ImageView imageView = (ImageView) view;
-						Bitmap bmp = (Bitmap) data;
-						Log.d(TAG, "view width : " + imageView.getWidth());
-						float scaled = (float) imageView.getWidth() / bmp.getWidth();
-						imageView.setImageBitmap(JandanParser.createScaledBitmap(bmp, scaled));
-						return true;
-					}
-				}
-				return false;
-			}
-		});
-		mListView.setAdapter(picAdapter);
 		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -113,7 +72,8 @@ public class PicFragment extends Fragment {
 			}
 		});
 
-
+		picAdapter = new PicAdapter();
+		mListView.setAdapter(picAdapter);
 		return rootView;
 	}
 	private class notifyDataSetChanged extends AsyncTask<Void, Void, Void> {
@@ -130,11 +90,25 @@ public class PicFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mPicCache = new FileCache(getActivity());
+		final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+
+		// Use 1/8th of the available memory for this memory cache.
+		final int cacheSize = maxMemory / 8;
+		mLruCache = new LruCache<String, Bitmap>(cacheSize) {
+			@Override
+			protected int sizeOf(String key, Bitmap bitmap) {
+				// The cache size will be measured in kilobytes rather than
+				// number of items.
+				return bitmap.getByteCount() / 1024;
+			}
+		};
+		mImageLoader = new ImageLoader(getActivity());
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		mPicFile.load(getActivity(), PicFile.PIC_FILE_NAME);
 		mParser = new JandanParser(getActivity().getApplicationContext());
 		mPicLoader = new PicLoader();
 		mPicLoader.execute(picPage);
@@ -146,22 +120,22 @@ public class PicFragment extends Fragment {
 		});
 	}
 
-	private class PicLoader extends AsyncTask<Integer, Void, List<Map<String, Object>>> {
+	private class PicLoader extends AsyncTask<Integer, Void, ArrayList<Pic>> {
 		@Override
-		protected List<Map<String, Object>> doInBackground(Integer... page) {
+		protected ArrayList<Pic> doInBackground(Integer... page) {
 			isParsing = true;
-			List<Map<String, Object>> list = mParser.JandanPicPage(page[0]);
+			ArrayList<Pic> pics = mParser.JandanPicPage(page[0]);
 			if (page[0] == 1){
-				items.clear();
+				mPicFile.clear();
 			}
-			return list;
-
+			return pics;
 		}
-		protected void onPostExecute(List<Map<String, Object>> result) {
+
+		protected void onPostExecute(ArrayList<Pic> result) {
 			if(result.isEmpty()){
 				//Toast.makeText(, "载入出错了！请稍后再试。", Toast.LENGTH_SHORT).show();
 			}
-			items.addAll(result);
+			mPicFile.addAll(result);
 			picAdapter.notifyDataSetChanged();
 			isParsing = false;
 			if (picAdapter.getCount() < 10) {
@@ -217,12 +191,17 @@ public class PicFragment extends Fragment {
 
 			final Map<String, Object> item = items.get(position);
 			viewHolder.updater.setText((String) item.get("updater"));
-			if (item.get("image") != null) {
-				Bitmap image = JandanParser.createThumbnail((String) item.get("image"));
-				float scaled = (float) viewHolder.image.getWidth() / image.getWidth();
-				viewHolder.image.setImageBitmap(JandanParser.createScaledBitmap(image, scaled));
-			}
+			loadBitmap(viewHolder.image, (String) item.get("id"));
 			return convertView;
+		}
+
+		private void loadBitmap(ImageView imageView, String hash) {
+			final Bitmap bitmap = mLruCache.get(hash);
+			if (bitmap != null) {
+				imageView.setImageBitmap(bitmap);
+			} else {
+				//mImageLoader.request();
+			}
 		}
 	}
 }
