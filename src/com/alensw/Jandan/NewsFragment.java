@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import com.alensw.http.PostParser;
 import com.alensw.ui.BadgeView;
 import com.larvalabs.svgandroid.SVG;
 
@@ -38,6 +39,7 @@ public class NewsFragment extends Fragment {
 	protected List<Map<String, Object>> items = new ArrayList<>();
 	protected ConcurrentHashMap<String, Bitmap> mCovers;
 
+	private PostParser mPostParser;
 	private NewsFile mNewsFile = new NewsFile();
 	private ImageLoader mImageLoader;
 
@@ -116,6 +118,7 @@ public class NewsFragment extends Fragment {
 		super.onActivityCreated(savedInstanceState);
 
 		mHandler = new Handler();
+		mPostParser = new PostParser();
 		mParser = new JandanParser(getActivity().getApplicationContext());
 		mParser.setOnImageChangedlistener(new JandanParser.OnImageChangedlistener() {
 			@Override
@@ -164,6 +167,7 @@ public class NewsFragment extends Fragment {
 		@Override
 		protected ArrayList<Post> doInBackground(Integer... page) {
 			isParsing = true;
+			mPostParser.parse(page[0], mCovers);
 			return mParser.JandanHomePage(page[0], mCovers);
 		}
 

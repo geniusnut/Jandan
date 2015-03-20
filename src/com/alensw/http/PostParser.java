@@ -26,6 +26,7 @@ public class PostParser {
 			for (int i = 0; i < jsonPosts.length(); i++) {
 				Post post = new Post();
 				JSONObject jsonPost = (JSONObject) jsonPosts.get(i);
+				// post.mLink =
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();

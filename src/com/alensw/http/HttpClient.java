@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.zip.GZIPInputStream;
 
 /**
  * Created by yw07 on 15-3-19.
@@ -26,12 +25,8 @@ public class HttpClient {
 			conn.setDoInput(true);
 			conn.setReadTimeout(TIMEOUT_READ);
 			conn.setRequestMethod("GET");
-			conn.setRequestProperty("Accept-Encoding", "gzip, identity");
 
 			InputStream is = conn.getInputStream();
-			if (conn.getContentEncoding().equals("gzip")) {
-				is = new GZIPInputStream(is, BLOCK_SIZE);
-			}
 			bos = new ByteArrayOutputStream(1024 * 256);
 			final byte[] data = new byte[4096];
 			int bytes = 0;
