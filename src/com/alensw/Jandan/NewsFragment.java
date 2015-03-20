@@ -31,6 +31,7 @@ public class NewsFragment extends Fragment {
 	protected SwipeRefreshLayout swipeLayout;
 	protected JandanParser mParser;
 
+
 	public static NewsLoader mNewsLoader;
 	protected boolean isParsing = false;
 	protected boolean mNeedReload = true;
@@ -120,6 +121,7 @@ public class NewsFragment extends Fragment {
 		mHandler = new Handler();
 		mPostParser = new PostParser();
 		mParser = new JandanParser(getActivity().getApplicationContext());
+		mPostParser = new PostParser();
 		mParser.setOnImageChangedlistener(new JandanParser.OnImageChangedlistener() {
 			@Override
 			public void OnImageChanged() {
@@ -227,7 +229,7 @@ public class NewsFragment extends Fragment {
 
 
 				//viewHolder.badge.setBadgeMargin(100);
-				Drawable iconCircle = SVG.getDrawable(getResources(), R.raw.ic_button_radio_on,
+				Drawable iconCircle = SVG.getDrawable(getResources(), R.raw.ic_dot,
 						0xCCFF0000 | 0xc0000000);
 				viewHolder.badge.setBackgroundDrawable(iconCircle);
 

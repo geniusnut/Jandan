@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Created by yw07 on 15-3-19.
@@ -36,7 +37,7 @@ public class HttpClient {
 				}
 			}
 			return new String(bos.toByteArray(), "UTF-8");
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 

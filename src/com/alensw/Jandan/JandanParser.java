@@ -307,8 +307,7 @@ public class JandanParser {
                 File file = get();
                 //mItem.put("image", createThumbnail(file.getPath()));
                 mItem.put("image", file.getPath());
-                if (mItem.get("isgif") == false)
-                    mItem.put("url", Uri.fromFile(file));
+
                 listener.OnImageChanged();
             } catch (InterruptedException e) {
                 e.printStackTrace();
