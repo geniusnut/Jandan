@@ -120,19 +120,7 @@ public class NewsFragment extends Fragment {
 
 		mHandler = new Handler();
 		mPostParser = new PostParser();
-		mParser = new JandanParser(getActivity().getApplicationContext());
-		mPostParser = new PostParser();
-		mParser.setOnImageChangedlistener(new JandanParser.OnImageChangedlistener() {
-			@Override
-			public void OnImageChanged() {
-				mHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						newsAdapter.notifyDataSetChanged();
-					}
-				});
-			}
-		});
+
 		mCovers = new ConcurrentHashMap<>(64);
 		mImageLoader = new ImageLoader(getActivity());
 
@@ -150,7 +138,6 @@ public class NewsFragment extends Fragment {
 		}
 		if (mNeedReload) {
 			mNewsLoader = new NewsLoader();
-			Log.d(TAG, "start loading");
 			mNewsLoader.execute(++page);
 		}
 	}
@@ -169,8 +156,7 @@ public class NewsFragment extends Fragment {
 		@Override
 		protected ArrayList<Post> doInBackground(Integer... page) {
 			isParsing = true;
-			mPostParser.parse(page[0], mCovers);
-			return mParser.JandanHomePage(page[0], mCovers);
+			return mPostParser.parse(page[0], mCovers);
 		}
 
 		protected void onPostExecute(ArrayList<Post> result) {
@@ -263,6 +249,7 @@ public class NewsFragment extends Fragment {
 		if (cover != null) {
 			imageView.setImageBitmap(cover);
 		} else {
+			imageView.setImageBitmap(null);
 			mImageLoader.request(thumbUrl, imageView, mImageLoaderCallback);
 		}
 	}

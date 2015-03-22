@@ -28,7 +28,7 @@ public class PicFragment extends Fragment {
 	private JandanParser mParser;
 	private int picPage = 0;
 	private boolean isParsing = false;
-	private PicFile mPicFile;
+	private PicFile mPicFile = new PicFile();
 	private LruCache<String, Bitmap> mLruCache;
 	private ImageLoader mImageLoader;
 
@@ -189,19 +189,27 @@ public class PicFragment extends Fragment {
 			} else
 				viewHolder = (ViewHolder) convertView.getTag();
 
-			final Map<String, Object> item = items.get(position);
-			viewHolder.updater.setText((String) item.get("updater"));
-			loadBitmap(viewHolder.image, (String) item.get("id"));
+			Pic pic = mPicFile.get(position);
+			loadBitmap(viewHolder.image, pic.mUrls.get(0));
+
 			return convertView;
 		}
 
-		private void loadBitmap(ImageView imageView, String hash) {
-			final Bitmap bitmap = mLruCache.get(hash);
+		private void loadBitmap(ImageView imageView, String thumbUrl) {
+			final Bitmap bitmap = mLruCache.get(thumbUrl);
 			if (bitmap != null) {
 				imageView.setImageBitmap(bitmap);
 			} else {
-				//mImageLoader.request();
+				imageView.setImageResource(R.drawable.loading);
+				mImageLoader.request(thumbUrl, imageView, mImageLoaderCallback);
 			}
 		}
 	}
+
+	private final ImageLoader.Callback mImageLoaderCallback = new ImageLoader.Callback() {
+		@Override
+		public void onLoaded(String thumbUrl, Bitmap bitmap) {
+			mLruCache.put(thumbUrl, bitmap);
+		}
+	};
 }
