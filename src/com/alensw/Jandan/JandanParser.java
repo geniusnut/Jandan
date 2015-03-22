@@ -493,19 +493,21 @@ public class JandanParser {
         Bitmap bitmap;
         bitmap = BitmapFactory.decodeFile(path);
         //  Log.d(TAG, "bitmap height = " + bitmap.getHeight());
-        float whScale = (float) bitmap.getHeight()/bitmap.getWidth();
-        if ( whScale > 4) {
-            BitmapRegionDecoder regionDecoder = null;
-            bitmap.recycle();
-            try {
-                regionDecoder = BitmapRegionDecoder.newInstance(path, false);
-            } catch (Throwable e) {
-                Log.e(TAG, "");
+        if (bitmap != null) {
+            float whScale = (float) bitmap.getHeight() / bitmap.getWidth();
+            if (whScale > 4) {
+                BitmapRegionDecoder regionDecoder = null;
+                bitmap.recycle();
+                try {
+                    regionDecoder = BitmapRegionDecoder.newInstance(path, false);
+                } catch (Throwable e) {
+                    Log.e(TAG, "");
+                }
+                Rect rect = new Rect();
+                rect.right = bitmap.getWidth();
+                rect.bottom = (int) (rect.right * 1.6);
+                return regionDecoder.decodeRegion(rect, null);
             }
-            Rect rect = new Rect();
-            rect.right = bitmap.getWidth();
-            rect.bottom = (int) (rect.right * 1.6);
-            return regionDecoder.decodeRegion(rect, null);
         }
         return bitmap;
     }

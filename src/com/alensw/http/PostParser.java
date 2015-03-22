@@ -39,7 +39,7 @@ public class PostParser {
 				JSONObject jsonPost = (JSONObject) jsonPosts.get(i);
 				post.mLink = jsonPost.getString("url");
 				post.mTitle = jsonPost.getString("title");
-				post.mCover = jsonPost.getJSONObject("comment_fields").getJSONArray("thumb_c").getString(0);
+				post.mCover = jsonPost.getJSONObject("custom_fields").getJSONArray("thumb_c").getString(0);
 				post.mAuthor = jsonPost.getJSONObject("author").getString("name");
 				post.mTag = jsonPost.getJSONArray("tags").getJSONObject(0).getString("title");
 				post.mCont = jsonPost.getInt("comment_count");

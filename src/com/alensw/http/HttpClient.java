@@ -22,15 +22,15 @@ public class HttpClient {
 		ByteArrayOutputStream bos = null;
 		try {
 			final HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-			conn.setConnectTimeout(TIMEOUT_CONNECT);
-			conn.setDoInput(true);
-			conn.setReadTimeout(TIMEOUT_READ);
-			conn.setRequestMethod("GET");
-			conn.setRequestProperty("Accept-Encoding", "gzip");
+//			conn.setConnectTimeout(TIMEOUT_CONNECT);
+//			conn.setDoInput(true);
+//			conn.setReadTimeout(TIMEOUT_READ);
+//			conn.setRequestMethod("GET");
+//			conn.setRequestProperty("Accept-Encoding", "gzip");
 
 			InputStream is = conn.getInputStream();
 
-			if (conn.getContentEncoding().equals("gzip")) {
+			if (conn.getContentEncoding()!= null && conn.getContentEncoding().equals("gzip")) {
 				is = new GZIPInputStream(is, BLOCK_SIZE);
 			}
 			bos = new ByteArrayOutputStream(1024 * 256);

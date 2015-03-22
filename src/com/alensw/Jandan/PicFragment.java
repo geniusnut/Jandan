@@ -6,11 +6,13 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import com.alensw.http.PicParser;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -22,7 +24,6 @@ public class PicFragment extends Fragment {
 	PicAdapter picAdapter;
 
 	public PicLoader mPicLoader;
-	ArrayList<Map<String, Object>> items = new ArrayList<>();
 
 	private FileCache mPicCache;
 	private JandanParser mParser;
@@ -31,6 +32,9 @@ public class PicFragment extends Fragment {
 	private PicFile mPicFile = new PicFile();
 	private LruCache<String, Bitmap> mLruCache;
 	private ImageLoader mImageLoader;
+	private PicParser mPicParser;
+	private Handler mHandler;
+	private boolean mNeedReload = true;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -102,29 +106,40 @@ public class PicFragment extends Fragment {
 				return bitmap.getByteCount() / 1024;
 			}
 		};
+
 		mImageLoader = new ImageLoader(getActivity());
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		mPicFile.load(getActivity(), PicFile.PIC_FILE_NAME);
-		mParser = new JandanParser(getActivity().getApplicationContext());
-		mPicLoader = new PicLoader();
-		mPicLoader.execute(picPage);
-		mParser.setOnImageChangedlistener(new JandanParser.OnImageChangedlistener() {
-			@Override
-			public void OnImageChanged() {
-				new notifyDataSetChanged().execute();
-			}
-		});
+
+		mHandler = new Handler();
+		mPicParser = new PicParser();
+
+		if (mPicFile.load(getActivity(), PicFile.PIC_FILE_NAME)) {
+			mNeedReload = false;
+			picPage = mPicFile.size() / 24;
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					picAdapter.notifyDataSetChanged();
+				}
+			});
+		}
+
+		if (mNeedReload) {
+			mPicLoader = new PicLoader();
+			mPicLoader.execute(picPage);
+		}
 	}
 
 	private class PicLoader extends AsyncTask<Integer, Void, ArrayList<Pic>> {
 		@Override
 		protected ArrayList<Pic> doInBackground(Integer... page) {
 			isParsing = true;
-			ArrayList<Pic> pics = mParser.JandanPicPage(page[0]);
+			// ArrayList<Pic> pics = mParser.JandanPicPage(page[0]);
+			ArrayList<Pic> pics = mPicParser.parse(page[0]);
 			if (page[0] == 1){
 				mPicFile.clear();
 			}
@@ -159,12 +174,12 @@ public class PicFragment extends Fragment {
 		//new String[]{"updater", "time", "text", "image", "isgif", "xx", "oo"},
 		@Override
 		public int getCount() {
-			return items.size();
+			return mPicFile.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return items.get(position);
+			return mPicFile.get(position);
 		}
 
 		@Override

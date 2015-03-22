@@ -26,12 +26,12 @@ public class PicParser {
         mDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    public ArrayList<Post> parse(int page, final ConcurrentHashMap<String, Bitmap> mCovers) {
+    public ArrayList<Pic> parse(int page) {
         final String url = PIC_URL + "&page=" + page;
         final String content = HttpClient.downloadJson(url);
 
 
-        ArrayList<Post> posts = new ArrayList<Post>();
+        ArrayList<Pic> pics = new ArrayList<Pic>();
         try {
             JSONObject json = new JSONObject(content);
             JSONArray jsonPics = json.getJSONArray("comments");
@@ -40,13 +40,21 @@ public class PicParser {
                 JSONObject jsonPic = (JSONObject) jsonPics.get(i);
                 pic.mId = jsonPic.getInt("comment_ID");
                 pic.mAuthor = jsonPic.getString("comment_author");
+                pic.mDesc = jsonPic.getString("text_content");
+                pic.mPhotos = jsonPic.getJSONArray("pics").length();
+                pic.mUrls = new ArrayList<String> (pic.mPhotos);
+                for (int j = 0; j < pic.mPhotos; j++) {
+                    pic.mUrls.add(jsonPic.getJSONArray("pics").getString(j));
+                }
+                pic.mOO = jsonPic.getInt("vote_positive");
+                pic.mXX = jsonPic.getInt("vote_negative");
                 pic.mTime = parseTime(jsonPic.getString("comment_date"));
-                // post.mLink =
+                pics.add(pic);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return posts;
+        return pics;
     }
 
     private long parseTime(String time) {

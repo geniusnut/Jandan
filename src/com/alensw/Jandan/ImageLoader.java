@@ -54,6 +54,7 @@ public class ImageLoader {
 		public void run() {
 			Bitmap bitmap = null;
 			String hashName = Utilities.md5(mThumbUrl);
+			FileCache.mCacheDir.mkdirs();
 			File file = FileCache.generateCacheFile(hashName);
 			if (!file.exists()) {
 				InputStream is = null;
