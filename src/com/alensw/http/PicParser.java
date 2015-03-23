@@ -1,8 +1,6 @@
 package com.alensw.http;
 
-import android.graphics.Bitmap;
 import com.alensw.Jandan.Pic;
-import com.alensw.Jandan.Post;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,8 +9,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.TimeZone;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Administrator on 2015/3/21.
@@ -22,9 +18,9 @@ public class PicParser {
     final static String PIC_URL = "http://i.jandan.net/?oxwlxojflwblxbsapi=jandan.get_pic_comments";
 
     private static final DateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    static {
-        mDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
+//    static {
+//        mDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+//    }
 
     public ArrayList<Pic> parse(int page) {
         final String url = PIC_URL + "&page=" + page;

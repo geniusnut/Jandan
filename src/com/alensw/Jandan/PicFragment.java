@@ -7,6 +7,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,7 @@ import java.util.Map;
 public class PicFragment extends Fragment {
 	private static final String TAG = "PicFragment";
 	protected ListView mListView;
+	private SwipeRefreshLayout swipeLayout;
 	SimpleAdapter mAdapter;
 	PicAdapter picAdapter;
 
@@ -41,7 +44,23 @@ public class PicFragment extends Fragment {
 							 Bundle savedInstanceState) {
 		final ViewGroup rootView = (ViewGroup) inflater.inflate(
 				R.layout.picfragment, container, false);
+
+		swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.pic_swipe);
+		swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+			@Override
+			public void onRefresh() {
+				picPage = 0;
+				Log.d(TAG, "swipe refresh layout.");
+				new PicLoader(null).execute(++picPage);
+			}
+		});
+		swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
+				android.R.color.holo_green_light,
+				android.R.color.holo_orange_light,
+				android.R.color.holo_red_light);
+
 		mListView = (ListView)  rootView.findViewById(R.id.pic_list);
+		// mListView.addHeaderView();
 		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -67,7 +86,7 @@ public class PicFragment extends Fragment {
 						if (picAdapter.getCount() - 8 <= mListView.getFirstVisiblePosition()) {
 							if (!isParsing) {
 								//mNewsLoader.execute(++page);
-								new PicLoader().execute(++picPage);
+								new PicLoader(null).execute(++picPage);
 							}
 						}
 					}
@@ -126,35 +145,76 @@ public class PicFragment extends Fragment {
 					picAdapter.notifyDataSetChanged();
 				}
 			});
+			ArrayList<Pic> pics = new ArrayList<>(0);
+			new PicLoader(pics).execute(0);
 		}
 
 		if (mNeedReload) {
-			mPicLoader = new PicLoader();
+			mPicLoader = new PicLoader(null);
 			mPicLoader.execute(picPage);
 		}
 	}
 
+	@Override
+	public void onStop() {
+		super.onStop();
+		mPicFile.save();
+	}
+
 	private class PicLoader extends AsyncTask<Integer, Void, ArrayList<Pic>> {
+		ArrayList<Pic> mPicCol;
+
+		PicLoader(ArrayList<Pic> pics) {
+			mPicCol = pics;
+		}
 		@Override
 		protected ArrayList<Pic> doInBackground(Integer... page) {
 			isParsing = true;
 			// ArrayList<Pic> pics = mParser.JandanPicPage(page[0]);
-			ArrayList<Pic> pics = mPicParser.parse(page[0]);
-			if (page[0] == 1){
-				mPicFile.clear();
+			if (mPicCol != null) {
+				mPicCol = mPicParser.parse(page[0]);
+				return mPicCol;
+			} else {
+				ArrayList<Pic> pics = mPicParser.parse(page[0]);
+				if (page[0] == 1) {
+					mPicFile.clear();
+				}
+				return pics;
 			}
-			return pics;
 		}
 
 		protected void onPostExecute(ArrayList<Pic> result) {
 			if(result.isEmpty()){
 				//Toast.makeText(, "载入出错了！请稍后再试。", Toast.LENGTH_SHORT).show();
 			}
+			if (mPicCol != null) {
+				Pic pic = mPicCol.get(0);
+				long seconds = pic.mTime - mPicFile.get(0).mTime;
+				int delta = pic.mId - mPicFile.get(0).mId;
+				if (delta <= 0)
+					return;
+
+				TextView tv = new TextView(getActivity());
+				tv.setText("Here's " + delta + " unread messages");
+				tv.setTextSize(20);
+				tv.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						picPage = 0;
+						new PicLoader(null).execute(++picPage);
+						v.setVisibility(View.GONE);
+					}
+				});
+				mListView.addHeaderView(tv);
+				return;
+			}
+
 			mPicFile.addAll(result);
 			picAdapter.notifyDataSetChanged();
+			swipeLayout.setRefreshing(false);
 			isParsing = false;
 			if (picAdapter.getCount() < 10) {
-				new PicLoader().execute(picPage);
+				new PicLoader(null).execute(picPage);
 				picPage ++;
 			}
 		}
@@ -205,6 +265,12 @@ public class PicFragment extends Fragment {
 				viewHolder = (ViewHolder) convertView.getTag();
 
 			Pic pic = mPicFile.get(position);
+			viewHolder.updater.setText(pic.mAuthor);
+			viewHolder.text.setText(pic.mDesc);
+			viewHolder.oo.setText(String.valueOf(pic.mOO));
+			viewHolder.xx.setText(String.valueOf(pic.mXX));
+			viewHolder.time.setText(Utilities.convertTime(pic.mTime));
+
 			loadBitmap(viewHolder.image, pic.mUrls.get(0));
 
 			return convertView;
@@ -220,6 +286,7 @@ public class PicFragment extends Fragment {
 			}
 		}
 	}
+
 
 	private final ImageLoader.Callback mImageLoaderCallback = new ImageLoader.Callback() {
 		@Override

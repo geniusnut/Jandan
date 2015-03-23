@@ -1,13 +1,23 @@
 package com.alensw.Jandan;
 
+import android.util.Log;
+
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  * Created by yw07 on 15-3-18.
  */
 public class Utilities {
+	private static final DateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+	//	static {
+//		mDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+//	}
 	private static String convertToHex(byte[] data) {
 		StringBuilder buf = new StringBuilder();
 		for (byte b : data) {
@@ -35,4 +45,18 @@ public class Utilities {
 		return convertToHex(sha1hash);
 	}
 
+	public static String convertTime(long mTime) {
+		Log.d("convertTime", "mTime = " + mTime);
+		long seconds = System.currentTimeMillis() / 1000 - mTime;
+
+		if (seconds < 3600) {
+			return seconds / 60 + "分钟前";
+		} else if (seconds < 86400) {
+			return seconds / 3600 + "小时前";
+		} else {
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTimeInMillis(mTime);
+			return mDateFormat.format(calendar.getTime());
+		}
+	}
 }
