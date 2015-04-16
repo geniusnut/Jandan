@@ -30,6 +30,7 @@ import java.net.URLConnection;
 public class PicActivity extends ActionBarActivity {
 	public static final String EXTRA_FILENAME = "filename";
 	public static final String EXTRA_GIF = "isgif";
+	public static final String EXTRA_PIC = "pic";
 
 	private TouchImageView mPictureView;
 	private GifImageView mGifView;
@@ -41,6 +42,7 @@ public class PicActivity extends ActionBarActivity {
 	private Toolbar toolbar;
 
 	private boolean running;
+	private Pic mPic;
 	int progress = 0;
 	private Uri mUri;
 	public Bitmap mBitmap = null;
@@ -56,6 +58,8 @@ public class PicActivity extends ActionBarActivity {
 			toolbar.getBackground().setAlpha(0);
 		}
 		toolbar.setLogo(R.drawable.jandan);
+
+		mPic = getIntent().getParcelableExtra(EXTRA_PIC);
 
 		if (savedBundle == null) {
 			mUri = getIntent().getData();

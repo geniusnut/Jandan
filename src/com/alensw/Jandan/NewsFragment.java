@@ -65,6 +65,7 @@ public class NewsFragment extends Fragment {
 				android.R.color.holo_red_light);
 
 		mListView = (ListView) rootView.findViewById(R.id.news_list);
+		mListView.setClipToPadding(false);
 		mListView.setAdapter(newsAdapter);
 		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -79,6 +80,7 @@ public class NewsFragment extends Fragment {
 				intent.putExtra("link", alink);
 				intent.putExtra("comm", acomm);
 				intent.putExtra(Intent.EXTRA_TITLE, atitle);
+				intent.putExtra("index", position);
 				startActivity(intent);
 			}
 		});
@@ -144,6 +146,12 @@ public class NewsFragment extends Fragment {
 
 	private void requestLoad() {
 
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		mNewsFile.save();
 	}
 
 	@Override

@@ -23,5 +23,14 @@
     <color name="primaryColorDark">#0D47A1</color>
     <color name="littleGray">#b3b4b7</color>
 
+    <color name="black_semi_transparent">#B2000000</color>
+    <color name="background">#e5e5e5</color>
+    <color name="half_black">#808080</color>
+    <color name="white_pressed">#f1f1f1</color>
+    <color name="pink">#e91e63</color>
+    <color name="pink_pressed">#ec407a</color>
+    <color name="blue_semi_transparent">#805677fc</color>
+    <color name="blue_semi_transparent_pressed">#80738ffe</color>
+
     <color name="digest_separator_color_morning">#ffe5e5e5</color>
 </resources>

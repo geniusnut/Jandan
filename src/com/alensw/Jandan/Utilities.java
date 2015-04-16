@@ -55,7 +55,7 @@ public class Utilities {
 			return seconds / 3600 + "小时前";
 		} else {
 			Calendar calendar = Calendar.getInstance();
-			calendar.setTimeInMillis(mTime);
+			calendar.setTimeInMillis(mTime * 1000);
 			return mDateFormat.format(calendar.getTime());
 		}
 	}

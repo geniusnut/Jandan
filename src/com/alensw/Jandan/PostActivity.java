@@ -2,26 +2,17 @@ package com.alensw.Jandan;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.LightingColorFilter;
-import android.graphics.PorterDuff.Mode;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.ColorRes;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.*;
-import android.view.animation.Animation;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
-import android.webkit.WebView;
-import android.widget.*;
-import com.larvalabs.svgandroid.SVG;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 /**
  * Created by yw07 on 14-11-20.
@@ -29,20 +20,26 @@ import com.larvalabs.svgandroid.SVG;
 public class PostActivity extends ActionBarActivity {
 	private final String TAG = "PostActivity";
 	Activity postActivity = this;
-	String link ;
-	String title ;
-	String comm;
-	ScrollView scrollView;
-	WebView webview;
-	WebView commwebview;
-	ImageView ivCarat;
+
 	private Toolbar toolbar;
+	private ViewPager mViewPager;
+
+	private NewsFile mNewsFile = new NewsFile();
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		//getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		setContentView(R.layout.activity_post);
 
+		mNewsFile.load(this, NewsFile.NEWS_FILE_NAME);
+		ViewPager pager = (ViewPager) findViewById(R.id.post_pager);
+		pager.setAdapter(new PostAdapter(getSupportFragmentManager()));
+
+		mViewPager = (ViewPager) findViewById(R.id.post_pager);
+		mViewPager.setAdapter(new PostAdapter(getSupportFragmentManager()));
+
+		int index = getIntent().getIntExtra("index", 0);
+		mViewPager.setCurrentItem(index);
 		toolbar = (Toolbar) findViewById(R.id.toolbar_post);
 		if (toolbar != null) {
 			toolbar.setTitle("News");
@@ -54,85 +51,6 @@ public class PostActivity extends ActionBarActivity {
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		}
 
-		//setActionBar();
-		link = getIntent().getStringExtra("link");
-		title = getIntent().getStringExtra(Intent.EXTRA_TITLE);
-		comm = getIntent().getStringExtra("comm");
-
-		webview = (WebView) findViewById(R.id.webview);
-		webview.clearCache(true);
-		Log.d(TAG, "webViewLoad : " + link);
-		new webViewLoad().execute(link);
-
-		TextView mComm = (TextView) findViewById(R.id.btn_post_comm_text);
-
-		mComm.setText(getString(R.string.post_comments, comm));
-		//Drawable iconExpand = getResources().getDrawable(R.drawable.icon_expand);
-		//iconExpand.setColorFilter(R.color.lightBlue, Mode.MULTIPLY);
-		ivCarat = (ImageView)findViewById(R.id.ivCarat);
-		//((ImageView)findViewById(R.id.ivCarat)).setImageDrawable(iconExpand);
-		//((ImageView)findViewById(R.id.ivCarat)).setBackgroundColor(Color.GRAY);
-		scrollView = (ScrollView) findViewById(R.id.scrollView);
-
-
-
-		commwebview = (WebView) findViewById(R.id.post_comm);
-		commwebview.clearCache(true);
-		new commViewLoad().execute(link);
-
-		commwebview.setVisibility(View.GONE);
-		final RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.btn_post_comm);
-		relativeLayout.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				if (commwebview.getVisibility() == View.VISIBLE) {
-					ivCarat.setRotation(0);
-					commwebview.removeAllViews();
-					commwebview.setVisibility(View.GONE);
-				}
-				else {
-					ivCarat.setRotation(180);
-					commwebview.setVisibility(View.VISIBLE);
-					Log.d(TAG, "scroll to " + (relativeLayout.getTop() - 10));
-					Log.d(TAG, "Scrollview height : " + scrollView.getBottom());
-					new Handler().post(new Runnable() {
-						@Override
-						public void run() {
-							scrollView.smoothScrollTo(0, relativeLayout.getTop() - 10);
-						}
-					});
-					/*scrollView.post(new Runnable() {
-						@Override
-						public void run() {
-							scrollView.smoothScrollTo(0, linearLayout.getTop()-10);
-						}
-					});*/
-				}
-			}
-		});
-	}
-
-	private class webViewLoad extends AsyncTask<String, Void, String> {
-		@Override
-		protected String doInBackground(String... strings) {
-			PostFormater postFormater = new PostFormater(getApplicationContext());
-			return postFormater.postFormater(strings[0]);
-		}
-		@Override
-		protected void onPostExecute(String data){
-			webview.loadDataWithBaseURL("", data, "text/html", "UTF-8", "");
-		}
-	}
-
-	private class commViewLoad extends AsyncTask<String, Void, String>{
-		@Override
-		protected String doInBackground(String... strings) {
-			PostFormater postFormater = new PostFormater(getApplicationContext());
-			return postFormater.commFormater(strings[0]);
-		}
-		protected void onPostExecute(String data){
-			commwebview.loadDataWithBaseURL("", data, "text/html", "UTF-8", "");
-		}
 	}
 
 	@Override
@@ -181,5 +99,22 @@ public class PostActivity extends ActionBarActivity {
 				postActivity.finish();
 			}
 		});
+	}
+
+	private class PostAdapter extends FragmentPagerAdapter {
+		public PostAdapter(FragmentManager fm) {
+			super(fm);
+		}
+
+		@Override
+		public Fragment getItem(int i) {
+			final Post post = mNewsFile.get(i);
+			return PostFragment.newInstance(post);
+		}
+
+		@Override
+		public int getCount() {
+			return mNewsFile.size();
+		}
 	}
 }

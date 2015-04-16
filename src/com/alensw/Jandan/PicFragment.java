@@ -17,7 +17,6 @@ import android.widget.*;
 import com.alensw.http.PicParser;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 public class PicFragment extends Fragment {
 	private static final String TAG = "PicFragment";
@@ -64,10 +63,10 @@ public class PicFragment extends Fragment {
 		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-				Map<String, Object> item = (Map<String, Object>) picAdapter.getItem(position);
-				Intent intent = new Intent(null, (Uri) item.get("url"),view.getContext(), PicActivity.class);
-				intent.putExtra(PicActivity.EXTRA_FILENAME, (String) item.get("id"));
-				intent.putExtra(PicActivity.EXTRA_GIF, (Boolean) item.get("isgif"));
+				Pic item = (Pic) picAdapter.getItem(position);
+				Intent intent = new Intent(null, Uri.parse(item.mUrls.get(0)), view.getContext(), PicActivity.class);
+				intent.putExtra(PicActivity.EXTRA_PIC, item);
+
 				startActivity(intent);
 			}
 		});
@@ -202,7 +201,7 @@ public class PicFragment extends Fragment {
 					public void onClick(View v) {
 						picPage = 0;
 						new PicLoader(null).execute(++picPage);
-						v.setVisibility(View.GONE);
+						mListView.removeHeaderView(v);
 					}
 				});
 				mListView.addHeaderView(tv);
