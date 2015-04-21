@@ -86,7 +86,7 @@ public class ImageLoader {
 					public void run() {
 						if (mImageViewReference != null && cover != null) {
 							final ImageView imageView = mImageViewReference.get();
-							if (imageView != null) {
+							if (imageView != null && imageView.getTag() == mThumbUrl) {
 								imageView.setImageBitmap(cover);
 							}
 						}

@@ -32,7 +32,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PicActivity"
+            android:name=".PicActivity1"
             android:label="@string/app_name"
             android:theme="@style/myAppTheme">
             <intent-filter>

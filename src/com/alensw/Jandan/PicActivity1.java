@@ -54,7 +54,7 @@ public class PicActivity1 extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mPic = getIntent().getParcelableExtra(EXTRA_PIC);
-		for (int i = mPic.mUrls.size() - 1; i >= 0; i--) {
+		for (int i = 0; i < mPic.mUrls.size(); i++) {
 			ItemInfo item = new ItemInfo();
 			item.url = mPic.mUrls.get(i);
 			item.isGif = item.url.endsWith("gif");
@@ -109,6 +109,10 @@ public class PicActivity1 extends ActionBarActivity {
 		@Override
 		public boolean isViewFromObject(View view, Object o) {
 			return view == ((PicAdapter) o).mView;
+		}
+
+		@Override
+		public void destroyItem(ViewGroup container, int position, Object object) {
 		}
 
 		@Override

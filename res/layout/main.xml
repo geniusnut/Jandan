@@ -1,4 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="vertical"
@@ -36,13 +36,4 @@
                 android:dividerHeight="0dp"/>
         </RelativeLayout>
     </android.support.v4.widget.DrawerLayout>
-
-    <com.alensw.ui.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/setter"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="bottom|right"
-        android:layout_marginRight="32dp"
-        android:layout_marginBottom="32dp" />
-</FrameLayout>
+</LinearLayout>

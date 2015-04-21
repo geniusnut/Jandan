@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import com.alensw.http.PicParser;
+import com.alensw.ui.ExpandableTextView;
 
 import java.util.ArrayList;
 
@@ -64,7 +65,7 @@ public class PicFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 				Pic item = (Pic) picAdapter.getItem(position);
-				Intent intent = new Intent(null, Uri.parse(item.mUrls.get(0)), view.getContext(), PicActivity.class);
+				Intent intent = new Intent(null, Uri.parse(item.mUrls.get(0)), view.getContext(), PicActivity1.class);
 				intent.putExtra(PicActivity.EXTRA_PIC, item);
 
 				startActivity(intent);
@@ -223,7 +224,7 @@ public class PicFragment extends Fragment {
 		class ViewHolder {
 			public TextView updater;
 			public ImageView image;
-			public TextView text;
+			public ExpandableTextView text;
 			public TextView time;
 			public TextView xx;
 			public TextView oo;
@@ -254,7 +255,7 @@ public class PicFragment extends Fragment {
 				convertView = inflater.inflate(R.layout.pic_item, null);
 				viewHolder = new ViewHolder();
 				viewHolder.updater = (TextView) convertView.findViewById(R.id.updater);
-				viewHolder.text = (TextView) convertView.findViewById(R.id.text);
+				viewHolder.text = (ExpandableTextView) convertView.findViewById(R.id.text);
 				viewHolder.oo = (TextView) convertView.findViewById(R.id.oo);
 				viewHolder.xx = (TextView) convertView.findViewById(R.id.xx);
 				viewHolder.time = (TextView) convertView.findViewById(R.id.time);
@@ -270,6 +271,7 @@ public class PicFragment extends Fragment {
 			viewHolder.xx.setText(String.valueOf(pic.mXX));
 			viewHolder.time.setText(Utilities.convertTime(pic.mTime));
 
+
 			loadBitmap(viewHolder.image, pic.mUrls.get(0));
 
 			return convertView;
@@ -281,6 +283,7 @@ public class PicFragment extends Fragment {
 				imageView.setImageBitmap(bitmap);
 			} else {
 				imageView.setImageResource(R.drawable.loading);
+				imageView.setTag(thumbUrl);
 				mImageLoader.request(thumbUrl, imageView, mImageLoaderCallback);
 			}
 		}
@@ -291,6 +294,7 @@ public class PicFragment extends Fragment {
 		@Override
 		public void onLoaded(String thumbUrl, Bitmap bitmap) {
 			mLruCache.put(thumbUrl, bitmap);
+
 		}
 	};
 }

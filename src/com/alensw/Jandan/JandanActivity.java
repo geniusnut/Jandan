@@ -4,14 +4,8 @@ import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.StateListDrawable;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
+import android.os.*;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -22,8 +16,6 @@ import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import com.alensw.ui.BadgeView;
-import com.alensw.ui.FloatingActionButton;
-import com.alensw.ui.FloatingActionButton1;
 import com.larvalabs.svgandroid.SVG;
 
 import java.util.ArrayList;
@@ -42,8 +34,11 @@ public class JandanActivity extends ActionBarActivity implements
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle toggle=null;
 	private BadgeView mBadgeView;
+	protected ListView mListView;
 	protected SimpleAdapter mAdapter;
-	protected FloatingActionButton mButton;
+	protected JandanParser mParser;
+	private Handler mHandler = new Handler(Looper.getMainLooper());
+	protected boolean isParsing = false;
 	int page = 0;
 	protected List<Map<String, Object>> items = new ArrayList<Map<String,Object>>();
 	private ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
@@ -60,7 +55,6 @@ public class JandanActivity extends ActionBarActivity implements
 		editor.apply();
 
 		toolbar = (Toolbar) findViewById(R.id.toolbar);
-		toolbar.setBackgroundDrawable(new ColorDrawable(Color.argb(255, 255, 235, 54)));
 		if (toolbar != null) {
 			toolbar.setTitle("煎蛋");
 			setSupportActionBar(toolbar);
@@ -73,30 +67,6 @@ public class JandanActivity extends ActionBarActivity implements
 		mBadgeView.setBadgeMargin(0, 0);
 		mBadgeView.show();
 
-		mButton = (FloatingActionButton) findViewById(R.id.setter);
-		mButton.setSize(FloatingActionButton.SIZE_MINI);
-		mButton.setColorNormalResId(R.color.white);
-		mButton.setColorPressedResId(R.color.white_pressed);
-		mButton.setIconDrawable(SVG.getDrawable(getResources(), R.raw.ic_favorite, R.color.half_black));
-		mButton.setStrokeVisible(false);
-
-		mButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				mButton.setClickState();
-				mButton.setIconDrawable(createDrawable(mButton.mClicked));
-				mButton.invalidate();
-			}
-		});
-
-
-		FloatingActionButton1 mFab = new FloatingActionButton1.Builder(this)
-				.withColor(getResources().getColor(R.color.white))
-				.withDrawable(getResources().getDrawable(R.drawable.icon_expand))
-				.withSize(72)
-				.withMargins(16, 0, 0, 16)
-				.create();
-
 		if (getFragmentManager().findFragmentById(R.id.content) == null) {
 			showNews();
 		}
@@ -105,25 +75,6 @@ public class JandanActivity extends ActionBarActivity implements
 
 	}
 
-
-	public static final int[] STATE_CHECKED = {android.R.attr.state_checked};
-	public static final int[] STATE_NORMAL = {};
-
-	public static Drawable createCheckButtonDrawable(Resources res, int color) {
-		final StateListDrawable sd = new StateListDrawable();
-		final Drawable d1 = SVG.getDrawable(res, R.raw.ic_favorite, color);
-		final Drawable d2 = SVG.getDrawable(res, R.raw.ic_favorite_outline, color);
-		sd.addState(STATE_CHECKED, d1);
-		sd.addState(STATE_NORMAL, d2);
-		return sd;
-	}
-
-	public Drawable createDrawable(boolean clicked) {
-		if (clicked)
-			return SVG.getDrawable(getResources(), R.raw.ic_favorite, R.color.half_black);
-		else
-			return SVG.getDrawable(getResources(), R.raw.ic_favorite_outline, R.color.half_black);
-	}
 	private ImageButton getNavButtonView(Toolbar toolbar) {
 		for (int i = 0; i < toolbar.getChildCount(); i++)
 			if (toolbar.getChildAt(i) instanceof ImageButton)
