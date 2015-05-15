@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.alensw.Jandan"
+    package="com.nut.Jandan"
           android:versionCode="1"
           android:versionName="1.0">
     <uses-sdk android:minSdkVersion="14"/>
@@ -14,7 +14,7 @@
         android:icon="@drawable/jandan">
 
         <activity
-            android:name="JandanActivity"
+            android:name="com.nut.Jandan.JandanActivity"
             android:label="@string/app_name"
             android:theme="@style/myAppTheme">
             <intent-filter>
@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PostActivity"
+            android:name="com.nut.Jandan.PostActivity"
             android:label="@string/app_name"
             android:theme="@style/myAppTheme">
             <intent-filter>
@@ -32,7 +32,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PicActivity1"
+            android:name=".PicActivity"
             android:label="@string/app_name"
             android:theme="@style/myAppTheme">
             <intent-filter>

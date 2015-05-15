@@ -1,9 +1,8 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:orientation="vertical"
     android:layout_height="match_parent"
-    tools:context=".JandanActiviy">
+    tools:context=".JandanActivity">
 
     <include layout="@layout/toolbar" />
 
@@ -28,12 +27,14 @@
             android:layout_height="match_parent">
             <ListView
                 android:id="@+id/drawer_list"
-                android:layout_width="240dp"
+                android:clipToPadding="false"
+                android:paddingTop="100dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:choiceMode="singleChoice"
-                android:divider="@android:color/transparent"
-                android:dividerHeight="0dp"/>
+                android:divider="@android:color/white"
+                android:dividerHeight="1dp" />
         </RelativeLayout>
     </android.support.v4.widget.DrawerLayout>
-</LinearLayout>
+</FrameLayout>

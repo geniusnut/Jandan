@@ -47,7 +47,7 @@ import java.util.StringTokenizer;
  * Entry point for parsing SVG files for Android.
  * Use one of the various static methods for parsing SVGs by resource, asset or input stream.
  * Optionally, a single color can be searched and replaced in the SVG while parsing.
- * You can also parse an svg path directly.
+ * You can also parsePosts an svg path directly.
  *
  * @author Larva Labs, LLC
  * @see #getSVGFromResource(android.content.res.Resources, int)
@@ -197,11 +197,11 @@ public class SVGParser {
                             xr.setContentHandler(idHandler);
 
                             ByteArrayInputStream svgData = cin.getCopy();
-                            xr.parse(new InputSource(cin.getCopy()));
+                            xr.parsePosts(new InputSource(cin.getCopy()));
                             svgHandler.idXml = idHandler.idXml;
 
                             xr.setContentHandler(svgHandler);
-                            xr.parse(new InputSource(cin.getCopy()));
+                            xr.parsePosts(new InputSource(cin.getCopy()));
                         }
                         Log.i(TAG, "Parsing complete in " + (System.currentTimeMillis() - start) + " millis.");*/
 			SVG result = new SVG(picture, svgHandler.bounds);
@@ -410,7 +410,7 @@ public class SVGParser {
 	}
 
 	/**
-	 * This is where the hard-to-parse paths are handled.
+	 * This is where the hard-to-parsePosts paths are handled.
 	 * Uppercase rules are absolute positions, lowercase are relative.
 	 * Types of path rules:
 	 * <p/>

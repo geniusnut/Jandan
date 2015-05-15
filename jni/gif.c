@@ -31,7 +31,7 @@ static jobject createGifInfoHandle(GifInfo *gifInfo, JNIEnv *env) {
     if (gifInfo == NULL)
         return NULL;
     jclass gifInfoHandleClass = (*env)->FindClass(env,
-            "com/alensw/gif/GifInfoHandle");
+            "com/nut/gif/GifInfoHandle");
     if (gifInfoHandleClass == NULL)
         return NULL;
     jmethodID gifInfoHandleCtorMID = (*env)->GetMethodID(env, gifInfoHandleClass, "<init>", "(JIII)V");
@@ -405,7 +405,7 @@ static int DDGifSlurp(GifFileType *GifFile, GifInfo *info, bool shouldDecode) {
 
 static void throwGifIOException(int errorCode, JNIEnv *env) {//nullchecks just to prevent segfaults, LinkageError will be thrown if GifIOException cannot be instantiated
     jclass exClass = (*env)->FindClass(env,
-            "com/alensw/gif/GifIOException");
+            "com/nut/gif/GifIOException");
     if (exClass == NULL)
         return;
     jmethodID mid = (*env)->GetMethodID(env, exClass, "<init>", "(I)V");
@@ -490,7 +490,7 @@ static jobject createGifHandle(GifFileType *GifFileIn, int Error, long startPos,
         return NULL;
     }
     jclass gifInfoHandleClass = (*env)->FindClass(env,
-            "com/alensw/gif/GifInfoHandle");
+            "com/nut/gif/GifInfoHandle");
     if (gifInfoHandleClass == NULL)
         return NULL;
     jmethodID gifInfoHandleCtorMID = (*env)->GetMethodID(env, gifInfoHandleClass, "<init>", "(JIII)V");
@@ -503,7 +503,7 @@ static jobject createGifHandle(GifFileType *GifFileIn, int Error, long startPos,
 }
 
 JNIEXPORT jobject JNICALL
-Java_com_alensw_gif_GifInfoHandle_openFile(JNIEnv *env, jclass __unused class,
+Java_com_nut_gif_GifInfoHandle_openFile(JNIEnv *env, jclass __unused class,
         jstring jfname, jboolean justDecodeMetaData) {
     if (isSourceNull(jfname, env)) {
         return NULL;
@@ -522,7 +522,7 @@ Java_com_alensw_gif_GifInfoHandle_openFile(JNIEnv *env, jclass __unused class,
 }
 
 JNIEXPORT jobject JNICALL
-Java_com_alensw_gif_GifInfoHandle_openByteArray(JNIEnv *env, jclass __unused class,
+Java_com_nut_gif_GifInfoHandle_openByteArray(JNIEnv *env, jclass __unused class,
         jbyteArray bytes, jboolean justDecodeMetaData) {
     if (isSourceNull(bytes, env)) {
         return NULL;
@@ -548,7 +548,7 @@ Java_com_alensw_gif_GifInfoHandle_openByteArray(JNIEnv *env, jclass __unused cla
 }
 
 JNIEXPORT jobject JNICALL
-Java_com_alensw_gif_GifInfoHandle_openDirectByteBuffer(JNIEnv *env,
+Java_com_nut_gif_GifInfoHandle_openDirectByteBuffer(JNIEnv *env,
         jclass __unused class, jobject buffer, jboolean justDecodeMetaData) {
     jbyte *bytes = (*env)->GetDirectBufferAddress(env, buffer);
     jlong capacity = (*env)->GetDirectBufferCapacity(env, buffer);
@@ -576,7 +576,7 @@ Java_com_alensw_gif_GifInfoHandle_openDirectByteBuffer(JNIEnv *env,
 }
 
 JNIEXPORT jobject JNICALL
-Java_com_alensw_gif_GifInfoHandle_openStream(JNIEnv *env, jclass __unused class,
+Java_com_nut_gif_GifInfoHandle_openStream(JNIEnv *env, jclass __unused class,
         jobject stream, jboolean justDecodeMetaData) {
     jclass streamCls = (*env)->NewGlobalRef(env,
             (*env)->GetObjectClass(env, stream));
@@ -617,7 +617,7 @@ Java_com_alensw_gif_GifInfoHandle_openStream(JNIEnv *env, jclass __unused class,
 }
 
 JNIEXPORT jobject JNICALL
-Java_com_alensw_gif_GifInfoHandle_openFd(JNIEnv *env, jclass __unused handleClass,
+Java_com_nut_gif_GifInfoHandle_openFd(JNIEnv *env, jclass __unused handleClass,
         jobject jfd, jlong offset, jboolean justDecodeMetaData) {
     if (isSourceNull(jfd, env)) {
         return NULL;
@@ -794,7 +794,7 @@ static void getBitmap(argb *bm, GifInfo *info) {
 }
 
 JNIEXPORT void JNICALL
-Java_com_alensw_gif_GifInfoHandle_reset(JNIEnv *__unused  env, jclass  __unused class,
+Java_com_nut_gif_GifInfoHandle_reset(JNIEnv *__unused  env, jclass  __unused class,
         jlong gifInfo) {
     GifInfo *info = (GifInfo *) (intptr_t) gifInfo;
     if (info == NULL)
@@ -803,7 +803,7 @@ Java_com_alensw_gif_GifInfoHandle_reset(JNIEnv *__unused  env, jclass  __unused 
 }
 
 JNIEXPORT void JNICALL
-Java_com_alensw_gif_GifInfoHandle_setSpeedFactor(JNIEnv __unused *env, jclass __unused handleClass,
+Java_com_nut_gif_GifInfoHandle_setSpeedFactor(JNIEnv __unused *env, jclass __unused handleClass,
         jlong gifInfo, jfloat factor) {
     GifInfo *info = (GifInfo *) (intptr_t) gifInfo;
     if (info == NULL)
@@ -812,7 +812,7 @@ Java_com_alensw_gif_GifInfoHandle_setSpeedFactor(JNIEnv __unused *env, jclass __
 }
 
 JNIEXPORT void JNICALL
-Java_com_alensw_gif_GifInfoHandle_seekToTime(JNIEnv *env, jclass __unused handleClass,
+Java_com_nut_gif_GifInfoHandle_seekToTime(JNIEnv *env, jclass __unused handleClass,
         jlong gifInfo, jint desiredPos, jobject jbitmap) {
     GifInfo *info = (GifInfo *) (intptr_t) gifInfo;
     if (info == NULL)
@@ -856,7 +856,7 @@ Java_com_alensw_gif_GifInfoHandle_seekToTime(JNIEnv *env, jclass __unused handle
 }
 
 JNIEXPORT void JNICALL
-Java_com_alensw_gif_GifInfoHandle_seekToFrame(JNIEnv *env, jclass __unused handleClass,
+Java_com_nut_gif_GifInfoHandle_seekToFrame(JNIEnv *env, jclass __unused handleClass,
         jlong gifInfo, jint desiredIdx, jobject jbitmap) {
     GifInfo *info = (GifInfo *) (intptr_t) gifInfo;
     if (info == NULL)
@@ -895,7 +895,7 @@ static inline jlong packRenderFrameResult(int invalidationDelay, bool isAnimatio
 }
 
 JNIEXPORT jlong JNICALL
-Java_com_alensw_gif_GifInfoHandle_renderFrame(JNIEnv *env, jclass __unused handleClass,
+Java_com_nut_gif_GifInfoHandle_renderFrame(JNIEnv *env, jclass __unused handleClass,
         jobject jbitmap, jlong gifInfo) {
     GifInfo *info = (GifInfo *) (intptr_t) gifInfo;
     if (info == NULL)
@@ -950,7 +950,7 @@ Java_com_alensw_gif_GifInfoHandle_renderFrame(JNIEnv *env, jclass __unused handl
 }
 
 JNIEXPORT void JNICALL
-Java_com_alensw_gif_GifInfoHandle_free(JNIEnv *env, jclass __unused handleClass,
+Java_com_nut_gif_GifInfoHandle_free(JNIEnv *env, jclass __unused handleClass,
         jlong gifInfo) {
     GifInfo *info = (GifInfo *) (intptr_t) gifInfo;
     if (info == NULL)
@@ -992,7 +992,7 @@ Java_com_alensw_gif_GifInfoHandle_free(JNIEnv *env, jclass __unused handleClass,
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_alensw_gif_GifInfoHandle_getComment(JNIEnv *env, jclass __unused handleClass,
+Java_com_nut_gif_GifInfoHandle_getComment(JNIEnv *env, jclass __unused handleClass,
         jlong gifInfo) {
     GifInfo *info = (GifInfo *) (intptr_t) gifInfo;
     if (info == NULL)
@@ -1001,7 +1001,7 @@ Java_com_alensw_gif_GifInfoHandle_getComment(JNIEnv *env, jclass __unused handle
 }
 
 JNIEXPORT jint JNICALL
-Java_com_alensw_gif_GifInfoHandle_getLoopCount(JNIEnv __unused *env, jclass __unused handleClass,
+Java_com_nut_gif_GifInfoHandle_getLoopCount(JNIEnv __unused *env, jclass __unused handleClass,
         jlong gifInfo) {
     GifInfo *info = (GifInfo *) (intptr_t) gifInfo;
     if (info == NULL)
@@ -1010,7 +1010,7 @@ Java_com_alensw_gif_GifInfoHandle_getLoopCount(JNIEnv __unused *env, jclass __un
 }
 
 JNIEXPORT jint JNICALL
-Java_com_alensw_gif_GifInfoHandle_getDuration(JNIEnv *__unused  env, jclass __unused handleClass,
+Java_com_nut_gif_GifInfoHandle_getDuration(JNIEnv *__unused  env, jclass __unused handleClass,
         jlong gifInfo) {
     GifInfo *info = (GifInfo *) (intptr_t) gifInfo;
     if (info == NULL)
@@ -1023,7 +1023,7 @@ Java_com_alensw_gif_GifInfoHandle_getDuration(JNIEnv *__unused  env, jclass __un
 }
 
 JNIEXPORT jint JNICALL
-Java_com_alensw_gif_GifInfoHandle_getCurrentPosition(JNIEnv *__unused env,
+Java_com_nut_gif_GifInfoHandle_getCurrentPosition(JNIEnv *__unused env,
         jclass __unused handleClass, jlong gifInfo) {
     GifInfo *info = (GifInfo *) (intptr_t) gifInfo;
     if (info == NULL)
@@ -1047,7 +1047,7 @@ Java_com_alensw_gif_GifInfoHandle_getCurrentPosition(JNIEnv *__unused env,
 }
 
 JNIEXPORT void JNICALL
-Java_com_alensw_gif_GifInfoHandle_saveRemainder(JNIEnv *__unused  env, jclass __unused handleClass,
+Java_com_nut_gif_GifInfoHandle_saveRemainder(JNIEnv *__unused  env, jclass __unused handleClass,
         jlong gifInfo) {
     GifInfo *info = (GifInfo *) (intptr_t) gifInfo;
     if (info == NULL)
@@ -1056,7 +1056,7 @@ Java_com_alensw_gif_GifInfoHandle_saveRemainder(JNIEnv *__unused  env, jclass __
 }
 
 JNIEXPORT void JNICALL
-Java_com_alensw_gif_GifInfoHandle_restoreRemainder(JNIEnv *__unused env,
+Java_com_nut_gif_GifInfoHandle_restoreRemainder(JNIEnv *__unused env,
         jclass __unused handleClass, jlong gifInfo) {
     GifInfo *info = (GifInfo *) (intptr_t) gifInfo;
     if (info == NULL || info->lastFrameReaminder == ULONG_MAX || info->gifFilePtr->ImageCount <= 1)
@@ -1066,7 +1066,7 @@ Java_com_alensw_gif_GifInfoHandle_restoreRemainder(JNIEnv *__unused env,
 }
 
 JNIEXPORT jlong JNICALL
-Java_com_alensw_gif_GifInfoHandle_getAllocationByteCount(JNIEnv *__unused  env,
+Java_com_nut_gif_GifInfoHandle_getAllocationByteCount(JNIEnv *__unused  env,
         jclass __unused handleClass, jlong gifInfo) {
     GifInfo *info = (GifInfo *) (intptr_t) gifInfo;
     if (info == NULL)
@@ -1079,7 +1079,7 @@ Java_com_alensw_gif_GifInfoHandle_getAllocationByteCount(JNIEnv *__unused  env,
 }
 
 JNIEXPORT jint JNICALL
-Java_com_alensw_gif_GifInfoHandle_getNativeErrorCode(JNIEnv *__unused  env,
+Java_com_nut_gif_GifInfoHandle_getNativeErrorCode(JNIEnv *__unused  env,
         jclass __unused handleClass, jlong gifInfo) {
     GifInfo *info = (GifInfo *) (intptr_t) gifInfo;
     if (info == NULL)

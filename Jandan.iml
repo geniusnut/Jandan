@@ -17,5 +17,8 @@
     <orderEntry type="library" name="android-support-v7-appcompat" level="project" />
     <orderEntry type="library" name="android-support-v4" level="project" />
     <orderEntry type="library" name="jsoup-1.8.1" level="project" />
+    <orderEntry type="module" module-name="cardview" />
+    <orderEntry type="library" name="android-support-v7-cardview" level="project" />
+    <orderEntry type="library" name="android-support-v7-recyclerview" level="project" />
   </component>
 </module>
