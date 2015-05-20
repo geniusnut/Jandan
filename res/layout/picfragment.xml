@@ -6,16 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/pic_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:dividerHeight="1dp"
-        android:divider="@drawable/extra_news_item_divider"
-        android:background="#e5e5e5"
-        android:animateLayoutChanges="true"
-        >
-
-    </ListView>
+        android:background="#e5e5e5" />
 
 </android.support.v4.widget.SwipeRefreshLayout>

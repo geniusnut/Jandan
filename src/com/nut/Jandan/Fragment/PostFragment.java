@@ -1,4 +1,4 @@
-package com.nut.Jandan;
+package com.nut.Jandan.Fragment;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,6 +13,7 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.nut.Jandan.R;
 import com.nut.cache.Post;
 import com.nut.dao.PostFormater;
 import com.nut.ui.CustomScrollView;
@@ -157,7 +158,6 @@ public class PostFragment extends Fragment {
 		Log.d("PostFragment", "start: " + mScrollView.getTag() + ", y: " + mScrollView.getScrollY());
 	}
 
-
 	static public PostFragment newInstance(Post post) {
 		PostFragment postFragment = new PostFragment();
 		Bundle args = new Bundle();
@@ -167,4 +167,5 @@ public class PostFragment extends Fragment {
 		postFragment.setArguments(args);
 		return postFragment;
 	}
+
 }

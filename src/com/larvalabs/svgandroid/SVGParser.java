@@ -360,8 +360,8 @@ public class SVGParser {
 				}
 				matrix.preTranslate(tx, ty);
 			}
-		} else if (s.startsWith("scale(")) {
-			NumberParse np = parseNumbers(s.substring("scale(".length()));
+		} else if (s.startsWith("slide_in_right(")) {
+			NumberParse np = parseNumbers(s.substring("slide_in_right(".length()));
 			if (np.numbers.size() > 0) {
 				float sx = np.numbers.get(0);
 				float sy = sx;

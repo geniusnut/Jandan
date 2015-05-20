@@ -497,7 +497,7 @@ public class JandanParser {
         Log.d(TAG, "");
         Bitmap bitmap;
         bitmap = BitmapFactory.decodeFile(path);
-        //  Log.d(TAG, "bitmap height = " + bitmap.getHeight());
+        Log.d(TAG, "bitmap height = " + bitmap.getHeight());
         if (bitmap != null) {
             float whScale = (float) bitmap.getHeight() / bitmap.getWidth();
             if (whScale > 4) {
@@ -510,7 +510,7 @@ public class JandanParser {
                 }
                 Rect rect = new Rect();
                 rect.right = bitmap.getWidth();
-                rect.bottom = (int) (rect.right * 1.6);
+                rect.bottom = (int) (rect.right * 4);
                 return regionDecoder.decodeRegion(rect, null);
             }
         }

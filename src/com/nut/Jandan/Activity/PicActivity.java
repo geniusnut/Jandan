@@ -1,4 +1,4 @@
-package com.nut.Jandan;
+package com.nut.Jandan.Activity;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import com.nut.Jandan.Utilities;
 import com.nut.cache.FileCache;
 import com.nut.cache.Pic;
 import com.nut.gif.GifImageView;
@@ -354,7 +355,7 @@ public class PicActivity extends ActionBarActivity {
 		}
 
 		if (width > screenWidth) {
-			// second try to scale down the image , this time depending upon the screen size
+			// second try to slide_in_right down the image , this time depending upon the screen size
 			scale = (int) Math.floor((float)width / screenWidth);
 		}
 		if (height > screenHeight) {

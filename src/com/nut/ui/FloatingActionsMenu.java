@@ -56,7 +56,7 @@ public class FloatingActionsMenu extends ViewGroup {
 
 	private AnimatorSet mExpandAnimation = new AnimatorSet().setDuration(ANIMATION_DURATION);
 	private AnimatorSet mCollapseAnimation = new AnimatorSet().setDuration(ANIMATION_DURATION);
-	private FloatingActionButton mAddButton;
+	private AddFloatingActionButton mAddButton;
 	private RotatingDrawable mRotatingDrawable;
 	private int mMaxButtonWidth;
 	private int mMaxButtonHeight;
@@ -181,13 +181,14 @@ public class FloatingActionsMenu extends ViewGroup {
 		ShapeDrawable drawable = new ShapeDrawable(shape);
 
 		final Paint paint = drawable.getPaint();
-		paint.setColor(Color.BLUE);
+		paint.setColor(Color.WHITE);
 		paint.setStyle(Paint.Style.FILL);
 		paint.setAntiAlias(true);
 
 		final RotatingDrawable rotatingDrawable = new RotatingDrawable(drawable);
-		mAddButton = new FloatingActionButton.Builder(context)
-				.withDrawable(new RotatingDrawable(rotatingDrawable))
+		mAddButton = new AddFloatingActionButton.Builder(context)
+				.withDrawable(drawable)
+				.withColor(context.getResources().getColor(R.color.teal500))
 				.withSize(64) // dp
 				.withMargins(16, 0, 0, 16)// dp
 				.create();
@@ -195,8 +196,8 @@ public class FloatingActionsMenu extends ViewGroup {
 
 		final OvershootInterpolator interpolator = new OvershootInterpolator();
 
-		final ObjectAnimator collapseAnimator = ObjectAnimator.ofFloat(rotatingDrawable, "rotation", EXPANDED_PLUS_ROTATION, COLLAPSED_PLUS_ROTATION);
-		final ObjectAnimator expandAnimator = ObjectAnimator.ofFloat(rotatingDrawable, "rotation", COLLAPSED_PLUS_ROTATION, EXPANDED_PLUS_ROTATION);
+		final ObjectAnimator collapseAnimator = ObjectAnimator.ofFloat(mAddButton, "rotation", EXPANDED_PLUS_ROTATION, COLLAPSED_PLUS_ROTATION);
+		final ObjectAnimator expandAnimator = ObjectAnimator.ofFloat(mAddButton, "rotation", COLLAPSED_PLUS_ROTATION, EXPANDED_PLUS_ROTATION);
 
 		collapseAnimator.setInterpolator(interpolator);
 		expandAnimator.setInterpolator(interpolator);
@@ -244,57 +245,6 @@ public class FloatingActionsMenu extends ViewGroup {
 	}
 
 	@Override
-	public boolean onInterceptTouchEvent(MotionEvent ev) {
-		final int action = ev.getAction();
-		if ((action == MotionEvent.ACTION_MOVE) && (mIsBeingDragged)) {
-			return true;
-		}
-
-		final int y = (int) ev.getY();
-
-		switch (action) {
-			case MotionEvent.ACTION_MOVE:
-				if (mIsBeingDragged) {
-					// We're currently scrolling, so yes, intercept the
-					// touch event!
-					return true;
-				}
-
-				// If the user has dragged her finger horizontally more than
-				// the touch slop, start the scroll
-
-				final int dy = Math.abs(y - mLastY);
-
-				// Touch slop should be calculated using ViewConfiguration
-				// constants.
-				if (dy > mTouchSlop) {
-					// Start scrolling!
-					mIsBeingDragged = true;
-					mLastY = y;
-					return true;
-				}
-				final ViewParent parent = getParent();
-				if (parent != null) {
-					parent.requestDisallowInterceptTouchEvent(true);
-				}
-				break;
-			case MotionEvent.ACTION_DOWN:
-				mLastY = y;
-				break;
-			case MotionEvent.ACTION_CANCEL:
-			case MotionEvent.ACTION_UP:
-				/* Release the drag */
-				mIsBeingDragged = false;
-				recycleVelocityTracker();
-
-				break;
-		}
-
-		return mIsBeingDragged;
-	}
-
-
-	@Override
 	public void computeScroll() {
 		super.computeScroll();
 		if (mScroller.computeScrollOffset()) {
@@ -303,26 +253,6 @@ public class FloatingActionsMenu extends ViewGroup {
 		}
 
 	}
-
-	private int getVelocity() {
-		mVelocityTracker.computeCurrentVelocity(1000);
-		return (int) mVelocityTracker.getYVelocity();
-	}
-
-	private void recycleVelocityTracker() {
-		if (mVelocityTracker != null) {
-			mVelocityTracker.recycle();
-			mVelocityTracker = null;
-		}
-	}
-
-	private void obtainVelocity(MotionEvent event) {
-		if (mVelocityTracker == null) {
-			mVelocityTracker = VelocityTracker.obtain();
-		}
-		mVelocityTracker.addMovement(event);
-	}
-
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {

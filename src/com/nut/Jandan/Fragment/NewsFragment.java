@@ -1,9 +1,8 @@
-package com.nut.Jandan;
+package com.nut.Jandan.Fragment;
 
 import android.app.Fragment;
-import android.content.ClipData;
-import android.content.ClipDescription;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -21,9 +20,17 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
+import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+import com.nut.Jandan.Activity.JandanActivity;
+import com.nut.Jandan.Activity.PostActivity;
+import com.nut.Jandan.R;
 import com.nut.cache.NewsFile;
 import com.nut.cache.Post;
-import com.nut.dao.ImageLoader;
 import com.nut.http.JandanParser;
 import com.nut.http.PostParser;
 import com.nut.ui.FloatingActionButton;
@@ -173,7 +180,7 @@ public class NewsFragment extends Fragment {
 	private void hideViews() {
 		mToolbar.animate().translationY(-mToolbar.getHeight()).setInterpolator(new AccelerateInterpolator(2));
 		mToolbar.animate().alpha(0).setInterpolator(new AccelerateInterpolator(2));
-		RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mFam.getLayoutParams();
+		FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mFam.getLayoutParams();
 		int fabBottomMargin = lp.bottomMargin;
 		mFam.animate().translationY(mFam.getHeight() + fabBottomMargin).setInterpolator(new AccelerateInterpolator(2)).start();
 	}
@@ -192,7 +199,22 @@ public class NewsFragment extends Fragment {
 		mPostParser = new PostParser();
 
 		mCovers = new ConcurrentHashMap<>(64);
-		mImageLoader = new ImageLoader(getActivity());
+
+		// This configuration tuning is custom. You can tune every option, you may tune some of them,
+		// or you can create default configuration by
+		//  ImageLoaderConfiguration.createDefault(this);
+		// method.
+		ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(getActivity());
+		config.threadPriority(Thread.NORM_PRIORITY - 2);
+		config.denyCacheImageMultipleSizesInMemory();
+		config.diskCacheFileNameGenerator(new Md5FileNameGenerator());
+		config.diskCacheSize(50 * 1024 * 1024); // 50 MiB
+		config.tasksProcessingOrder(QueueProcessingType.LIFO);
+		config.writeDebugLogs(); // Remove for release app
+
+		// Initialize ImageLoader with configuration.
+		ImageLoader.getInstance().init(config.build());
+		mImageLoader = ImageLoader.getInstance();
 
 		if (mNewsFile.load(getActivity(), NewsFile.NEWS_FILE_NAME)) {
 			final ArrayList<Post> news = new ArrayList<>(mNewsFile.size());
@@ -331,8 +353,19 @@ public class NewsFragment extends Fragment {
 		public void onClickTitle(View v);
 	}
 
+	private static DisplayImageOptions options = new DisplayImageOptions.Builder()
+			.showImageOnLoading(R.drawable.loading)
+			.showImageForEmptyUri(R.drawable.loading)
+			.showImageOnFail(R.drawable.loading)
+			.cacheInMemory(true)
+			.cacheOnDisk(true)
+			.considerExifParams(true)
+			.bitmapConfig(Bitmap.Config.RGB_565)
+			.build();
+
 	protected final BaseAdapter newsAdapter = new BaseAdapter() {
 		private final int droidGreen = Color.parseColor("#A4C639");
+
 		class ViewHolder {
 			public TextView link;
 			public ImageView image;
@@ -394,51 +427,20 @@ public class NewsFragment extends Fragment {
 			imageView.setImageDrawable(cover);
 		} else {
 			imageView.setImageBitmap(null);
-			mImageLoader.request(thumbUrl, imageView, new ImageLoader.Callback() {
+			mImageLoader.loadImage(thumbUrl, options, new SimpleImageLoadingListener() {
 				@Override
-				public void onLoaded(final String thumbUrl, final Drawable drawable) {
-					mCovers.put(thumbUrl, drawable);
-
+				public void onLoadingComplete(String imageUri, View view, final Bitmap loadedImage) {
+					// Do whatever you want with Bitmap
 					mHandler.post(new Runnable() {
 						@Override
 						public void run() {
 							if (imageView.getTag() == thumbUrl) {
-								imageView.setImageDrawable(drawable);
+								imageView.setImageBitmap(loadedImage);
 							}
 						}
 					});
 				}
 			});
-		}
-	}
-
-	private final ImageLoader.Callback mImageLoaderCallback = new ImageLoader.Callback() {
-		@Override
-		public void onLoaded(String thumbUrl, Drawable drawable) {
-			mCovers.put(thumbUrl, drawable);
-		}
-	};
-
-	private final class MyClickListener implements View.OnLongClickListener {
-		// called when the item is long-clicked
-		@Override
-		public boolean onLongClick(View view) {
-			// TODO Auto-generated method stub
-
-			// create it from the object's tag
-			ClipData.Item item = new ClipData.Item((CharSequence) view.getTag());
-
-			String[] mimeTypes = {ClipDescription.MIMETYPE_TEXT_PLAIN};
-			ClipData data = new ClipData(view.getTag().toString(), mimeTypes, item);
-			View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
-
-			view.startDrag(data, //data to be dragged
-					shadowBuilder, //drag shadow
-					view, //local data about the drag and drop operation
-					0   //no needed flags
-			);
-			view.setVisibility(View.INVISIBLE);
-			return true;
 		}
 	}
 }

@@ -142,7 +142,7 @@ public class SVG {
 			final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 			final Canvas canvas = new Canvas(bitmap);
 			if (width != width0 || height != height0)
-				canvas.scale((float) width / width0, (float) height / height0);
+				canvas.slide_in_right((float) width / width0, (float) height / height0);
 			picture.draw(canvas);
 			return new BitmapDrawable(res, bitmap);
 		} catch (Throwable e) {

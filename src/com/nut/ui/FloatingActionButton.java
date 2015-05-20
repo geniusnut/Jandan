@@ -22,24 +22,26 @@ import com.nut.Jandan.R;
 
 public class FloatingActionButton extends View {
 
-	private Context context;
-	Paint mButtonPaint;
-	Paint mDrawablePaint;
-	Bitmap mBitmap;
-	Drawable mDrawable;
-	FrameLayout.LayoutParams mParams;
-	protected final Paint mPaintThin = new Paint(Paint.ANTI_ALIAS_FLAG);
+	protected Paint mButtonPaint;
+	protected Paint mDrawablePaint;
 
-	boolean mHidden = false;
-	public boolean mLiked = false;
-	public long mLikes = 0;
+	protected Bitmap mBitmap;
+	protected FrameLayout.LayoutParams mParams;
+
+	private boolean mHidden = false;
 	private String mTitle;
 
 	public FloatingActionButton(Context context, FrameLayout.LayoutParams params) {
 		super(context);
-		this.context = context;
 		mParams = params;
 		init(Color.WHITE);
+	}
+
+	public FloatingActionButton(Builder builder) {
+		super(builder.context);
+		mParams = builder.params;
+		setColor(builder.color);
+		setDrawable(builder.drawable);
 	}
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -66,25 +68,12 @@ public class FloatingActionButton extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		setClickable(true);
-		//
+		// draw the button circle
 		canvas.drawCircle(getWidth() / 2, getHeight() / 2, (float) (getWidth() / 2.6), mButtonPaint);
 		// draw Bitmap
-		if (mDrawable != null) {
-			mDrawable.setBounds((getWidth() - mDrawable.getIntrinsicWidth()) / 2, (getHeight() - mDrawable.getIntrinsicHeight()) / 2,
-					(getWidth() + mDrawable.getIntrinsicWidth()) / 2, (getHeight() + mDrawable.getIntrinsicHeight()) / 2);
-			mDrawable.draw(canvas);
-		} else
-			canvas.drawBitmap(mBitmap, (getWidth() - mBitmap.getWidth()) / 2,
-					(getHeight() - mBitmap.getHeight()) / 1.8f, mDrawablePaint);
-	}
+		canvas.drawBitmap(mBitmap, (getWidth() - mBitmap.getWidth()) / 2,
+				(getHeight() - mBitmap.getHeight()) / 2f, mDrawablePaint);
 
-	private String convertToStr(long mLikes) {
-		return String.valueOf(mLikes);
-	}
-
-	public void setLikes(long likes) {
-		mLikes = likes;
-		invalidate();
 	}
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -105,11 +94,10 @@ public class FloatingActionButton extends View {
 	public void setDrawable(Drawable drawable) {
 		int w = drawable.getIntrinsicWidth();
 		int h = drawable.getIntrinsicHeight();
-		mDrawable = drawable;
 		Bitmap.Config config = Bitmap.Config.ARGB_8888;
 		if (w == 0 || h == 0) {
-			w = 48;
-			h = 48;
+			w = 72;
+			h = 72;
 		}
 		mBitmap = Bitmap.createBitmap(w, h, config);
 		Canvas canvas = new Canvas(mBitmap);
@@ -154,11 +142,6 @@ public class FloatingActionButton extends View {
 		this.setLayoutParams(mParams);
 	}
 
-	public void setLiked(boolean liked) {
-		mLiked = liked;
-		invalidate();
-	}
-
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public void show() {
 		if (mHidden) {
@@ -188,10 +171,10 @@ public class FloatingActionButton extends View {
 		return mHidden;
 	}
 
-	public static class Builder {
-		private FrameLayout.LayoutParams params;
+	public static class Builder<T extends Builder> {
+		public FrameLayout.LayoutParams params;
 		// private final Activity activity;
-		private Context context;
+		public Context context;
 		private ViewGroup root;
 		int gravity = Gravity.BOTTOM | Gravity.RIGHT; // default bottom right
 		Drawable drawable;
@@ -207,8 +190,8 @@ public class FloatingActionButton extends View {
 		 */
 		public Builder(Context context) {
 			scale = context.getResources().getDisplayMetrics().density;
-			// The calculation (value * scale + 0.5f) is a widely used to convert to dps to pixel
-			// units based on density scale
+			// The calculation (value * slide_in_right + 0.5f) is a widely used to convert to dps to pixel
+			// units based on density slide_in_right
 			// see <a href="http://developer.android.com/guide/practices/screens_support.html">
 			// developer.android.com (Supporting Multiple Screen Sizes)</a>
 			size = (int) (72 * scale + 0.5f); // default size is 72dp by 72dp
@@ -221,18 +204,18 @@ public class FloatingActionButton extends View {
 		/**
 		 * Sets the FAB gravity.
 		 */
-		public Builder withGravity(int gravity) {
+		public T withGravity(int gravity) {
 			this.gravity = gravity;
-			return this;
+			return (T) this;
 		}
 
 		/**
 		 * Sets the FAB margins in dp.
 		 */
-		public Builder withMargins(int left, int top, int right, int bottom) {
+		public T withMargins(int left, int top, int right, int bottom) {
 			params.setMargins((int) (left * scale + 0.5f), (int) (top * scale + 0.5f),
 					(int) (right * scale + 0.5f), (int) (bottom * scale + 0.5f));
-			return this;
+			return (T) this;
 		}
 
 		/**
@@ -240,9 +223,9 @@ public class FloatingActionButton extends View {
 		 *
 		 * @param drawable
 		 */
-		public Builder withDrawable(final Drawable drawable) {
+		public T withDrawable(final Drawable drawable) {
 			this.drawable = drawable;
-			return this;
+			return (T) this;
 		}
 
 		/**
@@ -250,9 +233,9 @@ public class FloatingActionButton extends View {
 		 *
 		 * @param color
 		 */
-		public Builder withColor(final int color) {
+		public T withColor(final int color) {
 			this.color = color;
-			return this;
+			return (T) this;
 		}
 
 		/**
@@ -261,10 +244,10 @@ public class FloatingActionButton extends View {
 		 * @param size
 		 * @return
 		 */
-		public Builder withSize(int size) {
+		public T withSize(int size) {
 			size = (int) (size * scale + 0.5f);
 			params = new FrameLayout.LayoutParams(size, size);
-			return this;
+			return (T) this;
 		}
 
 		/**
@@ -273,10 +256,11 @@ public class FloatingActionButton extends View {
 		 */
 		public FloatingActionButton create() {
 			params.gravity = this.gravity;
+
 			final FloatingActionButton button = new FloatingActionButton(context, params);
 			button.setColor(this.color);
 			button.setDrawable(this.drawable);
-			return button;
+			return new FloatingActionButton(this);
 		}
 	}
 

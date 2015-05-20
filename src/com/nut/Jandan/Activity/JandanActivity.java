@@ -1,4 +1,4 @@
-package com.nut.Jandan;
+package com.nut.Jandan.Activity;
 
 import android.annotation.TargetApi;
 import android.app.Fragment;
@@ -19,6 +19,9 @@ import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import com.larvalabs.svgandroid.SVG;
+import com.nut.Jandan.Fragment.NewsFragment;
+import com.nut.Jandan.Fragment.PicFragment;
+import com.nut.Jandan.R;
 import com.nut.ui.BadgeView;
 
 import java.util.ArrayList;
@@ -61,6 +64,8 @@ public class JandanActivity extends ActionBarActivity implements
 		}
 		mToolbar.setLogo(R.drawable.jandan);
 		View NavView = getNavButtonView(mToolbar);
+
+
 		mBadgeView = new BadgeView(this, NavView);
 		mBadgeView.setBackground(SVG.getDrawable(getResources(), R.raw.ic_dot));
 		mBadgeView.setBadgePosition(1);
@@ -293,6 +298,7 @@ public class JandanActivity extends ActionBarActivity implements
 			getFragmentManager().popBackStack();
 			FragmentTransaction transaction = getFragmentManager().beginTransaction();
 			transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+			overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
 			transaction.replace(R.id.content, newsFrag).commit();
 		}
 	}
@@ -303,7 +309,7 @@ public class JandanActivity extends ActionBarActivity implements
 		if (!picFrag.isVisible()) {
 			getFragmentManager().popBackStack();
 			FragmentTransaction transaction = getFragmentManager().beginTransaction();
-			transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+			transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right);
 			transaction.replace(R.id.content, picFrag).commit();
 		}
 	}

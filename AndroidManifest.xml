@@ -14,7 +14,7 @@
         android:icon="@drawable/jandan">
 
         <activity
-            android:name="com.nut.Jandan.JandanActivity"
+            android:name=".Activity.JandanActivity"
             android:label="@string/app_name"
             android:theme="@style/myAppTheme">
             <intent-filter>
@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.nut.Jandan.PostActivity"
+            android:name=".Activity.PostActivity"
             android:label="@string/app_name"
             android:theme="@style/myAppTheme">
             <intent-filter>
@@ -32,7 +32,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PicActivity"
+            android:name=".Activity.PicActivity"
             android:label="@string/app_name"
             android:theme="@style/myAppTheme">
             <intent-filter>

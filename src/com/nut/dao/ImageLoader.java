@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class ImageLoader {
 
 	private final ThreadPoolExecutor mExecutor = new ThreadPoolExecutor(2, 4,
-			10, TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(25));
+			10, TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(256));
 
 
 	public static interface Callback {

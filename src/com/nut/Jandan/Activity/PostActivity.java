@@ -1,4 +1,4 @@
-package com.nut.Jandan;
+package com.nut.Jandan.Activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.*;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import com.nut.Jandan.Fragment.PostFragment;
+import com.nut.Jandan.R;
 import com.nut.cache.NewsFile;
 import com.nut.cache.Post;
 

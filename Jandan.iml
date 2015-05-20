@@ -20,5 +20,6 @@
     <orderEntry type="module" module-name="cardview" />
     <orderEntry type="library" name="android-support-v7-cardview" level="project" />
     <orderEntry type="library" name="android-support-v7-recyclerview" level="project" />
+    <orderEntry type="library" name="universal-image-loader-1.9.3" level="project" />
   </component>
 </module>
