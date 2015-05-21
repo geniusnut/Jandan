@@ -10,6 +10,8 @@
         android:id="@+id/pic_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#e5e5e5" />
+        android:clipToPadding="false"
+        android:background="#e5e5e5"
+        android:paddingTop="?attr/actionBarSize" />
 
 </android.support.v4.widget.SwipeRefreshLayout>

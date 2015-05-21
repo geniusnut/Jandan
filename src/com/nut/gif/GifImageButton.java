@@ -121,7 +121,7 @@ public class GifImageButton extends ImageButton {
      * is called as fallback.
      * For supported URI schemes see: {@link android.content.ContentResolver#openAssetFileDescriptor(android.net.Uri, String)}.
      *
-     * @param uri The Uri of an image
+     * @param uri The Uri of an scaleImage
      */
     @Override
     public void setImageURI(Uri uri) {

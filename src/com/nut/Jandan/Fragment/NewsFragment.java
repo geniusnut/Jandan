@@ -9,9 +9,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -93,13 +93,15 @@ public class NewsFragment extends Fragment {
 		mRecList.setHasFixedSize(true);
 		LinearLayoutManager llm = new LinearLayoutManager(getActivity());
 		llm.setOrientation(LinearLayoutManager.VERTICAL);
-		GridLayoutManager glm = new GridLayoutManager(getActivity(), 2);
-		glm.setOrientation(GridLayout.VERTICAL);
 		mRecList.setLayoutManager(llm);
 		NewsAdapter na = new NewsAdapter();
 		mRecList.setAdapter(na);
 
 		mRecList.setOnScrollListener(new HidingScrollListener() {
+			private int previousTotal = 0; // The total number of items in the dataset after the last load
+			private boolean loading = true; // True if we are still waiting for the last set of data to load.
+			private int visibleThreshold = 5;
+			int firstVisibleItem, visibleItemCount, totalItemCount;
 			@Override
 			public void onHide() {
 				hideViews();
@@ -107,6 +109,26 @@ public class NewsFragment extends Fragment {
 			@Override
 			public void onShow() {
 				showViews();
+			}
+
+			@Override
+			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+				super.onScrolled(recyclerView, dx, dy);
+				visibleItemCount = recyclerView.getChildCount();
+				totalItemCount = ((LinearLayoutManager) recyclerView.getLayoutManager()).getItemCount();
+
+				if (loading) {
+					if (totalItemCount > previousTotal) {
+						loading = false;
+						previousTotal = totalItemCount;
+					}
+				}
+				if (!loading && (totalItemCount - visibleItemCount)
+						<= (firstVisibleItem + visibleThreshold)) {
+
+					new NewsLoader().execute(++page);
+					loading = true;
+				}
 			}
 		});
 
@@ -139,16 +161,25 @@ public class NewsFragment extends Fragment {
 	}
 
 	//borrow code from https://mzgreen.github.io/2015/02/15/How-to-hideshow-Toolbar-when-list-is-scroling(part1)/
-	public abstract class HidingScrollListener extends RecyclerView.OnScrollListener {
+	public static abstract class HidingScrollListener extends RecyclerView.OnScrollListener {
 		private static final int HIDE_THRESHOLD = 20;
 		private int scrolledDistance = 0;
 		private boolean controlsVisible = true;
 
+
 		@Override
 		public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 			super.onScrolled(recyclerView, dx, dy);
+			int firstVisibleItem = 0;
+			int[] into = new int[2];
+			RecyclerView.LayoutManager lm = recyclerView.getLayoutManager();
+			if (lm instanceof StaggeredGridLayoutManager) {
+				((StaggeredGridLayoutManager) lm).findFirstVisibleItemPositions(into);
+				firstVisibleItem = into[0];
+			} else if (lm instanceof LinearLayoutManager) {
+				firstVisibleItem = ((LinearLayoutManager) lm).findFirstVisibleItemPosition();
+			}
 
-			int firstVisibleItem = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
 			if (firstVisibleItem == 0) {
 				if (!controlsVisible) {
 					onShow();
@@ -165,7 +196,6 @@ public class NewsFragment extends Fragment {
 					scrolledDistance = 0;
 				}
 			}
-
 			if ((controlsVisible && dy > 0) || (!controlsVisible && dy < 0)) {
 				scrolledDistance += dy;
 			}
@@ -200,10 +230,6 @@ public class NewsFragment extends Fragment {
 
 		mCovers = new ConcurrentHashMap<>(64);
 
-		// This configuration tuning is custom. You can tune every option, you may tune some of them,
-		// or you can create default configuration by
-		//  ImageLoaderConfiguration.createDefault(this);
-		// method.
 		ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(getActivity());
 		config.threadPriority(Thread.NORM_PRIORITY - 2);
 		config.denyCacheImageMultipleSizesInMemory();
@@ -319,7 +345,7 @@ public class NewsFragment extends Fragment {
 			public NewsViewHolder(View itemView, IVHClickListener listener) {
 				super(itemView);
 				link = (TextView) itemView.findViewById(R.id.link);
-				image = (ImageView) itemView.findViewById(R.id.image);
+				image = (ImageView) itemView.findViewById(R.id.scale_image);
 				title = (TextView) itemView.findViewById(R.id.title);
 				by = (TextView) itemView.findViewById(R.id.by);
 				tag = (TextView) itemView.findViewById(R.id.tag);
@@ -353,7 +379,7 @@ public class NewsFragment extends Fragment {
 		public void onClickTitle(View v);
 	}
 
-	private static DisplayImageOptions options = new DisplayImageOptions.Builder()
+	public static DisplayImageOptions options = new DisplayImageOptions.Builder()
 			.showImageOnLoading(R.drawable.loading)
 			.showImageForEmptyUri(R.drawable.loading)
 			.showImageOnFail(R.drawable.loading)
@@ -397,7 +423,7 @@ public class NewsFragment extends Fragment {
 				convertView = inflater.inflate(R.layout.card_news_item, null);
 				viewHolder = new ViewHolder();
 				viewHolder.link = (TextView) convertView.findViewById(R.id.link);
-				viewHolder.image = (ImageView) convertView.findViewById(R.id.image);
+				viewHolder.image = (ImageView) convertView.findViewById(R.id.scale_image);
 				viewHolder.title = (TextView) convertView.findViewById(R.id.title);
 				viewHolder.by = (TextView) convertView.findViewById(R.id.by);
 				viewHolder.tag = (TextView) convertView.findViewById(R.id.tag);

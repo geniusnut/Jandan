@@ -92,7 +92,7 @@ public class JandanParser {
                 item.mLink = matcher.group();
             }
 
-            //image
+            //scaleImage
             pattern = Pattern.compile("src=\"(.*?)\"");
             matcher = pattern.matcher(thumbs_b.toString());
             if (matcher.find()) {
@@ -284,7 +284,7 @@ public class JandanParser {
                 mCache.updateCache(values);
 
             //add item to items
-//            if(item.get("image") != null) {
+//            if(item.get("scaleImage") != null) {
 //                items.add(item);
 //            }
         }
@@ -310,7 +310,7 @@ public class JandanParser {
         public void done() {
             try {
                 File file = get();
-                //mItem.put("image", createThumbnail(file.getPath()));
+                //mItem.put("scaleImage", createThumbnail(file.getPath()));
                 mItem.put("image", file.getPath());
 
                 listener.OnImageChanged();
@@ -446,7 +446,7 @@ public class JandanParser {
                 }
             }
 
-            //image
+            //scaleImage
             pattern = Pattern.compile("src=\"(\\S*)[^ ][jpg]\"");
             matcher = pattern.matcher(i.toString());
             if (matcher.find()){

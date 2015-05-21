@@ -31,9 +31,9 @@ public enum GifError {
      */
     NO_SCRN_DSCR(104, "No screen descriptor detected"),
     /**
-     * No image descriptor detected
+     * No scaleImage descriptor detected
      */
-    NO_IMAG_DSCR(105, "No image descriptor detected"),
+    NO_IMAG_DSCR(105, "No scaleImage descriptor detected"),
     /**
      * Neither global nor local color map found
      */
@@ -63,10 +63,10 @@ public enum GifError {
      */
     IMAGE_DEFECT(112, "Image is defective, decoding aborted"),
     /**
-     * Image EOF detected before image complete.
+     * Image EOF detected before scaleImage complete.
      * EOF means GIF terminator, NOT end of input source.
      */
-    EOF_TOO_SOON(113, "Image EOF detected before image complete"),
+    EOF_TOO_SOON(113, "Image EOF detected before scaleImage complete"),
     /**
      * No frames found, at least one frame required
      */
@@ -76,9 +76,9 @@ public enum GifError {
      */
     INVALID_SCR_DIMS(1001, "Invalid screen size, dimensions must be positive"),
     /**
-     * Invalid image size, dimensions must be positive
+     * Invalid scaleImage size, dimensions must be positive
      */
-    INVALID_IMG_DIMS(1002, "Invalid image size, dimensions must be positive"),
+    INVALID_IMG_DIMS(1002, "Invalid scaleImage size, dimensions must be positive"),
     /**
      * Image size exceeds screen size
      */

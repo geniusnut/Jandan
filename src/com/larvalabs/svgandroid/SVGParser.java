@@ -1525,7 +1525,7 @@ public class SVGParser {
 				}
 				popTransform();
 			} else if (!hidden && localName.equals("image")) { // only handle inline images
-				// <image width="100" height="100" xlink:href="data:image/png;base64,...">
+				// <scaleImage width="100" height="100" xlink:href="data:scaleImage/png;base64,...">
 				String url = getStringAttr("href", atts);
 				if (url.startsWith("data") && url.indexOf("base64") > 0
 						&& Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {

@@ -2,19 +2,24 @@ package com.nut.ui;
 
 import android.content.Context;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.ImageView;
+import com.nut.gif.GifMovie;
 
 /**
  * Created by yw07 on 15-3-13.
  */
-public class GoldenSquareImage extends ImageView {
+public class GoldenSquareImage extends ImageView implements Gif {
 
 	private final Matrix mMatrix = new Matrix();
-	;
+
 	float x_gravity = 0.5f;
 	float y_gravity = 0.5f;
+
+	private Paint mBkgndPaint;
+	private GifMovie mGifMovie;
 
 	public GoldenSquareImage(Context context) {
 		super(context);
@@ -105,5 +110,19 @@ public class GoldenSquareImage extends ImageView {
 		mDrawMatrix.setScale(scale, scale);
 		mDrawMatrix.postTranslate((int) (dx + x_gravity), (int) (dy + y_gravity));
 		setImageMatrix(mDrawMatrix);
+	}
+
+	@Override
+	public void setGifMovie(GifMovie gifMovie) {
+		mBkgndPaint = new Paint(Paint.DITHER_FLAG | Paint.FILTER_BITMAP_FLAG);
+		mGifMovie = gifMovie;
+		setImageBitmap(mGifMovie.mBitmap);
+		mGifMovie.start(this, mBkgndPaint);
+		invalidate();
+	}
+
+	@Override
+	public GifMovie getGifMovie() {
+		return mGifMovie != null ? mGifMovie : null;
 	}
 }

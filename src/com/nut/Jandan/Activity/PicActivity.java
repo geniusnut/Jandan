@@ -202,7 +202,7 @@ public class PicActivity extends ActionBarActivity {
 			long mLength;
 			try {
 				if (picture.exists()) {
-					//Decode file into a bitmap in real size for being able to make zoom on the image
+					//Decode file into a bitmap in real size for being able to make zoom on the scaleImage
 					result = BitmapFactory.decodeStream(new FlushedInputStream
 							(new BufferedInputStream(new FileInputStream(picture))));
 				} else {
@@ -230,7 +230,7 @@ public class PicActivity extends ActionBarActivity {
 
 				}
 			} catch (OutOfMemoryError e) {
-				// If out of memory error when loading image, try to load it scaled
+				// If out of memory error when loading scaleImage, try to load it scaled
 				result = loadScaledImage(picture.getPath());
 				if (result == null) {
 
@@ -355,7 +355,7 @@ public class PicActivity extends ActionBarActivity {
 		}
 
 		if (width > screenWidth) {
-			// second try to slide_in_right down the image , this time depending upon the screen size
+			// second try to slide_in_right down the scaleImage , this time depending upon the screen size
 			scale = (int) Math.floor((float)width / screenWidth);
 		}
 		if (height > screenHeight) {

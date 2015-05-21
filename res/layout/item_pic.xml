@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="1dp"
-    android:paddingBottom="1dp"
+    android:elevation="0dp"
+    card_view:cardCornerRadius="0dp"
     android:background="@drawable/bkg"
     >
 
@@ -15,6 +16,19 @@
         android:layout_height="match_parent"
         >
 
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.nut.ui.ScaleImageView
+                android:src="@drawable/loading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/scale_image" />
+
+
+        </FrameLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -22,6 +36,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -29,8 +44,8 @@
                 android:textSize="12sp"
                 android:textColor="#b3b4b7"
                 android:text="updater"
-                android:id="@+id/updater"
-                />
+                android:id="@+id/updater" />
+
             <TextView
                 android:layout_marginLeft="8dp"
                 android:layout_width="wrap_content"
@@ -38,21 +53,8 @@
                 android:textSize="12sp"
                 android:text="time"
                 android:id="@+id/time"
-                android:textColor="#b3b4b7"
-                />
+                android:textColor="#b3b4b7" />
         </LinearLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/loading"
-                android:id="@+id/image" />
-        </FrameLayout>
 
         <com.nut.ui.ExpandableTextView
             android:layout_width="wrap_content"

@@ -1,5 +1,6 @@
 package com.nut.http;
 
+import android.util.Log;
 import com.nut.cache.Pic;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,6 +31,7 @@ public class PicParser {
         ArrayList<Pic> pics = new ArrayList<Pic>();
         try {
             JSONObject json = new JSONObject(content);
+            Log.d(TAG, "json: " + json.toString());
             JSONArray jsonPics = json.getJSONArray("comments");
             for (int i = 0; i < jsonPics.length(); i++) {
                 Pic pic = new Pic();

@@ -1,6 +1,5 @@
 package com.nut.Jandan.Activity;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,9 +9,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.*;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import com.nut.Jandan.Fragment.PostFragment;
 import com.nut.Jandan.R;
 import com.nut.cache.NewsFile;
@@ -57,12 +58,6 @@ public class PostActivity extends ActionBarActivity {
 
 	}
 
-	public Toolbar getToolbar() {
-		if (mToolbar != null)
-			return mToolbar;
-		return null;
-	}
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.menu, menu);
@@ -84,31 +79,6 @@ public class PostActivity extends ActionBarActivity {
 				break;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	private void setActionBar() {
-		LayoutInflater inflater = (LayoutInflater) getActionBar()
-				.getThemedContext().getSystemService(LAYOUT_INFLATER_SERVICE);
-
-		View customActionBarView = inflater.inflate(R.layout.actionbar_post, null);
-
-		ActionBar actionBar = getActionBar();
-		actionBar.setDisplayOptions(
-				ActionBar.DISPLAY_SHOW_CUSTOM,
-				ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME
-						| ActionBar.DISPLAY_SHOW_TITLE);
-		actionBar.setCustomView(customActionBarView,
-				new ActionBar.LayoutParams(
-						ViewGroup.LayoutParams.MATCH_PARENT,
-						ViewGroup.LayoutParams.MATCH_PARENT));
-
-		LinearLayout btn_back = (LinearLayout)findViewById(R.id.btn_post_back);
-		btn_back.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				postActivity.finish();
-			}
-		});
 	}
 
 	private class PostAdapter extends FragmentPagerAdapter {

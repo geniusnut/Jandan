@@ -5,7 +5,6 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,7 +19,7 @@ import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import com.larvalabs.svgandroid.SVG;
 import com.nut.Jandan.Fragment.NewsFragment;
-import com.nut.Jandan.Fragment.PicFragment;
+import com.nut.Jandan.Fragment.PicsFragment;
 import com.nut.Jandan.R;
 import com.nut.ui.BadgeView;
 
@@ -33,7 +32,7 @@ public class JandanActivity extends ActionBarActivity implements
 		OnItemClickListener {
 	private final String TAG = "JandanActivity";
 	private NewsFragment newsFrag = null;
-	private PicFragment picFrag = null;
+	private PicsFragment picFrag = null;
 	private DrawerLayout mDrawerLayout;
 	private ViewGroup mDrawerPanel;
 	private Toolbar mToolbar;
@@ -155,8 +154,6 @@ public class JandanActivity extends ActionBarActivity implements
 					final SharedPreferences.Editor editor = pref.edit();
 					editor.putBoolean("news", true);
 					editor.apply();
-					if (pref.getBoolean("news", false))
-						mBadgeView.hide();
 					showNews();
 				} else if (position == 1) {
 					showPic();
@@ -178,7 +175,7 @@ public class JandanActivity extends ActionBarActivity implements
 						mDrawerList.requestFocus();
 						Fragment fragment = getFragmentManager().findFragmentById(R.id.content);
 						Log.d(TAG, "drawer open: " + fragment.getClass());
-						if (fragment instanceof PicFragment) {
+						if (fragment instanceof PicsFragment) {
 							mDrawerList.getItemAtPosition(1);
 						}
 					}
@@ -234,8 +231,6 @@ public class JandanActivity extends ActionBarActivity implements
 			viewHolder.title.setText((String) item.get("title"));
 			viewHolder.info.setText((String) item.get("info"));
 
-			viewHolder.image.setBackgroundColor(choosed(position) ? Color.BLACK : Color.TRANSPARENT);
-
 			return convertView;
 		}
 	}
@@ -247,7 +242,7 @@ public class JandanActivity extends ActionBarActivity implements
 			case 0:
 				return getFragmentManager().findFragmentById(R.id.content) instanceof NewsFragment;
 			case 1:
-				return getFragmentManager().findFragmentById(R.id.content) instanceof PicFragment;
+				return getFragmentManager().findFragmentById(R.id.content) instanceof PicsFragment;
 			case 2:
 				break;
 			default:
@@ -259,26 +254,24 @@ public class JandanActivity extends ActionBarActivity implements
 	private void initList(){
 		final HashMap<String, Object> newsMap = new HashMap<String, Object>();
 		final TextView tv = (TextView)findViewById(R.id.title);
-		//final int color = tv.getTextColors().getDefaultColor();
+		final int color = getResources().getColor(android.R.color.black);
+
 		//Log.d("JandanActivity", "color = " + color);
-		Drawable iconNews = SVG.getDrawable(getResources(), R.raw.news,
-				 0x00ffffff | 0xc0000000);
+		Drawable iconNews = SVG.getDrawable(getResources(), R.raw.ic_explore_24px, color);
 		newsMap.put("img", iconNews);
 		newsMap.put("title", "新鲜事");
 		newsMap.put("info", "地球上没有新鲜事");
 		list.add(newsMap);
 
 		final HashMap<String, Object> picMap = new HashMap<String, Object>();
-		Drawable iconPic = SVG.getDrawable(getResources(), R.raw.pic,
-				 0x00ffffff | 0xc0000000);
+		Drawable iconPic = SVG.getDrawable(getResources(), R.raw.ic_image_24px, color);
 		picMap.put("img", iconPic);
 		picMap.put("title", "无聊图");
 		picMap.put("info", "");
 		list.add(picMap);
 
 		final HashMap<String, Object> ooxxMap = new HashMap<String, Object>();
-		Drawable iconOOXX = SVG.getDrawable(getResources(), R.raw.ooxx,
-				 0x00ffffff | 0xc0000000);
+		Drawable iconOOXX = SVG.getDrawable(getResources(), R.raw.ic_local_movies_24px, color);
 		ooxxMap.put("img", iconOOXX);
 		ooxxMap.put("title", "妹子图");
 		ooxxMap.put("info", "");
@@ -297,19 +290,16 @@ public class JandanActivity extends ActionBarActivity implements
 		if (!newsFrag.isVisible()) {
 			getFragmentManager().popBackStack();
 			FragmentTransaction transaction = getFragmentManager().beginTransaction();
-			transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
-			overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
 			transaction.replace(R.id.content, newsFrag).commit();
 		}
 	}
 	private void showPic() {
 		if (picFrag == null) {
-			picFrag = new PicFragment();
+			picFrag = new PicsFragment();
 		}
 		if (!picFrag.isVisible()) {
 			getFragmentManager().popBackStack();
 			FragmentTransaction transaction = getFragmentManager().beginTransaction();
-			transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right);
 			transaction.replace(R.id.content, picFrag).commit();
 		}
 	}

@@ -1,48 +1,46 @@
 package com.nut.Jandan.Fragment;
 
 import android.app.Fragment;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
+import com.nut.Jandan.Activity.JandanActivity;
 import com.nut.Jandan.Adapter.PicAdapter;
 import com.nut.Jandan.R;
 import com.nut.cache.Pic;
 import com.nut.cache.PicFile;
-import com.nut.dao.ImageLoader;
-import com.nut.http.JandanParser;
 import com.nut.http.PicParser;
 
 import java.util.ArrayList;
 
-public class PicFragment extends Fragment {
+public class PicsFragment extends Fragment {
 	private static final String TAG = "PicFragment";
 
 	private RecyclerView mRecyclerView;
 	private SwipeRefreshLayout swipeLayout;
 	private PicAdapter picAdapter;
+	private Toolbar mToolbar;
 
 	private PicLoader mPicLoader;
 
-	private JandanParser mParser;
 	private int picPage = 0;
 	private boolean isParsing = false;
 	public PicFile mPicFile = new PicFile();
-	private LruCache<String, Drawable> mLruCache;
-	private ImageLoader mImageLoader;
 	private PicParser mPicParser;
 	private Handler mHandler;
 	private boolean mNeedReload = true;
-	private LinearLayoutManager mLayoutManager;
+	private StaggeredGridLayoutManager mLayoutManager;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,6 +48,8 @@ public class PicFragment extends Fragment {
 		final ViewGroup rootView = (ViewGroup) inflater.inflate(
 				R.layout.picfragment, container, false);
 
+		mToolbar = ((JandanActivity) getActivity()).getToolbar();
+		mToolbar.bringToFront();
 		swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.pic_swipe);
 		swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
@@ -67,18 +67,30 @@ public class PicFragment extends Fragment {
 		mRecyclerView = (RecyclerView) rootView.findViewById(R.id.pic_list);
 		// mRecyclerView.addHeaderView();
 
-		mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+		mRecyclerView.setOnScrollListener(new NewsFragment.HidingScrollListener() {
 			private int previousTotal = 0; // The total number of items in the dataset after the last load
 			private boolean loading = true; // True if we are still waiting for the last set of data to load.
 			private int visibleThreshold = 5;
 			int firstVisibleItem, visibleItemCount, totalItemCount;
+			int[] into = new int[2];
+
+			@Override
+			public void onHide() {
+				hideViews();
+			}
+
+			@Override
+			public void onShow() {
+				showViews();
+			}
 
 			@Override
 			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 				super.onScrolled(recyclerView, dx, dy);
 				visibleItemCount = recyclerView.getChildCount();
 				totalItemCount = mLayoutManager.getItemCount();
-				firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
+				mLayoutManager.findFirstVisibleItemPositions(into);
+				firstVisibleItem = into[0];
 				if (loading) {
 					if (totalItemCount > previousTotal) {
 						loading = false;
@@ -92,33 +104,43 @@ public class PicFragment extends Fragment {
 					loading = true;
 				}
 			}
+
 		});
 
-		mLayoutManager = new LinearLayoutManager(getActivity());
+
+		mLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
 
 		mRecyclerView.setLayoutManager(mLayoutManager);
 		mRecyclerView.setHasFixedSize(false);
-		picAdapter = new PicAdapter(getActivity(), mPicFile);
+		picAdapter = new PicAdapter(getActivity(), mPicFile, mHandler);
 		mRecyclerView.setAdapter(picAdapter);
 		return rootView;
+	}
+
+	private void hideViews() {
+		mToolbar.animate().translationY(-mToolbar.getHeight()).setInterpolator(new AccelerateInterpolator(2));
+		mToolbar.animate().alpha(0).setInterpolator(new AccelerateInterpolator(2));
+//		FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mFam.getLayoutParams();
+//		int fabBottomMargin = lp.bottomMargin;
+//		mFam.animate().translationY(mFam.getHeight() + fabBottomMargin).setInterpolator(new AccelerateInterpolator(2)).start();
+	}
+
+	private void showViews() {
+		mToolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
+		mToolbar.animate().alpha(1).setInterpolator(new DecelerateInterpolator(2));
+//		mFam.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-
-		// Use 1/8th of the available memory for this memory cache.
-		final int cacheSize = maxMemory / 4;
-
-
+		mHandler = new Handler();
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		mHandler = new Handler();
 		mPicParser = new PicParser();
 
 		if (mPicFile.load(getActivity(), PicFile.PIC_FILE_NAME)) {
@@ -203,11 +225,4 @@ public class PicFragment extends Fragment {
 			}
 		}
 	}
-
-	private final ImageLoader.Callback mImageLoaderCallback = new ImageLoader.Callback() {
-		@Override
-		public void onLoaded(String thumbUrl, Drawable drawable) {
-			mLruCache.put(thumbUrl, drawable);
-		}
-	};
 }
