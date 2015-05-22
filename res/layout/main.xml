@@ -20,5 +20,12 @@
         </LinearLayout>
 
         <include layout="@layout/drawer" />
+        <!--<fragment-->
+        <!--android:layout_width="240dp"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_gravity="start"-->
+        <!--android:name="com.nut.Jandan.Fragment.DrawerFragment"-->
+        <!--tools:layout="@layout/drawer"/>-->
+
     </android.support.v4.widget.DrawerLayout>
 </FrameLayout>

@@ -7,7 +7,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.widget.ImageView;
-import com.nut.Jandan.Utilities;
+import com.nut.Jandan.Utility.Utilities;
 import com.nut.cache.FileCache;
 import com.nut.gif.GifDrawable;
 import com.nut.http.JandanParser;

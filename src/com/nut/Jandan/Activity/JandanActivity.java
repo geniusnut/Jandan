@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -20,19 +21,18 @@ import android.widget.AdapterView.OnItemClickListener;
 import com.larvalabs.svgandroid.SVG;
 import com.nut.Jandan.Fragment.NewsFragment;
 import com.nut.Jandan.Fragment.PicsFragment;
+import com.nut.Jandan.Fragment.SettingsFragment;
 import com.nut.Jandan.R;
 import com.nut.ui.BadgeView;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JandanActivity extends ActionBarActivity implements
 		OnItemClickListener {
 	private final String TAG = "JandanActivity";
 	private NewsFragment newsFrag = null;
 	private PicsFragment picFrag = null;
+	private Stack<Fragment> mFragmentStack;
 	private DrawerLayout mDrawerLayout;
 	private ViewGroup mDrawerPanel;
 	private Toolbar mToolbar;
@@ -40,6 +40,8 @@ public class JandanActivity extends ActionBarActivity implements
 	private ActionBarDrawerToggle toggle=null;
 	private BadgeView mBadgeView;
 	protected SimpleAdapter mAdapter;
+
+	private int mSelected = -1;
 
 	protected List<Map<String, Object>> items = new ArrayList<Map<String,Object>>();
 	private ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
@@ -50,6 +52,8 @@ public class JandanActivity extends ActionBarActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+
+		mFragmentStack = new Stack<>();
 
 		final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 		final SharedPreferences.Editor editor = pref.edit();
@@ -64,18 +68,12 @@ public class JandanActivity extends ActionBarActivity implements
 		mToolbar.setLogo(R.drawable.jandan);
 		View NavView = getNavButtonView(mToolbar);
 
-
-		mBadgeView = new BadgeView(this, NavView);
-		mBadgeView.setBackground(SVG.getDrawable(getResources(), R.raw.ic_dot));
-		mBadgeView.setBadgePosition(1);
-		mBadgeView.setBadgeMargin(0, 0);
-		mBadgeView.show();
-
-
+		initDrawer();
 		if (getFragmentManager().findFragmentById(R.id.content) == null) {
+			mSelected = 0;
 			showNews();
 		}
-		initDrawer();
+
 	}
 
 	private ImageButton getNavButtonView(Toolbar toolbar) {
@@ -117,6 +115,21 @@ public class JandanActivity extends ActionBarActivity implements
 	{
 
 	}
+
+	@Override
+	public void onBackPressed() {
+		//final NewsFragment fragment = (NewsFragment) getFragmentManager().findFragmentByTag("news");
+
+		Fragment fragment = getFragmentManager().findFragmentById(R.id.content);
+		if (fragment instanceof SettingsFragment && mFragmentStack.size() > 0) {
+			FragmentTransaction ft = getFragmentManager().beginTransaction();
+
+			ft.replace(R.id.content, mFragmentStack.lastElement()).commit();
+
+		} else
+			super.onBackPressed();
+	}
+
 	private void initDrawer(){
 		mDrawerLayout = (DrawerLayout) this.findViewById(R.id.drawer_layout);
 		mDrawerPanel = (ViewGroup) mDrawerLayout.findViewById(R.id.drawer_panel);
@@ -148,24 +161,24 @@ public class JandanActivity extends ActionBarActivity implements
 		});
 		mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				if (position == 0) {
-					final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(view.getContext());
-					final SharedPreferences.Editor editor = pref.edit();
-					editor.putBoolean("news", true);
-					editor.apply();
-					showNews();
-				} else if (position == 1) {
-					showPic();
-				} else if (position == 2) {
-					showOOXX();
-				}
+			public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+				mSelected = position;
+				Fragment currentFragment = getFragmentManager().findFragmentById(R.id.content);
+				FragmentTransaction ft = getFragmentManager().beginTransaction();
+				ft.setCustomAnimations(R.anim.gla_there_com, R.anim.gla_there_go);
+				ft.remove(currentFragment).commit();
 
-				mDrawerLayout.closeDrawers();
+				new Handler().post(new Runnable() {
+					@Override
+					public void run() {
+						mDrawerLayout.closeDrawer(mDrawerPanel);
+
+					}
+				});
 			}
 		});
 
-		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
 		toggle = new ActionBarDrawerToggle(this, mDrawerLayout,
 						R.string.app_name,
 						R.string.app_name) {
@@ -181,11 +194,36 @@ public class JandanActivity extends ActionBarActivity implements
 					}
 					public void onDrawerClosed(View view) {
 						super.onDrawerClosed(view);
+						Fragment fragment = getFragmentManager().findFragmentById(R.id.content);
+						Log.d(TAG, "drawer close: " + fragment.getClass());
+
+						if (mSelected == 0) {
+							final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(view.getContext());
+							final SharedPreferences.Editor editor = pref.edit();
+							editor.putBoolean("news", true);
+							editor.apply();
+							showNews();
+						} else if (mSelected == 1) {
+							showPic();
+						} else if (mSelected == 2) {
+							showOOXX();
+						}
 						setTitle(R.string.app_name);
 					}
 				};
 		mDrawerLayout.setDrawerListener(toggle);
 
+		View settings = findViewById(R.id.settings);
+		settings.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+				fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+				mFragmentStack.push(getFragmentManager().findFragmentById(R.id.content));
+				fragmentTransaction.replace(R.id.content, new SettingsFragment()).commit();
+				mDrawerLayout.closeDrawers();
+			}
+		});
 	}
 
 	private class ViewHolder {
@@ -231,30 +269,18 @@ public class JandanActivity extends ActionBarActivity implements
 			viewHolder.title.setText((String) item.get("title"));
 			viewHolder.info.setText((String) item.get("info"));
 
+			if (mSelected == position)
+				convertView.setBackgroundColor(getResources().getColor(R.color.tealA200));
+			else
+				convertView.setBackgroundColor(getResources().getColor(R.color.teal500));
 			return convertView;
 		}
-	}
-
-	;
-
-	private boolean choosed(int pos) {
-		switch (pos) {
-			case 0:
-				return getFragmentManager().findFragmentById(R.id.content) instanceof NewsFragment;
-			case 1:
-				return getFragmentManager().findFragmentById(R.id.content) instanceof PicsFragment;
-			case 2:
-				break;
-			default:
-				break;
-		}
-		return false;
 	}
 
 	private void initList(){
 		final HashMap<String, Object> newsMap = new HashMap<String, Object>();
 		final TextView tv = (TextView)findViewById(R.id.title);
-		final int color = getResources().getColor(android.R.color.black);
+		final int color = 0x8A000000;
 
 		//Log.d("JandanActivity", "color = " + color);
 		Drawable iconNews = SVG.getDrawable(getResources(), R.raw.ic_explore_24px, color);
@@ -276,6 +302,10 @@ public class JandanActivity extends ActionBarActivity implements
 		ooxxMap.put("title", "妹子图");
 		ooxxMap.put("info", "");
 		list.add(ooxxMap);
+
+		ImageView settingImage = (ImageView) findViewById(R.id.image_setting);
+		Drawable iconSetting = SVG.getDrawable(getResources(), R.raw.ic_settings_applications_24px, color);
+		settingImage.setImageDrawable(iconSetting);
 	}
 
 	public Toolbar getToolbar() {
@@ -290,8 +320,10 @@ public class JandanActivity extends ActionBarActivity implements
 		if (!newsFrag.isVisible()) {
 			getFragmentManager().popBackStack();
 			FragmentTransaction transaction = getFragmentManager().beginTransaction();
-			transaction.replace(R.id.content, newsFrag).commit();
+			transaction.setCustomAnimations(R.anim.gla_there_com, R.anim.gla_there_go);
+			transaction.replace(R.id.content, newsFrag).addToBackStack("news").commit();
 		}
+		mDrawerList.setItemChecked(0, true);
 	}
 	private void showPic() {
 		if (picFrag == null) {
@@ -300,8 +332,10 @@ public class JandanActivity extends ActionBarActivity implements
 		if (!picFrag.isVisible()) {
 			getFragmentManager().popBackStack();
 			FragmentTransaction transaction = getFragmentManager().beginTransaction();
-			transaction.replace(R.id.content, picFrag).commit();
+			transaction.setCustomAnimations(R.anim.gla_there_com, R.anim.gla_there_go);
+			transaction.replace(R.id.content, picFrag).addToBackStack("pics").commit();
 		}
+		mDrawerList.setItemChecked(1, true);
 	}
 	private void showOOXX() {
 

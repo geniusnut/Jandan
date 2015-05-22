@@ -1,6 +1,7 @@
 package com.nut.http;
 
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import com.nut.cache.Post;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,6 +35,7 @@ public class PostParser {
 		ArrayList<Post> posts = new ArrayList<Post>();
 		try {
 			JSONObject json = new JSONObject(content);
+			Log.d(TAG, "Post json: " + json.toString());
 			JSONArray jsonPosts = json.getJSONArray("posts");
 			for (int i = 0; i < jsonPosts.length(); i++) {
 				Post post = new Post();

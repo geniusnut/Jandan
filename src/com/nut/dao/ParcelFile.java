@@ -1,4 +1,4 @@
-package com.nut;
+package com.nut.dao;
 
 import android.content.ContentResolver;
 import android.net.Uri;

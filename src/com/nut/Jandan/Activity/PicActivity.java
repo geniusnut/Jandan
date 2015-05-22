@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import com.nut.Jandan.Utilities;
+import com.nut.Jandan.Utility.Utilities;
 import com.nut.cache.FileCache;
 import com.nut.cache.Pic;
 import com.nut.gif.GifImageView;

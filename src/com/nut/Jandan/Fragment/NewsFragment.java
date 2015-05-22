@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -72,6 +73,7 @@ public class NewsFragment extends Fragment {
 		ViewGroup rootView = (ViewGroup) inflater.inflate(
 				R.layout.swipe_news_frag, container, false);
 
+		((ActionBarActivity) getActivity()).getSupportActionBar().show();
 		mToolbar = ((JandanActivity) getActivity()).getToolbar();
 		mToolbar.bringToFront();
 		swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
@@ -158,6 +160,10 @@ public class NewsFragment extends Fragment {
 	public void onStart() {
 		super.onStart();
 		swipeLayout.setProgressViewOffset(false, mToolbar.getHeight(), mToolbar.getHeight() + 128);
+	}
+
+	public boolean backPressed() {
+		return false;
 	}
 
 	//borrow code from https://mzgreen.github.io/2015/02/15/How-to-hideshow-Toolbar-when-list-is-scroling(part1)/

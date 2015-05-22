@@ -1,4 +1,4 @@
-package com.nut.Jandan;
+package com.nut.Jandan.Utility;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;

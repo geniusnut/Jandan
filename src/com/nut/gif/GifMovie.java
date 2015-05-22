@@ -11,7 +11,7 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import com.alensw.support.jni.JniUtils;
-import com.nut.ParcelFile;
+import com.nut.dao.ParcelFile;
 import com.nut.thread.Job;
 import com.nut.thread.JobQueue;
 import com.nut.thread.Task;

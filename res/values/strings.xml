@@ -8,4 +8,13 @@
     <string name="news_comments">[%s]</string>
     <string name="action_settings">settings</string>
     <string name="post_comments">共有%s条评论</string>
+    <string name="settings_nomal">settings</string>
+    <string name="settings_check_update">check updating</string>
+    <string name="settings_check_update_summary">version:</string>
+    <string name="settings_clear_cache">clear cache</string>
+    <string name="settings_more">others</string>
+    <string name="settings_feedback">feedback</string>
+    <string name="settings_feedback_summary">go to market</string>
+    <string name="settings_about">About</string>
+    <string name="settings_about_summary">about us</string>
 </resources>

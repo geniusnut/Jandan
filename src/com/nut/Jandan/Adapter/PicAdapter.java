@@ -17,10 +17,10 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 import com.nostra13.universalimageloader.utils.DiskCacheUtils;
 import com.nut.Jandan.Fragment.NewsFragment;
 import com.nut.Jandan.R;
-import com.nut.Jandan.Utilities;
-import com.nut.ParcelFile;
+import com.nut.Jandan.Utility.Utilities;
 import com.nut.cache.Pic;
 import com.nut.cache.PicFile;
+import com.nut.dao.ParcelFile;
 import com.nut.gif.GifMovie;
 import com.nut.ui.ExpandableTextView;
 import com.nut.ui.ScaleImageView;
