@@ -21,11 +21,8 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
-import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.nut.Jandan.Activity.JandanActivity;
 import com.nut.Jandan.Activity.PostActivity;
@@ -236,16 +233,16 @@ public class NewsFragment extends Fragment {
 
 		mCovers = new ConcurrentHashMap<>(64);
 
-		ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(getActivity());
-		config.threadPriority(Thread.NORM_PRIORITY - 2);
-		config.denyCacheImageMultipleSizesInMemory();
-		config.diskCacheFileNameGenerator(new Md5FileNameGenerator());
-		config.diskCacheSize(50 * 1024 * 1024); // 50 MiB
-		config.tasksProcessingOrder(QueueProcessingType.LIFO);
-		config.writeDebugLogs(); // Remove for release app
-
-		// Initialize ImageLoader with configuration.
-		ImageLoader.getInstance().init(config.build());
+//		ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(getActivity());
+//		config.threadPriority(Thread.NORM_PRIORITY - 2);
+//		config.denyCacheImageMultipleSizesInMemory();
+//		config.diskCacheFileNameGenerator(new Md5FileNameGenerator());
+//		config.diskCacheSize(50 * 1024 * 1024); // 50 MiB
+//		config.tasksProcessingOrder(QueueProcessingType.LIFO);
+//		config.writeDebugLogs(); // Remove for release app
+//
+//		// Initialize ImageLoader with configuration.
+//		ImageLoader.getInstance().init(config.build());
 		mImageLoader = ImageLoader.getInstance();
 
 		if (mNewsFile.load(getActivity(), NewsFile.NEWS_FILE_NAME)) {
@@ -370,6 +367,7 @@ public class NewsFragment extends Fragment {
 				intent.putExtra("link", post.mLink);
 				intent.putExtra("comm", post.mCont);
 				intent.putExtra(Intent.EXTRA_TITLE, post.mTitle);
+				intent.putExtra("cover", post.mCover.replace("custom", "medium"));
 				intent.putExtra("index", getPosition());
 				startActivity(intent);
 				if (v instanceof ImageView) {

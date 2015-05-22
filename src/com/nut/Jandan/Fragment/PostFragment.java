@@ -1,5 +1,6 @@
 package com.nut.Jandan.Fragment;
 
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,6 +14,8 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.nut.Jandan.R;
 import com.nut.cache.Post;
 import com.nut.dao.PostFormater;
@@ -31,9 +34,11 @@ public class PostFragment extends Fragment {
 	private WebView mWebView;
 	private WebView mCommWebView;
 	private ImageView ivCarat;
+	private ImageView mCoverView;
 
 	private String mLink;
 	private String mTitle;
+	private String mCover;
 	private int mComm;
 
 	@Override
@@ -42,6 +47,7 @@ public class PostFragment extends Fragment {
 		Bundle args = getArguments();
 		mLink = args.getString("link");
 		mTitle = args.getString("title", "");
+		mCover = args.getString("cover", "");
 		mComm = args.getInt("comm", 0);
 	}
 
@@ -50,10 +56,21 @@ public class PostFragment extends Fragment {
 		/** Inflating the layout for this fragment **/
 		super.onCreateView(inflater, container, savedInstanceState);
 		View view = inflater.inflate(R.layout.post_frag, container, false);
-
+		mCoverView = (ImageView) view.findViewById(R.id.cover);
 
 		//setActionBar();
-
+		if (mCover.endsWith("jpg"))
+			ImageLoader.getInstance().loadImage(mCover, new SimpleImageLoadingListener() {
+				@Override
+				public void onLoadingComplete(String imageUri, View view, final Bitmap loadedImage) {
+					mCoverView.post(new Runnable() {
+						@Override
+						public void run() {
+							mCoverView.setImageBitmap(loadedImage);
+						}
+					});
+				}
+			});
 
 		mWebView = (WebView) view.findViewById(R.id.webview);
 		mWebView.clearCache(true);
@@ -164,6 +181,7 @@ public class PostFragment extends Fragment {
 		args.putString("link", post.mLink);
 		args.putString("title", post.mTitle);
 		args.putInt("comm", post.mCont);
+		args.putString("cover", post.mCover.replace("custom", "medium"));
 		postFragment.setArguments(args);
 		return postFragment;
 	}
