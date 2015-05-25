@@ -4,23 +4,21 @@ package com.nut.dao;
  * Created by yw07 on 14-11-20.
  */
 
-import android.content.Context;
 import android.util.Log;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 public class PostFormater {
 
-	final String TAG = "PostFormater";
+	private final String TAG = "PostFormater";
 
-	final Context context;
+	public static final int POST_FORMAT = 0;
+	public static final int COMMENT_FORMAT = 1;
+
 	Document document;
 
 	int timeout = 5000;
 
-	public PostFormater(Context context){
-		this.context = context;
-	}
 
 	public String postFormater(String link){
 		String data;
