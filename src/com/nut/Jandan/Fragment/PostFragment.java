@@ -92,11 +92,8 @@ public class PostFragment extends Fragment {
 		mScrollView.setScrollViewListener(new CustomScrollView.ScrollViewListener() {
 			@Override
 			public void onScrollChanged(CustomScrollView scrollView, int x, int y, int oldx, int oldy) {
-				Log.d("PostFragment", "mScrollView: " + mScrollView.getTag() + ", y: " + y);
-				Log.d("PostFragment", "mWebContent y: " + mWebContent.getScrollY());
-				Log.d("PostFragment", "mWebImage y: " + mWebImage.getScrollY());
-				if (y >= 0)
-					mWebImage.scrollTo(0, -y / 2);
+//				if (y >= 0)
+//					mWebImage.scrollTo(0, -y / 2);
 			}
 		});
 		mWebImage = (View) mScrollView.findViewById(R.id.web_image);

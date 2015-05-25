@@ -33,7 +33,7 @@ public class JandanActivity extends ActionBarActivity implements
 	private NewsFragment newsFrag = null;
 	private PicsFragment picFrag = null;
 	private Stack<Fragment> mFragmentStack;
-	private DrawerLayout mDrawerLayout;
+	public DrawerLayout mDrawerLayout;
 	private ViewGroup mDrawerPanel;
 	private Toolbar mToolbar;
 	private ListView mDrawerList;
@@ -63,6 +63,7 @@ public class JandanActivity extends ActionBarActivity implements
 		mToolbar = (Toolbar) findViewById(R.id.toolbar);
 		if (mToolbar != null) {
 			mToolbar.setTitle("煎蛋");
+			// ToolbarColorHelper.colorizeToolbar(mToolbar, Color.BLACK, this);
 			setSupportActionBar(mToolbar);
 		}
 		mToolbar.setLogo(R.drawable.jandan);
@@ -123,8 +124,10 @@ public class JandanActivity extends ActionBarActivity implements
 		Fragment fragment = getFragmentManager().findFragmentById(R.id.content);
 		if (fragment instanceof SettingsFragment && mFragmentStack.size() > 0) {
 			FragmentTransaction ft = getFragmentManager().beginTransaction();
-
-			ft.replace(R.id.content, mFragmentStack.lastElement()).commit();
+			fragment.onPause();
+			ft.remove(fragment);
+			fragment.onResume();
+			ft.show(mFragmentStack.lastElement()).commit();
 
 		} else
 			super.onBackPressed();
@@ -211,16 +214,26 @@ public class JandanActivity extends ActionBarActivity implements
 						setTitle(R.string.app_name);
 					}
 				};
+		toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				onBackPressed();
+			}
+		});
 		mDrawerLayout.setDrawerListener(toggle);
 
-		View settings = findViewById(R.id.settings);
+		final View settings = findViewById(R.id.settings);
 		settings.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-				fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-				mFragmentStack.push(getFragmentManager().findFragmentById(R.id.content));
-				fragmentTransaction.replace(R.id.content, new SettingsFragment()).commit();
+				FragmentTransaction ft = getFragmentManager().beginTransaction();
+				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+				Fragment currentFragment = getFragmentManager().findFragmentById(R.id.content);
+				currentFragment.onPause();
+				ft.hide(currentFragment);
+				mFragmentStack.push(currentFragment);
+				Fragment settingsFragment = new SettingsFragment();
+				ft.add(R.id.content, settingsFragment).commit();
 				mDrawerLayout.closeDrawers();
 			}
 		});
@@ -277,6 +290,7 @@ public class JandanActivity extends ActionBarActivity implements
 		}
 	}
 
+
 	private void initList(){
 		final HashMap<String, Object> newsMap = new HashMap<String, Object>();
 		final TextView tv = (TextView)findViewById(R.id.title);
@@ -321,7 +335,7 @@ public class JandanActivity extends ActionBarActivity implements
 			getFragmentManager().popBackStack();
 			FragmentTransaction transaction = getFragmentManager().beginTransaction();
 			transaction.setCustomAnimations(R.anim.gla_there_com, R.anim.gla_there_go);
-			transaction.replace(R.id.content, newsFrag).addToBackStack("news").commit();
+			transaction.replace(R.id.content, newsFrag).commit();
 		}
 		mDrawerList.setItemChecked(0, true);
 	}

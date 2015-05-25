@@ -49,11 +49,14 @@ public class PostActivity extends ActionBarActivity {
 		if (mToolbar != null) {
 			mToolbar.setTitle("News");
 			ImageView share = (ImageView) mToolbar.findViewById(R.id.share);
+			// ToolbarColorHelper.colorizeToolbar(mToolbar, Color.BLACK, this);
+			mToolbar.getBackground().setAlpha(0);
 			Log.d(TAG, "mToolbar width" + mToolbar.getMeasuredWidth());
 			share.setLayoutParams(new Toolbar.LayoutParams(56, 56, Gravity.RIGHT));
 			//share.setImageDrawable(SVG.getDrawable(getResources(), R.raw.ic_menu_share));
 			setSupportActionBar(mToolbar);
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+			mToolbar.bringToFront();
 		}
 
 	}
