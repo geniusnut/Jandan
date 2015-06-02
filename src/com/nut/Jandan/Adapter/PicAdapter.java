@@ -2,19 +2,24 @@ package com.nut.Jandan.Adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.*;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.utils.DiskCacheUtils;
+import com.nut.Jandan.Activity.PicActivity;
 import com.nut.Jandan.Fragment.NewsFragment;
 import com.nut.Jandan.R;
 import com.nut.Jandan.Utility.Utilities;
@@ -60,7 +65,8 @@ public class PicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
 
-		Pic pic = mPicFile.get(position);
+		final Pic pic = mPicFile.get(position);
+
 
 		ViewHolder holder = (ViewHolder) viewHolder;
 		holder.updater.setText(pic.mAuthor);
@@ -70,8 +76,25 @@ public class PicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 		holder.time.setText(Utilities.convertTime(pic.mTime));
 		holder.scaleImage.setImageDrawable(mContext.getResources().getDrawable(R.drawable.loading));
 
+
+		int height = calcLayoutParams();
+		FrameLayout.LayoutParams flp = new FrameLayout.LayoutParams(-1, height);
+		holder.mWrapper.setLayoutParams(flp);
 		final String url = pic.mUrls.get(0);
 		loadPic(holder.scaleImage, url);
+
+		holder.itemView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(mContext, PicActivity.class);
+				intent.putExtra(PicActivity.EXTRA_PIC, pic);
+				mContext.startActivity(intent);
+			}
+		});
+	}
+
+	private int calcLayoutParams() {
+		return 600;
 	}
 
 	@Override
@@ -153,6 +176,7 @@ public class PicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 		public TextView xx;
 		public TextView time;
 		public ScaleImageView scaleImage;
+		public LinearLayout mWrapper;
 
 		public ViewHolder(View itemView) {
 			super(itemView);
@@ -162,6 +186,7 @@ public class PicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 			xx = (TextView) itemView.findViewById(R.id.xx);
 			time = (TextView) itemView.findViewById(R.id.time);
 			scaleImage = (ScaleImageView) itemView.findViewById(R.id.scale_image);
+			mWrapper = (LinearLayout) itemView.findViewById(R.id.card_wraper);
 		}
 	}
 

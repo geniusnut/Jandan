@@ -7,6 +7,7 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
@@ -17,11 +18,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+import com.nostra13.universalimageloader.utils.DiskCacheUtils;
 import com.nut.Jandan.Utility.Utilities;
 import com.nut.cache.FileCache;
 import com.nut.cache.Pic;
+import com.nut.dao.ParcelFile;
 import com.nut.gif.GifImageView;
+import com.nut.gif.GifMovie;
+import com.nut.ui.GifTouchImageView;
 import com.nut.ui.PictureView;
+import com.nut.ui.ScaleImageView;
 import com.nut.ui.TouchImageView;
 
 import java.io.*;
@@ -40,6 +48,9 @@ public class PicActivity extends ActionBarActivity {
 	private TouchImageView mTouchImageView;
 	private GifImageView mGifImageView;
 
+	private ImageLoader mImageLoader;
+
+	private Handler mHandler;
 	private Pic mPic;
 	private PicAdapter mPicAdapter;
 
@@ -55,6 +66,8 @@ public class PicActivity extends ActionBarActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mHandler = new Handler();
+		mImageLoader = ImageLoader.getInstance();
 		mPic = getIntent().getParcelableExtra(EXTRA_PIC);
 		for (int i = 0; i < mPic.mUrls.size(); i++) {
 			ItemInfo item = new ItemInfo();
@@ -94,16 +107,19 @@ public class PicActivity extends ActionBarActivity {
 //				container.addView(gifImageView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 //				picAdapter = new PicAdapter(gifImageView, item);
 
-				if (item.isGif) {
-					// View view = getLayoutInflater().inflate(R.layout.gif_viewer, null);
-					GifImageView gifImageView = new GifImageView(getBaseContext());
-					container.addView(gifImageView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-					picAdapter = new PicAdapter(gifImageView, item);
-				} else {
-					TouchImageView view = new TouchImageView(getBaseContext());
-					container.addView(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-					picAdapter = new PicAdapter(view, item);
-				}
+				TouchImageView imageView = new TouchImageView(container.getContext());
+				container.addView(imageView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+				picAdapter = new PicAdapter(imageView, item);
+//				if (item.isGif) {
+//					// View view = getLayoutInflater().inflate(R.layout.gif_viewer, null);
+//					GifImageView gifImageView = new GifImageView(getBaseContext());
+//					container.addView(gifImageView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+//					picAdapter = new PicAdapter(gifImageView, item);
+//				} else {
+//					TouchImageView view = new TouchImageView(getBaseContext());
+//					container.addView(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+//					picAdapter = new PicAdapter(view, item);
+//				}
 				if (mPicAdapter == null)
 					mPicAdapter = picAdapter;
 
@@ -131,25 +147,54 @@ public class PicActivity extends ActionBarActivity {
 	};
 
 	private class PicAdapter {
-		View mView;
+		TouchImageView mView;
 		ItemInfo mItemInfo;
 
 		public PicAdapter(View view, ItemInfo item) {
-			mView = view;
+			mView = (TouchImageView) view;
 			mItemInfo = item;
 		}
 
 		public void start() {
-			if (mItemInfo.isGif) {
-				mGifImageView = (GifImageView) mView;
-				progress = 0;
-				mGifLoader = new GifLoader(mGifImageView);
-				mGifLoader.execute(mItemInfo.url, null);
-			} else {
-				mTouchImageView = (TouchImageView) mView;
-				BitmapLoader bl = new BitmapLoader(mTouchImageView, null, null);
-				bl.execute(mItemInfo.url);
-			}
+			mView.setTag(mItemInfo.url);
+			mImageLoader.loadImage(mItemInfo.url, new SimpleImageLoadingListener() {
+				@Override
+				public void onLoadingComplete(String imageUri, View view, final Bitmap loadedImage) {
+					if (mItemInfo.url.endsWith("gif")) {
+						File file = DiskCacheUtils.findInCache(imageUri, mImageLoader.getDiskCache());
+						// File file = new File("/storage/emulated/0/Wowtu/Download/2684669.gif");
+						ParcelFile pfd = null;
+						try {
+							pfd = ParcelFile.openFile(file, true);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+
+
+						if (pfd != null) {
+							final GifMovie gifMovie = GifMovie.create(pfd, Uri.EMPTY, mHandler);
+							mView.post(new Runnable() {
+								@Override
+								public void run() {
+									if (mView.getTag() == mItemInfo.url) {
+										mView.setGifMovie(gifMovie);
+									}
+								}
+							});
+
+						}
+					} else {
+						mView.post(new Runnable() {
+							@Override
+							public void run() {
+								if (mView.getTag() == mItemInfo.url) {
+									mView.setImageBitmap(loadedImage);
+								}
+							}
+						});
+					}
+				}
+			});
 		}
 	}
 

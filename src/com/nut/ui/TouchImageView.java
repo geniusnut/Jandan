@@ -32,10 +32,15 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.OverScroller;
 import android.widget.Scroller;
+import com.nut.gif.GifMovie;
 
-public class TouchImageView extends PictureView {
+public class TouchImageView extends PictureView implements Gif {
 
 	private static final String DEBUG = "DEBUG";
+
+	private Paint mBkgndPaint;
+	private GifMovie mGifMovie;
+
 
 	//
 	// SuperMin and SuperMax multipliers. Determine how much the scaleImage can be
@@ -106,6 +111,20 @@ public class TouchImageView extends PictureView {
 	public TouchImageView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		sharedConstructing(context);
+	}
+
+	@Override
+	public void setGifMovie(GifMovie gifMovie) {
+		mBkgndPaint = new Paint(Paint.DITHER_FLAG | Paint.FILTER_BITMAP_FLAG);
+		mGifMovie = gifMovie;
+		setImageBitmap(mGifMovie.mBitmap);
+		mGifMovie.start(this, mBkgndPaint);
+		invalidate();
+	}
+
+	@Override
+	public GifMovie getGifMovie() {
+		return mGifMovie != null ? mGifMovie : null;
 	}
 
 	private void sharedConstructing(Context context) {

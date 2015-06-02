@@ -5,7 +5,6 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:elevation="0dp"
     card_view:cardCornerRadius="0dp"
     android:background="@drawable/bkg"
     >
@@ -14,6 +13,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/card_wraper"
         >
 
         <FrameLayout
@@ -44,6 +44,7 @@
                 android:textSize="12sp"
                 android:textColor="#b3b4b7"
                 android:text="updater"
+                android:lines="1"
                 android:id="@+id/updater" />
 
             <TextView

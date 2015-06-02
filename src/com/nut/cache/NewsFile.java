@@ -23,6 +23,7 @@ public class NewsFile extends ListFile<Post> {
 	@Override
 	public Post readEntry(DataInputStream dis) throws Throwable {
 		final Post post = new Post();
+		post.mId = dis.readInt();
 		post.mLink = dis.readUTF();
 		post.mTitle = dis.readUTF();
 		post.mCover = dis.readUTF();
@@ -34,7 +35,7 @@ public class NewsFile extends ListFile<Post> {
 
 	@Override
 	public void writeEntry(DataOutputStream dos, Post post) throws Throwable {
-
+		dos.writeInt(post.mId);
 		dos.writeUTF(post.mLink);
 		dos.writeUTF(post.mTitle);
 		dos.writeUTF(post.mCover);

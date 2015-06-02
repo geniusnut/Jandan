@@ -2,6 +2,7 @@ package com.nut.http;
 
 import android.graphics.drawable.Drawable;
 import android.util.Log;
+import com.alensw.Jandan.CommentModel;
 import com.nut.cache.Post;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,14 +21,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PostParser {
 	final static String TAG = "";
 	final static String POSTS_URL = "http://i.jandan.net/?oxwlxojflwblxbsapi=get_recent_posts&include=url,date,tags,author,title,comment_count,custom_fields&custom_fields=thumb_c&dev=1";
-	final static String POST_URL = "http://i.jandan.net/?oxwlxojflwblxbsapi=get_posts";
+	final static String POST_URL = "http://i.jandan.net/?oxwlxojflwblxbsapi=get_post";
+	// ?oxwlxojflwblxbsapi=get_post&id=62799&include=content
+	// http://i.jandan.net/?oxwlxojflwblxbsapi=get_post&id=62799&include=comments
 
 	private static final DateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	static {
 		mDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
 
-	public ArrayList<Post> parsePosts(int page, final ConcurrentHashMap<String, Drawable> mCovers) {
+	public static ArrayList<Post> parsePosts(int page, final ConcurrentHashMap<String, Drawable> mCovers) {
 		final String url = POSTS_URL + "&page=" + page;
 		final String content = HttpClient.downloadJson(url);
 
@@ -40,6 +43,7 @@ public class PostParser {
 			for (int i = 0; i < jsonPosts.length(); i++) {
 				Post post = new Post();
 				JSONObject jsonPost = (JSONObject) jsonPosts.get(i);
+				post.mId = jsonPost.getInt("id");
 				post.mLink = jsonPost.getString("url");
 				post.mTitle = jsonPost.getString("title");
 				post.mCover = jsonPost.getJSONObject("custom_fields").getJSONArray("thumb_c").getString(0);
@@ -55,6 +59,32 @@ public class PostParser {
 			e.printStackTrace();
 		}
 		return posts;
+	}
+
+	public static ArrayList<CommentModel> parseComments(String id) {
+		final String url = POST_URL + "&id=" + id + "&include=comments";
+		final String content = HttpClient.downloadJson(url);
+
+		ArrayList<CommentModel> comments = new ArrayList<CommentModel>();
+		try {
+			JSONObject json = new JSONObject(content);
+			Log.d(TAG, "Post json: " + json.toString());
+			JSONArray jsonPosts = json.getJSONObject("post").getJSONArray("comments");
+			for (int i = 0; i < jsonPosts.length(); i++) {
+				CommentModel comment = new CommentModel();
+				JSONObject jsonComment = (JSONObject) jsonPosts.get(i);
+				comment.mAuthor = jsonComment.getString("name");
+				comment.mContent = jsonComment.getString("content");
+				comment.mDate = jsonComment.getString("date");
+				comment.mPositive = jsonComment.getInt("vote_positive");
+				comment.mNegative = jsonComment.getInt("vote_negative");
+				comment.mIndex = jsonComment.getInt("index");
+				comments.add(comment);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return comments;
 	}
 
 

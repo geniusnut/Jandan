@@ -7,6 +7,7 @@ import android.os.Parcelable;
  * Created by yw07 on 15-3-17.
  */
 public class Post implements Parcelable {
+	public int mId;
 	public String mLink;
 	public String mTitle;
 	public String mCover;
@@ -19,6 +20,7 @@ public class Post implements Parcelable {
 	}
 
 	public Post(Parcel in) {
+		mId = in.readInt();
 		mLink = in.readString();
 		mTitle = in.readString();
 		mCover = in.readString();
@@ -44,6 +46,7 @@ public class Post implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(mId);
 		dest.writeString(mLink);
 		dest.writeString(mTitle);
 		dest.writeString(mCover);
