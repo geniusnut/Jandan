@@ -72,7 +72,7 @@ public class FloatingActionButton extends View {
 		canvas.drawCircle(getWidth() / 2, getHeight() / 2, (float) (getWidth() / 2.6), mButtonPaint);
 		// draw Bitmap
 		canvas.drawBitmap(mBitmap, (getWidth() - mBitmap.getWidth()) / 2,
-				(getHeight() - mBitmap.getHeight()) / 2f, mDrawablePaint);
+				(getHeight() - mBitmap.getHeight()) / 2, mDrawablePaint);
 
 	}
 
@@ -95,9 +95,10 @@ public class FloatingActionButton extends View {
 		int w = drawable.getIntrinsicWidth();
 		int h = drawable.getIntrinsicHeight();
 		Bitmap.Config config = Bitmap.Config.ARGB_8888;
+		final float iconSize = getResources().getDimension(R.dimen.fab_icon_size);
 		if (w == 0 || h == 0) {
-			w = 72;
-			h = 72;
+			w = (int) iconSize;
+			h = (int) iconSize;
 		}
 		mBitmap = Bitmap.createBitmap(w, h, config);
 		Canvas canvas = new Canvas(mBitmap);

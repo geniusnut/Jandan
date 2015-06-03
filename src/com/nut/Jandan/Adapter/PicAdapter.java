@@ -7,7 +7,6 @@ import android.graphics.*;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -94,7 +93,7 @@ public class PicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 	}
 
 	private int calcLayoutParams() {
-		return 600;
+		return -1;
 	}
 
 	@Override

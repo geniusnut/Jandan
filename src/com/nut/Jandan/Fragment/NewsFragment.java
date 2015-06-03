@@ -1,9 +1,7 @@
 package com.nut.Jandan.Fragment;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -29,7 +27,6 @@ import com.nut.Jandan.Activity.PostActivity;
 import com.nut.Jandan.R;
 import com.nut.cache.NewsFile;
 import com.nut.cache.Post;
-import com.nut.http.JandanParser;
 import com.nut.http.PostParser;
 import com.nut.ui.FloatingActionButton;
 import com.nut.ui.FloatingActionsMenu;
@@ -40,29 +37,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class NewsFragment extends Fragment {
+public class NewsFragment extends BaseFragment {
 	private final String TAG = "NewsFragment";
-	protected ListView mListView;
-	protected SwipeRefreshLayout swipeLayout;
-	protected JandanParser mParser;
+
 	private Toolbar mToolbar;
+	protected ListView mListView;
 	private RecyclerView mRecList;
+	private FloatingActionsMenu mFam;
+	protected SwipeRefreshLayout swipeLayout;
 	RecyclerView.ItemAnimator mCachedAnimator = null;
 
-
-	public static NewsLoader mNewsLoader;
+	protected Handler mHandler;
 	protected boolean isParsing = false;
 	protected boolean mNeedReload = true;
-	protected Handler mHandler;
-	int page = 0;
-	protected List<Map<String, Object>> items = new ArrayList<>();
 	protected ConcurrentHashMap<String, Drawable> mCovers;
+	protected List<Map<String, Object>> items = new ArrayList<>();
 
-	private HashMap<String, String> coverMaps = new HashMap(64);
+	private int mPage = 0;
 	private PostParser mPostParser;
-	private NewsFile mNewsFile = new NewsFile();
+	private NewsAdapter newsAdapter;
 	private ImageLoader mImageLoader;
-	private FloatingActionsMenu mFam;
+	private NewsFile mNewsFile = new NewsFile();
+	private HashMap<String, String> coverMaps = new HashMap(64);
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,29 +69,30 @@ public class NewsFragment extends Fragment {
 		((ActionBarActivity) getActivity()).getSupportActionBar().show();
 		mToolbar = ((JandanActivity) getActivity()).getToolbar();
 		mToolbar.bringToFront();
+
 		swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
 		swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh() {
-				page = 0;
+				mPage = 0;
 				Log.d(TAG, "swipe refresh layout.");
-				new NewsLoader().execute(++page);
+				new NewsLoader().execute(++mPage);
 			}
 		});
-
 		swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
 				android.R.color.holo_green_light,
 				android.R.color.holo_orange_light,
 				android.R.color.holo_red_light);
+		int toolbarSize = JandanActivity.getActionBarSize(getActivity());
+		swipeLayout.setProgressViewOffset(false, toolbarSize, toolbarSize + 128);
 
 		mRecList = (RecyclerView) rootView.findViewById(R.id.cardList);
 		mRecList.setHasFixedSize(true);
 		LinearLayoutManager llm = new LinearLayoutManager(getActivity());
 		llm.setOrientation(LinearLayoutManager.VERTICAL);
 		mRecList.setLayoutManager(llm);
-		NewsAdapter na = new NewsAdapter();
-		mRecList.setAdapter(na);
-
+		newsAdapter = new NewsAdapter();
+		mRecList.setAdapter(newsAdapter);
 		mRecList.setOnScrollListener(new HidingScrollListener() {
 			private int previousTotal = 0; // The total number of items in the dataset after the last load
 			private boolean loading = true; // True if we are still waiting for the last set of data to load.
@@ -125,12 +122,11 @@ public class NewsFragment extends Fragment {
 				if (!loading && (totalItemCount - visibleItemCount)
 						<= (firstVisibleItem + visibleThreshold)) {
 
-					new NewsLoader().execute(++page);
+					new NewsLoader().execute(++mPage);
 					loading = true;
 				}
 			}
 		});
-
 		mCachedAnimator = mRecList.getItemAnimator();
 		mCachedAnimator.setSupportsChangeAnimations(true);
 		mRecList.setItemAnimator(mCachedAnimator);
@@ -147,16 +143,6 @@ public class NewsFragment extends Fragment {
 			mFam.addButton(fab);
 		}
 		return rootView;
-	}
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-		swipeLayout.setProgressViewOffset(false, mToolbar.getHeight(), mToolbar.getHeight() + 128);
 	}
 
 	public boolean backPressed() {
@@ -230,25 +216,13 @@ public class NewsFragment extends Fragment {
 
 		mHandler = new Handler();
 		mPostParser = new PostParser();
-
 		mCovers = new ConcurrentHashMap<>(64);
-
-//		ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(getActivity());
-//		config.threadPriority(Thread.NORM_PRIORITY - 2);
-//		config.denyCacheImageMultipleSizesInMemory();
-//		config.diskCacheFileNameGenerator(new Md5FileNameGenerator());
-//		config.diskCacheSize(50 * 1024 * 1024); // 50 MiB
-//		config.tasksProcessingOrder(QueueProcessingType.LIFO);
-//		config.writeDebugLogs(); // Remove for release app
-//
-//		// Initialize ImageLoader with configuration.
-//		ImageLoader.getInstance().init(config.build());
 		mImageLoader = ImageLoader.getInstance();
 
 		if (mNewsFile.load(getActivity(), NewsFile.NEWS_FILE_NAME)) {
 			final ArrayList<Post> news = new ArrayList<>(mNewsFile.size());
 			mNeedReload = false;
-			page = mNewsFile.size() / 24;
+			mPage = mNewsFile.size() / 24;
 			mHandler.post(new Runnable() {
 				@Override
 				public void run() {
@@ -258,8 +232,7 @@ public class NewsFragment extends Fragment {
 			requestLoad(); // Try to load all covers or just only try to load the cover visible in the listview.
 		}
 		if (mNeedReload) {
-			mNewsLoader = new NewsLoader();
-			mNewsLoader.execute(++page);
+			new NewsLoader().execute(++mPage);
 		}
 	}
 
@@ -288,9 +261,9 @@ public class NewsFragment extends Fragment {
 
 		protected void onPostExecute(ArrayList<Post> result) {
 			if(result.isEmpty()){
-				//Toast.makeText(, "载入出错了！请稍后再试。", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getActivity(), "载入出错了！请稍后再试。", Toast.LENGTH_SHORT).show();
 			}
-			if (page == 1)
+			if (mPage == 1)
 				mNewsFile.clear();
 			mNewsFile.addAll(result);
 			newsAdapter.notifyDataSetChanged();
@@ -393,62 +366,7 @@ public class NewsFragment extends Fragment {
 			.bitmapConfig(Bitmap.Config.RGB_565)
 			.build();
 
-	protected final BaseAdapter newsAdapter = new BaseAdapter() {
-		private final int droidGreen = Color.parseColor("#A4C639");
 
-		class ViewHolder {
-			public TextView link;
-			public ImageView image;
-			public TextView title;
-			public TextView by;
-			public TextView tag;
-			public TextView cont;
-		}
-		@Override
-		public int getCount() {
-			return mNewsFile.size();
-		}
-
-		@Override
-		public Object getItem(int position) {
-			return mNewsFile.get(position);
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return 0;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			ViewHolder viewHolder;
-			if (convertView == null) {
-				LayoutInflater inflater = getActivity().getLayoutInflater();
-				convertView = inflater.inflate(R.layout.card_news_item, null);
-				viewHolder = new ViewHolder();
-				viewHolder.link = (TextView) convertView.findViewById(R.id.link);
-				viewHolder.image = (ImageView) convertView.findViewById(R.id.scale_image);
-				viewHolder.title = (TextView) convertView.findViewById(R.id.title);
-				viewHolder.by = (TextView) convertView.findViewById(R.id.by);
-				viewHolder.tag = (TextView) convertView.findViewById(R.id.tag);
-				viewHolder.cont = (TextView) convertView.findViewById(R.id.cont);
-
-				convertView.setTag(viewHolder);
-			} else {
-				viewHolder = (ViewHolder) convertView.getTag();
-			}
-
-			final Post item = mNewsFile.get(position);
-			viewHolder.title.setText(item.mTitle);
-			viewHolder.by.setText(item.mAuthor);
-			viewHolder.link.setText(item.mLink);
-			viewHolder.tag.setText(item.mTag);
-			viewHolder.cont.setText(String.valueOf(item.mCont));
-
-			setImageToView(viewHolder.image, item.mCover);
-			return convertView;
-		}
-	};
 
 	private void setImageToView(final ImageView imageView, final String thumbUrl) {
 		imageView.setTag(thumbUrl);

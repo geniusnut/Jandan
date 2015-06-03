@@ -1,6 +1,5 @@
 package com.nut.Jandan.Fragment;
 
-import android.app.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,10 +20,11 @@ import com.nut.Jandan.R;
 import com.nut.cache.Pic;
 import com.nut.cache.PicFile;
 import com.nut.http.PicParser;
+import com.nut.ui.DividerItemDecoration;
 
 import java.util.ArrayList;
 
-public class PicsFragment extends Fragment {
+public class PicsFragment extends BaseFragment {
 	private static final String TAG = "PicFragment";
 
 	private RecyclerView mRecyclerView;
@@ -65,6 +65,7 @@ public class PicsFragment extends Fragment {
 				android.R.color.holo_red_light);
 
 		mRecyclerView = (RecyclerView) rootView.findViewById(R.id.pic_list);
+		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
 		// mRecyclerView.addHeaderView();
 
 		mRecyclerView.setOnScrollListener(new NewsFragment.HidingScrollListener() {
@@ -106,7 +107,6 @@ public class PicsFragment extends Fragment {
 			}
 
 		});
-
 
 		mLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
 
@@ -178,7 +178,7 @@ public class PicsFragment extends Fragment {
 		@Override
 		protected ArrayList<Pic> doInBackground(Integer... page) {
 			isParsing = true;
-			// ArrayList<Pic> pics = mParser.JandanPicPage(page[0]);
+			// ArrayList<Pic> pics = mParser.JandanPicPage(mPage[0]);
 			if (mPicCol != null) {
 				mPicCol = mPicParser.parse(page[0]);
 				return mPicCol;

@@ -44,7 +44,7 @@ public class ToolbarColorHelper {
 				for (int j = 0; j < ((ActionMenuView) v).getChildCount(); j++) {
 
 					//Step 2: Changing the color of any ActionMenuViews - icons that
-					//are not back button, nor text, nor overflow menu icon.
+					//are not back button, nor text, nor overflow post icon.
 					final View innerView = ((ActionMenuView) v).getChildAt(j);
 
 					if (innerView instanceof ActionMenuItemView) {

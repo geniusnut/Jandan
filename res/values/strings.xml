@@ -17,4 +17,5 @@
     <string name="settings_feedback_summary">go to market</string>
     <string name="settings_about">About</string>
     <string name="settings_about_summary">about us</string>
+    <string name="share">share</string>
 </resources>

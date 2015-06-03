@@ -5,23 +5,21 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Handler;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.AttributeSet;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
 import android.webkit.WebView;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.alensw.Jandan.CommentModel;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
-import com.nut.Jandan.Fragment.PostFragment;
 import com.nut.Jandan.R;
 import com.nut.cache.Post;
 import com.nut.dao.PostFormater;
@@ -50,6 +48,7 @@ public class PostAdapter extends RecyclerView.Adapter {
     private RecyclerView mRecyclerView;
     private HeaderWrapper mHeader;
     private OnParallaxScroll mParallaxScroll;
+    private final LinearLayoutManager mLayoutManager;
     private List<CommentModel> mComments;
 
     public interface OnParallaxScroll {
@@ -66,6 +65,7 @@ public class PostAdapter extends RecyclerView.Adapter {
     public PostAdapter(Post post, RecyclerView recyclerView) {
         mPost = post;
         mRecyclerView = recyclerView;
+        mLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
         mComments = new ArrayList<CommentModel>(0);
     }
 
@@ -159,9 +159,13 @@ public class PostAdapter extends RecyclerView.Adapter {
                         new CommentsTask().execute(String.valueOf(mPost.mId));
                     } else {
                         ((VHItem) viewHolder).ivCarat.setRotation(180);
+//                        mComments.remove(0);
+//                        notifyItemRemoved(2);
+//                        notifyItemRangeChanged(2, mComments.size());
+                        int size = mComments.size();
                         mComments.clear();
-                        notifyItemRangeRemoved(3, mComments.size());
-                        notifyItemRangeChanged(3, mComments.size());
+                        notifyItemRangeRemoved(2, size);
+                        notifyItemRangeChanged(2, size);
                     }
                 }
             });
@@ -170,7 +174,7 @@ public class PostAdapter extends RecyclerView.Adapter {
             CommentModel comment = mComments.get(position - 2);
             ((VHComment) viewHolder).mAuthor.setText(comment.mAuthor);
             ((VHComment) viewHolder).mDate.setText(comment.mDate);
-            ((VHComment) viewHolder).mContent.setText(comment.mContent);
+            ((VHComment) viewHolder).mContent.setText(Html.fromHtml(comment.mContent));
         }
     }
 
@@ -207,14 +211,14 @@ public class PostAdapter extends RecyclerView.Adapter {
         private final TextView commTextView;
         private final ImageView ivCarat;
         private final WebView mCommWebView;
-        private final RelativeLayout commToggle;
+        private final ViewGroup commToggle;
         public VHItem(View itemView) {
             super(itemView);
             mWebView = (WebView) itemView.findViewById(R.id.webview);
             commTextView = (TextView) itemView.findViewById(R.id.btn_post_comm_text);
             ivCarat = (ImageView) itemView.findViewById(R.id.ivCarat);
             mCommWebView = (WebView) itemView.findViewById(R.id.post_comm);
-            commToggle = (RelativeLayout) itemView.findViewById(R.id.btn_post_comm);
+            commToggle = (ViewGroup) itemView.findViewById(R.id.btn_post_comm);
         }
     }
 
@@ -294,7 +298,9 @@ public class PostAdapter extends RecyclerView.Adapter {
             if (mComments.size() > 0 )
                 mComments.clear();
             mComments.addAll(commentModels);
-            notifyDataSetChanged();
+            notifyItemRangeChanged(2, mComments.size());
+            if (mRecyclerView != null)
+                mRecyclerView.smoothScrollToPosition(2);
         }
     }
 }

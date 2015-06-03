@@ -34,9 +34,9 @@ public class JandanApp extends Application {
 		DisplayImageOptions options = new DisplayImageOptions.Builder()
 				.bitmapConfig(Bitmap.Config.RGB_565)
 				.imageScaleType(ImageScaleType.EXACTLY)
-				.cacheOnDisc(true)
+				.cacheOnDisk(true)
 				.displayer(new FadeInBitmapDisplayer(200))
-				.showImageOnLoading(R.drawable.loading)
+				.showImageOnLoading(R.drawable.ic_back)
 				.build();
 
 		File cacheDir;

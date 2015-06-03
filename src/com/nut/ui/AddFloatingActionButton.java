@@ -35,7 +35,9 @@ public class AddFloatingActionButton extends FloatingActionButton {
 		canvas.save();
 		Matrix rotator = new Matrix();
 
-		rotator.postRotate(mRotation, 36, 36);
+		int cx = (getWidth() - mBitmap.getWidth()) >> 1;
+		int cy = (getHeight() - mBitmap.getHeight()) >> 1;
+		rotator.postRotate(mRotation, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
 		rotator.postTranslate((getWidth() - mBitmap.getWidth()) / 2,
 				(getHeight() - mBitmap.getHeight()) / 2);
 		setClickable(true);

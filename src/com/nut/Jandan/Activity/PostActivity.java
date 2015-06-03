@@ -1,19 +1,23 @@
 package com.nut.Jandan.Activity;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import com.larvalabs.svgandroid.SVG;
 import com.nut.Jandan.Fragment.PostFragment;
 import com.nut.Jandan.R;
 import com.nut.cache.NewsFile;
@@ -30,6 +34,8 @@ public class PostActivity extends ActionBarActivity {
 	private ViewPager mViewPager;
 
 	private NewsFile mNewsFile = new NewsFile();
+	private ShareActionProvider mShareActionProvider;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -48,11 +54,8 @@ public class PostActivity extends ActionBarActivity {
 		mToolbar = (Toolbar) findViewById(R.id.toolbar_post);
 		if (mToolbar != null) {
 			mToolbar.setTitle("News");
-			ImageView share = (ImageView) mToolbar.findViewById(R.id.share);
-			// ToolbarColorHelper.colorizeToolbar(mToolbar, Color.BLACK, this);
-			mToolbar.getBackground().setAlpha(0);
+
 			Log.d(TAG, "mToolbar width" + mToolbar.getMeasuredWidth());
-			share.setLayoutParams(new Toolbar.LayoutParams(56, 56, Gravity.RIGHT));
 			//share.setImageDrawable(SVG.getDrawable(getResources(), R.raw.ic_menu_share));
 			setSupportActionBar(mToolbar);
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -61,11 +64,32 @@ public class PostActivity extends ActionBarActivity {
 
 	}
 
+	public Toolbar getToolbar() {
+		return mToolbar;
+	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.menu, menu);
-		return true;
+		getMenuInflater().inflate(R.menu.post, menu);
+		int color = getIconColor(this);
+		int size = 72;
+		MenuItem shareItem = menu.findItem(R.id.share);
+		shareItem.setIcon(SVG.getDrawable(getResources(), R.raw.ic_menu_share, color, size));
+//		mShareActionProvider = (ShareActionProvider)
+//				MenuItemCompat.getActionProvider(shareItem);
+//		mShareActionProvider.setShareIntent(getDefaultIntent());
+
+		return super.onCreateOptionsMenu(menu);
 	}
+
+	private Intent getDefaultIntent() {
+		String mimeType = "text/plain";
+		final Intent intentShare = new Intent(Intent.ACTION_SEND);
+		intentShare.setType(mimeType);
+		intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+		intentShare.putExtra(Intent.EXTRA_TEXT, mNewsFile.get(mViewPager.getCurrentItem()).mLink);
+		return intentShare;
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle action bar item clicks here. The action bar will
@@ -74,6 +98,9 @@ public class PostActivity extends ActionBarActivity {
 		int id = item.getItemId();
 		switch (id) {
 			case R.id.action_settings:
+				return true;
+			case R.id.share:
+				// share();
 				return true;
 			case android.R.id.home:
 				postActivity.finish();
@@ -105,5 +132,12 @@ public class PostActivity extends ActionBarActivity {
 		public int getCount() {
 			return mNewsFile.size();
 		}
+	}
+
+	public static int getIconColor(Context context) {
+		TypedValue typedValue = new TypedValue();
+		//context.getTheme().resolveAttribute(android.R.attr.colorPrimary, typedValue, true);
+		TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[]{android.R.attr.textColorSecondary});
+		return a.getColor(0, 0);
 	}
 }
