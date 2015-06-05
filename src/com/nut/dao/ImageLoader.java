@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.widget.ImageView;
 import com.nut.Jandan.Utility.Utilities;
 import com.nut.cache.FileCache;
@@ -33,7 +32,9 @@ public class ImageLoader {
 
 
 	public static interface Callback {
-		public abstract void onLoaded(String thumbUrl, Drawable drawable); // called in loader thread
+		public void onLoading(int progress);
+
+		public void onLoaded(String thumbUrl, Drawable drawable); // called in loader thread
 	}
 
 	public ImageLoader(Context context) {
@@ -70,11 +71,16 @@ public class ImageLoader {
 					URL url = new URL(mThumbUrl);
 					URLConnection conn = url.openConnection();
 					is = conn.getInputStream();
+					long length = is.available();
 					final byte[] data = new byte[8192];
-					int bytes = 0;
+					int bytes = 0, written = 0, percent;
 					while ((bytes = is.read(data)) >= 0) {
-						if (bytes > 0)
+						if (bytes > 0) {
 							fos.write(data, 0, bytes);
+							written += bytes;
+							percent = (int) (written / length * 100);
+							mCallback.onLoading(percent);
+						}
 					}
 					fos.flush();
 					fos.close();
@@ -86,18 +92,6 @@ public class ImageLoader {
 			Drawable drawable = null;
 			if (!mThumbUrl.endsWith("gif")) {
 				bitmap = JandanParser.createThumbnail(file.getPath());
-//				final Drawable coverDrawable = new BitmapDrawable(bitmap);
-//				new Handler(Looper.getMainLooper()).post(new Runnable() {
-//					@Override
-//					public void run() {
-//						if (mImageViewReference != null) {
-//							final ImageView imageView = mImageViewReference.get();
-//							if (imageView != null) {
-//								imageView.setImageDrawable(coverDrawable);
-//							}
-//						}
-//					}
-//				});
 				drawable = new BitmapDrawable(bitmap);
 			} else {
 				try {
@@ -108,7 +102,6 @@ public class ImageLoader {
 
 			}
 
-			Uri uri = Uri.fromFile(file);
 
 			if (drawable != null) {
 				//bitmap.recycle();

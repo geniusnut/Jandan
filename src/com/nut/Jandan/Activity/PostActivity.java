@@ -16,12 +16,14 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import com.larvalabs.svgandroid.SVG;
 import com.nut.Jandan.Fragment.PostFragment;
 import com.nut.Jandan.R;
 import com.nut.cache.NewsFile;
 import com.nut.cache.Post;
+import com.nut.ui.ShareHelper;
 
 /**
  * Created by yw07 on 14-11-20.
@@ -100,7 +102,7 @@ public class PostActivity extends ActionBarActivity {
 			case R.id.action_settings:
 				return true;
 			case R.id.share:
-				// share();
+				share(findViewById(R.id.share));
 				return true;
 			case android.R.id.home:
 				postActivity.finish();
@@ -109,6 +111,15 @@ public class PostActivity extends ActionBarActivity {
 				break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void share(View anchor) {
+		final String mimeType = "text/plain";
+		final Intent shareIntent = new Intent(Intent.ACTION_SEND);
+		shareIntent.setType(mimeType);
+		shareIntent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+		shareIntent.putExtra(Intent.EXTRA_TEXT, "i.jandan.net"); //TODO
+		ShareHelper.showMenu(this, shareIntent, anchor);
 	}
 
 	private class PostAdapter extends FragmentPagerAdapter {

@@ -27,9 +27,7 @@ import com.nut.cache.Pic;
 import com.nut.dao.ParcelFile;
 import com.nut.gif.GifImageView;
 import com.nut.gif.GifMovie;
-import com.nut.ui.GifTouchImageView;
 import com.nut.ui.PictureView;
-import com.nut.ui.ScaleImageView;
 import com.nut.ui.TouchImageView;
 
 import java.io.*;
@@ -110,16 +108,7 @@ public class PicActivity extends ActionBarActivity {
 				TouchImageView imageView = new TouchImageView(container.getContext());
 				container.addView(imageView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 				picAdapter = new PicAdapter(imageView, item);
-//				if (item.isGif) {
-//					// View view = getLayoutInflater().inflate(R.layout.gif_viewer, null);
-//					GifImageView gifImageView = new GifImageView(getBaseContext());
-//					container.addView(gifImageView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-//					picAdapter = new PicAdapter(gifImageView, item);
-//				} else {
-//					TouchImageView view = new TouchImageView(getBaseContext());
-//					container.addView(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-//					picAdapter = new PicAdapter(view, item);
-//				}
+
 				if (mPicAdapter == null)
 					mPicAdapter = picAdapter;
 

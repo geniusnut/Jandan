@@ -1,5 +1,6 @@
 package com.nut.Jandan.Fragment;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -7,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -22,6 +22,7 @@ import android.widget.*;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+import com.nut.Jandan.Activity.BaseFragmentActivity;
 import com.nut.Jandan.Activity.JandanActivity;
 import com.nut.Jandan.Activity.PostActivity;
 import com.nut.Jandan.R;
@@ -37,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class NewsFragment extends BaseFragment {
+public class NewsFragment extends Fragment implements BaseFragmentInterface {
 	private final String TAG = "NewsFragment";
 
 	private Toolbar mToolbar;
@@ -66,8 +67,11 @@ public class NewsFragment extends BaseFragment {
 		ViewGroup rootView = (ViewGroup) inflater.inflate(
 				R.layout.swipe_news_frag, container, false);
 
-		((ActionBarActivity) getActivity()).getSupportActionBar().show();
 		mToolbar = ((JandanActivity) getActivity()).getToolbar();
+		if (mToolbar.getTranslationY() < 0) {
+			mToolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
+			mToolbar.animate().alpha(1).setInterpolator(new DecelerateInterpolator(2));
+		}
 		mToolbar.bringToFront();
 
 		swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
@@ -79,10 +83,8 @@ public class NewsFragment extends BaseFragment {
 				new NewsLoader().execute(++mPage);
 			}
 		});
-		swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
-				android.R.color.holo_green_light,
-				android.R.color.holo_orange_light,
-				android.R.color.holo_red_light);
+		int color = getResources().getColor(R.color.teal500);
+		swipeLayout.setColorSchemeColors(color);
 		int toolbarSize = JandanActivity.getActionBarSize(getActivity());
 		swipeLayout.setProgressViewOffset(false, toolbarSize, toolbarSize + 128);
 
@@ -146,6 +148,19 @@ public class NewsFragment extends BaseFragment {
 	}
 
 	public boolean backPressed() {
+		return false;
+	}
+
+	@Override
+	public void show(BaseFragmentActivity activity) {
+		if (activity == null) {
+			return;
+		}
+		activity.showFragment(this);
+	}
+
+	@Override
+	public boolean onBackPressed() {
 		return false;
 	}
 
@@ -271,7 +286,6 @@ public class NewsFragment extends BaseFragment {
 			isParsing = false;
 		}
 	}
-
 
 	public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder> {
 

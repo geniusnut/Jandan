@@ -1,21 +1,19 @@
 package com.nut.Jandan.Activity;
 
 import android.annotation.SuppressLint;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import com.nut.Jandan.Fragment.BaseFragment;
+import com.nut.Jandan.Fragment.BaseFragmentInterface;
 
 import java.util.LinkedList;
 import java.util.Map;
 
-/**
- * Created by yw07 on 15-6-2.
- */
 public abstract class BaseFragmentActivity extends ActionBarActivity {
-	private LinkedList<BaseFragment> currentList;
-	private BaseFragment mCurrentFragment;
+	private LinkedList<Fragment> currentList;
+	private Fragment mCurrentFragment;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -23,15 +21,15 @@ public abstract class BaseFragmentActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 	}
 
-	public boolean showOnly(BaseFragment fragment) {
+	public boolean showOnly(Fragment fragment) {
 		if (fragment == null) {
 			return false;
 		}
 		try {
-			final BaseFragment old = mCurrentFragment;
+			final Fragment old = mCurrentFragment;
 			FragmentTransaction transaction = getTransaction();
 			boolean isShown = false;
-			for (BaseFragment f : currentList) {
+			for (Fragment f : currentList) {
 				if (f != fragment) {
 					transaction.remove(f);
 				} else {
@@ -46,7 +44,7 @@ public abstract class BaseFragmentActivity extends ActionBarActivity {
 			}
 			transaction.commit();
 			mCurrentFragment = fragment;
-			// onFragmentChanged(fragment, old);
+			onFragmentChanged(fragment, old);
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -65,7 +63,7 @@ public abstract class BaseFragmentActivity extends ActionBarActivity {
 		try {
 			currentList.removeLast();
 			FragmentTransaction transaction = getTransaction();
-			final BaseFragment oldFrag = mCurrentFragment;
+			final Fragment oldFrag = mCurrentFragment;
 			transaction.remove(oldFrag);
 			//
 			mCurrentFragment = currentList.getLast();
@@ -73,14 +71,14 @@ public abstract class BaseFragmentActivity extends ActionBarActivity {
 			//
 			transaction.commit();
 
-			// onFragmentChanged(oldFrag, curFragment);
+			onFragmentChanged(oldFrag, mCurrentFragment);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return true;
 	}
 
-	public boolean showFragment(BaseFragment fragment) {
+	public boolean showFragment(Fragment fragment) {
 		if (fragment == null) {
 			return false;
 		}
@@ -96,12 +94,13 @@ public abstract class BaseFragmentActivity extends ActionBarActivity {
 		}
 		currentList.add(fragment);
 		transaction.commit();
+		onFragmentChanged(fragment, mCurrentFragment);
 		return true;
 	}
 
 	public abstract int getContentId();
 
-	private int hideOtherFragment(BaseFragment shown, FragmentTransaction transaction) {
+	private int hideOtherFragment(Fragment shown, FragmentTransaction transaction) {
 		if (shown == null || transaction == null) {
 			return -1;
 		}
@@ -110,15 +109,15 @@ public abstract class BaseFragmentActivity extends ActionBarActivity {
 		}
 		int index = -1;
 		for (int i = 0; i < currentList.size(); i++) {
-			BaseFragment baseFragment = currentList.get(i);
-			if (baseFragment == shown) {
+			Fragment Fragment = currentList.get(i);
+			if (Fragment == shown) {
 				index = i;
-				if (baseFragment.isHidden()) {
-					transaction.show(baseFragment);
+				if (Fragment.isHidden()) {
+					transaction.show(Fragment);
 				}
 			} else {
-				if (baseFragment.isVisible())
-					transaction.hide(baseFragment);
+				if (Fragment.isVisible())
+					transaction.hide(Fragment);
 			}
 		}
 		return index;
@@ -137,8 +136,10 @@ public abstract class BaseFragmentActivity extends ActionBarActivity {
 		if (mCurrentFragment == null) {
 			return false;
 		}
-		if (mCurrentFragment.onBackPressed()) {
-			return true;
+		if (mCurrentFragment instanceof BaseFragmentInterface) {
+			BaseFragmentInterface baseFragmentInterface = (BaseFragmentInterface) mCurrentFragment;
+			if (baseFragmentInterface.onBackPressed())
+				return true;
 		}
 		return showPreFrag(map);
 	}
@@ -155,5 +156,14 @@ public abstract class BaseFragmentActivity extends ActionBarActivity {
 //                android.R.anim.fade_out//
 //        );
 		return transaction;
+	}
+
+	protected void onFragmentChanged(Fragment shown, Fragment hidden) {
+	}
+
+	public int getFragmentSize() {
+		if (currentList == null)
+			return 0;
+		return currentList.size();
 	}
 }

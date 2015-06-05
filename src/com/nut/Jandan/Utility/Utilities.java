@@ -6,6 +6,9 @@ import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Created by yw07 on 15-3-18.
@@ -56,4 +59,14 @@ public class Utilities {
 			return mDateFormat.format(calendar.getTime());
 		}
 	}
+
+	public static <T> boolean safeSort(List<T> list, Comparator<? super T> comparator) {
+		try {
+			Collections.sort(list, comparator);
+			return true;
+		} catch (Throwable e) {    //	IllegalArgumentException???
+		}
+		return false;
+	}
+
 }

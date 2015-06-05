@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -149,19 +150,18 @@ public class PostAdapter extends RecyclerView.Adapter {
 
             //((VHItem) viewHolder).commTextView.setText(getString(R.string.post_comments, mPost.mCont));
 
-            // new webViewLoad(((VHItem) viewHolder).mCommWebView, PostFormater.COMMENT_FORMAT).execute(mPost.mLink);
             ((VHItem) viewHolder).commToggle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     mShowComment = !mShowComment;
                     if (mShowComment) {
+                        ((VHItem) viewHolder).commToggle.setEnabled(false);
                         ((VHItem) viewHolder).ivCarat.setRotation(0);
-                        new CommentsTask().execute(String.valueOf(mPost.mId));
+                        new CommentsTask(((VHItem) viewHolder).commToggle).execute(String.valueOf(mPost.mId));
                     } else {
                         ((VHItem) viewHolder).ivCarat.setRotation(180);
-//                        mComments.remove(0);
-//                        notifyItemRemoved(2);
-//                        notifyItemRangeChanged(2, mComments.size());
+                        int scrollY = mRecyclerView.getScrollY();
+                        int offsetY = ((VHItem) viewHolder).ivCarat.getBottom();
                         int size = mComments.size();
                         mComments.clear();
                         notifyItemRangeRemoved(2, size);
@@ -215,6 +215,8 @@ public class PostAdapter extends RecyclerView.Adapter {
         public VHItem(View itemView) {
             super(itemView);
             mWebView = (WebView) itemView.findViewById(R.id.webview);
+            mWebView.getSettings().setJavaScriptEnabled(true);
+            mWebView.setWebViewClient(new WebViewClient());
             commTextView = (TextView) itemView.findViewById(R.id.btn_post_comm_text);
             ivCarat = (ImageView) itemView.findViewById(R.id.ivCarat);
             mCommWebView = (WebView) itemView.findViewById(R.id.post_comm);
@@ -288,6 +290,12 @@ public class PostAdapter extends RecyclerView.Adapter {
 
     public class CommentsTask extends AsyncTask<String, Void, ArrayList<CommentModel>> {
 
+        View mCommToggle;
+
+        public CommentsTask(View commToggle) {
+            mCommToggle = commToggle;
+        }
+
         @Override
         protected ArrayList<CommentModel> doInBackground(String... params) {
             return PostParser.parseComments(params[0]);
@@ -299,6 +307,7 @@ public class PostAdapter extends RecyclerView.Adapter {
                 mComments.clear();
             mComments.addAll(commentModels);
             notifyItemRangeChanged(2, mComments.size());
+            //  mCommToggle.setEnabled(true);
             if (mRecyclerView != null)
                 mRecyclerView.smoothScrollToPosition(2);
         }

@@ -140,7 +140,7 @@ public class TouchImageView extends PictureView implements Gif {
 			mScaleType = ScaleType.FIT_CENTER;
 		}
 		minScale = 1;
-		maxScale = 3;
+		maxScale = 10;
 		superMinScale = SUPER_MIN_MULTIPLIER * minScale;
 		superMaxScale = SUPER_MAX_MULTIPLIER * maxScale;
 		setImageMatrix(matrix);
@@ -173,6 +173,7 @@ public class TouchImageView extends PictureView implements Gif {
 	@Override
 	public void setImageBitmap(Bitmap bm) {
 		super.setImageBitmap(bm);
+		setBitmap(bm);
 		savePreviousImageValues();
 		fitImageToView();
 	}

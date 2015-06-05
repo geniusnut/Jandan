@@ -1,7 +1,6 @@
 package com.nut.Jandan.Activity;
 
 import android.annotation.TargetApi;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -13,7 +12,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.*;
 import android.widget.*;
@@ -21,7 +19,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import com.larvalabs.svgandroid.SVG;
 import com.nut.Jandan.Fragment.NewsFragment;
 import com.nut.Jandan.Fragment.PicsFragment;
-import com.nut.Jandan.Fragment.SettingsBaseFragment;
+import com.nut.Jandan.Fragment.SettingsFragment;
 import com.nut.Jandan.R;
 import com.nut.ui.BadgeView;
 
@@ -30,18 +28,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class JandanActivity extends BaseFragmentActivity implements
+public class JandanActivity extends BarFragmentActivity implements
 		OnItemClickListener {
 	private final String TAG = "JandanActivity";
 	private NewsFragment newsFrag = null;
 	private PicsFragment picFrag = null;
-	public DrawerLayout mDrawerLayout;
 	private ViewGroup mDrawerPanel;
 	private Toolbar mToolbar;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle toggle=null;
 	private BadgeView mBadgeView;
-	protected SimpleAdapter mAdapter;
 
 	private int mSelected = -1;
 
@@ -99,19 +95,19 @@ public class JandanActivity extends BaseFragmentActivity implements
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
-		toggle.syncState();
+		mDrawerToggle.syncState();
 	}
 
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 
-		toggle.onConfigurationChanged(newConfig);
+		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (toggle.onOptionsItemSelected(item)) {
+		if (mDrawerToggle.onOptionsItemSelected(item)) {
 			return(true);
 		}
 
@@ -136,22 +132,8 @@ public class JandanActivity extends BaseFragmentActivity implements
 					mDrawerLayout.closeDrawer(Gravity.LEFT);
 			}
 		});
-		SimpleAdapter sa = new SimpleAdapter(this, list,
-				R.layout.drawer_row, strings, ids
-		);
 
 		mDrawerList.setAdapter(new DrawerAdapter());
-		sa.setViewBinder(new SimpleAdapter.ViewBinder() {
-			@Override
-			public boolean setViewValue(View view, Object data, String textRepresentation) {
-				if (view instanceof ImageView && data instanceof Drawable){
-					ImageView iv = (ImageView) view;
-					iv.setImageDrawable((Drawable)data);
-					return true;
-				}
-				return false;
-			}
-		});
 		mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
@@ -170,41 +152,16 @@ public class JandanActivity extends BaseFragmentActivity implements
 			}
 		});
 
-
-		toggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-						R.string.app_name,
-						R.string.app_name) {
-					public void onDrawerOpened(View view) {
-						super.onDrawerOpened(view);
-						setTitle("Drawer Opened");
-						mDrawerList.requestFocus();
-						Fragment fragment = getFragmentManager().findFragmentById(R.id.content);
-						Log.d(TAG, "drawer open: " + fragment);
-						if (fragment instanceof PicsFragment) {
-							mDrawerList.getItemAtPosition(1);
-						}
-					}
-					public void onDrawerClosed(View view) {
-						super.onDrawerClosed(view);
-						Fragment fragment = getFragmentManager().findFragmentById(R.id.content);
-						Log.d(TAG, "drawer close: " + fragment.getClass());
-
-						setTitle(R.string.app_name);
-					}
-				};
-		toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onBackPressed();
-			}
-		});
 		mDrawerLayout.setDrawerListener(toggle);
+
+		setDrawerLayout(mDrawerLayout);
 
 		final View settings = findViewById(R.id.settings);
 		settings.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				new SettingsBaseFragment().show((BaseFragmentActivity) mDrawerLayout.getContext());
+				// ((BaseFragmentActivity) v.getContext()).showFragment(new SettingsFragment());
+				new SettingsFragment().show((BaseFragmentActivity) mDrawerLayout.getContext());
 				mDrawerLayout.closeDrawers();
 			}
 		});
@@ -299,17 +256,18 @@ public class JandanActivity extends BaseFragmentActivity implements
 		return null;
 	}
 	private void showNews() {
+		mDrawerList.setItemChecked(0, true);
 		if (newsFrag == null)
 			newsFrag = new NewsFragment();
-		newsFrag.show((BaseFragmentActivity) this);
-		mDrawerList.setItemChecked(0, true);
+		this.showOnly(newsFrag);
 	}
 	private void showPic() {
+		mDrawerList.setItemChecked(1, true);
 		if (picFrag == null)
 			picFrag = new PicsFragment();
-		picFrag.show(this);
-		mDrawerList.setItemChecked(1, true);
+		this.showOnly(picFrag);
 	}
+
 	private void showOOXX() {
 
 	}

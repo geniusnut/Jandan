@@ -5,18 +5,18 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import com.nut.Jandan.Activity.JandanActivity;
+import com.nut.Jandan.Activity.BarFragmentActivity;
+import com.nut.Jandan.Activity.BaseFragmentActivity;
 import com.nut.Jandan.R;
 import com.nut.Jandan.Utility.FileUtils;
 
 /**
  * Created by yw07 on 15-5-22.
  */
-public class SettingsFragment extends PreferenceFragment {
+public class SettingsFragment extends PreferenceFragment implements BaseFragmentInterface {
 	private SharedPreferences mPreferences;
 	private Preference mUpdate;
 	private Preference mCache;
@@ -26,15 +26,12 @@ public class SettingsFragment extends PreferenceFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.settings);
-		((JandanActivity) getActivity()).getSupportActionBar().hide();
-		((JandanActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		((JandanActivity) getActivity()).mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_setting, container, false);
-		return view;
+		((BarFragmentActivity) getActivity()).showBars(false);
+		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 
 	@Override
@@ -53,5 +50,19 @@ public class SettingsFragment extends PreferenceFragment {
 				return true;
 			}
 		});
+	}
+
+	@Override
+	public void show(BaseFragmentActivity activity) {
+		if (activity == null) {
+			return;
+		}
+		activity.showFragment(this);
+	}
+
+	@Override
+	public boolean onBackPressed() {
+		((BarFragmentActivity) getActivity()).showBars(true);
+		return false;
 	}
 }

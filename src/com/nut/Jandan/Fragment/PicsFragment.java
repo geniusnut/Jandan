@@ -1,5 +1,6 @@
 package com.nut.Jandan.Fragment;
 
+import android.app.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
+import com.nut.Jandan.Activity.BaseFragmentActivity;
 import com.nut.Jandan.Activity.JandanActivity;
 import com.nut.Jandan.Adapter.PicAdapter;
 import com.nut.Jandan.R;
@@ -24,7 +26,7 @@ import com.nut.ui.DividerItemDecoration;
 
 import java.util.ArrayList;
 
-public class PicsFragment extends BaseFragment {
+public class PicsFragment extends Fragment implements BaseFragmentInterface {
 	private static final String TAG = "PicFragment";
 
 	private RecyclerView mRecyclerView;
@@ -49,7 +51,12 @@ public class PicsFragment extends BaseFragment {
 				R.layout.picfragment, container, false);
 
 		mToolbar = ((JandanActivity) getActivity()).getToolbar();
+		if (mToolbar.getTranslationY() < 0) {
+			mToolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
+			mToolbar.animate().alpha(1).setInterpolator(new DecelerateInterpolator(2));
+		}
 		mToolbar.bringToFront();
+
 		swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.pic_swipe);
 		swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
@@ -59,10 +66,10 @@ public class PicsFragment extends BaseFragment {
 				new PicLoader(null).execute(++picPage);
 			}
 		});
-		swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
-				android.R.color.holo_green_light,
-				android.R.color.holo_orange_light,
-				android.R.color.holo_red_light);
+		int color = getResources().getColor(R.color.teal500);
+		swipeLayout.setColorSchemeColors(color);
+		int toolbarSize = JandanActivity.getActionBarSize(getActivity());
+		swipeLayout.setProgressViewOffset(false, toolbarSize, toolbarSize + 128);
 
 		mRecyclerView = (RecyclerView) rootView.findViewById(R.id.pic_list);
 		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
@@ -107,13 +114,13 @@ public class PicsFragment extends BaseFragment {
 			}
 
 		});
-
 		mLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-
+		mLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
 		mRecyclerView.setLayoutManager(mLayoutManager);
 		mRecyclerView.setHasFixedSize(false);
 		picAdapter = new PicAdapter(getActivity(), mPicFile, mHandler);
 		mRecyclerView.setAdapter(picAdapter);
+
 		return rootView;
 	}
 
@@ -166,6 +173,19 @@ public class PicsFragment extends BaseFragment {
 	public void onStop() {
 		super.onStop();
 		mPicFile.save();
+	}
+
+	@Override
+	public void show(BaseFragmentActivity activity) {
+		if (activity == null) {
+			return;
+		}
+		activity.showFragment(this);
+	}
+
+	@Override
+	public boolean onBackPressed() {
+		return false;
 	}
 
 	private class PicLoader extends AsyncTask<Integer, Void, ArrayList<Pic>> {

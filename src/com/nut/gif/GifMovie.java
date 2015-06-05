@@ -46,7 +46,7 @@ public class GifMovie {
 	private int mWidth;
 	private int mHeight;
 	public Bitmap mBitmap;
-	protected static ThreadPoolExecutor mExecutor = new ThreadPoolExecutor(10, 20, 10,
+	protected static ThreadPoolExecutor mExecutor = new ThreadPoolExecutor(5, 10, 20,
 			TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(256));
 
 	public static GifMovie create(ParcelFile pfd, Uri uri, Handler handler) {

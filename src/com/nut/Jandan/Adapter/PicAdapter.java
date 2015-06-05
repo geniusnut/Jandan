@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.*;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,11 +23,13 @@ import com.nut.Jandan.Activity.PicActivity;
 import com.nut.Jandan.Fragment.NewsFragment;
 import com.nut.Jandan.R;
 import com.nut.Jandan.Utility.Utilities;
+import com.nut.Jandan.model.UrlFile;
 import com.nut.cache.Pic;
 import com.nut.cache.PicFile;
 import com.nut.dao.ParcelFile;
 import com.nut.gif.GifMovie;
 import com.nut.ui.ExpandableTextView;
+import com.nut.ui.ProgressWheel;
 import com.nut.ui.ScaleImageView;
 
 import java.io.File;
@@ -58,7 +61,16 @@ public class PicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 		View view = inflater.inflate(R.layout.item_pic, viewGroup, false);
-		return new ViewHolder(view);
+		final ViewHolder holder = new ViewHolder(view);
+		holder.itemView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(mContext, PicActivity.class);
+				intent.putExtra(PicActivity.EXTRA_PIC, mPicFile.get(holder.getPosition()));
+				mContext.startActivity(intent);
+			}
+		});
+		return holder;
 	}
 
 	@Override
@@ -80,20 +92,12 @@ public class PicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 		FrameLayout.LayoutParams flp = new FrameLayout.LayoutParams(-1, height);
 		holder.mWrapper.setLayoutParams(flp);
 		final String url = pic.mUrls.get(0);
-		loadPic(holder.scaleImage, url);
-
-		holder.itemView.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(mContext, PicActivity.class);
-				intent.putExtra(PicActivity.EXTRA_PIC, pic);
-				mContext.startActivity(intent);
-			}
-		});
+		new loadImage(url, holder.progressWheel).execute();
+		// loadPic(holder.scaleImage, url);
 	}
 
 	private int calcLayoutParams() {
-		return -1;
+		return 800;
 	}
 
 	@Override
@@ -115,7 +119,34 @@ public class PicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 		return mPicFile.size();
 	}
 
-	private void loadPic(final ImageView imageView, final String thumbUrl) {
+	private class loadImage extends AsyncTask<Void, Void, Void> {
+		private UrlFile mUrlFile;
+		private ProgressWheel mWheel;
+
+		public loadImage(String url, ProgressWheel wheel) {
+			mUrlFile = new UrlFile(url);
+			mWheel = wheel;
+		}
+
+		@Override
+		protected void onPostExecute(Void aVoid) {
+			mWheel.setVisibility(View.GONE);
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			File file = mUrlFile.openFile(new UrlFile.Callback() {
+				@Override
+				public void onLoading(int progress) {
+					mWheel.setProgress(progress);
+				}
+			});
+
+			return null;
+		}
+	}
+
+	private void loadPicUIL(final ImageView imageView, final String thumbUrl) {
 		imageView.setTag(thumbUrl);
 
 		mImageLoader.loadImage(thumbUrl, NewsFragment.options, new SimpleImageLoadingListener() {
@@ -165,7 +196,7 @@ public class PicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 	}
 
 	public int getCount() {
-		return 10;
+		return mPicFile.size();
 	}
 
 	public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -175,7 +206,9 @@ public class PicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 		public TextView xx;
 		public TextView time;
 		public ScaleImageView scaleImage;
+		public ProgressWheel progressWheel;
 		public LinearLayout mWrapper;
+		public int position;
 
 		public ViewHolder(View itemView) {
 			super(itemView);
@@ -184,6 +217,7 @@ public class PicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 			oo = (TextView) itemView.findViewById(R.id.oo);
 			xx = (TextView) itemView.findViewById(R.id.xx);
 			time = (TextView) itemView.findViewById(R.id.time);
+			progressWheel = (ProgressWheel) itemView.findViewById(R.id.progressWheel);
 			scaleImage = (ScaleImageView) itemView.findViewById(R.id.scale_image);
 			mWrapper = (LinearLayout) itemView.findViewById(R.id.card_wraper);
 		}
