@@ -25,6 +25,8 @@ public class PostParser {
 	// ?oxwlxojflwblxbsapi=get_post&id=62799&include=content
 	// http://i.jandan.net/?oxwlxojflwblxbsapi=get_post&id=62799&include=comments
 
+	//  http://jandan.duoshuo.com/api/threads/listPosts.json?thread_key=comment-2822415
+
 	private static final DateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	static {
 		mDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));

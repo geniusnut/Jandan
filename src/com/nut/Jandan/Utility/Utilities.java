@@ -1,5 +1,12 @@
 package com.nut.Jandan.Utility;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.*;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import com.nut.Jandan.R;
+
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -69,4 +76,28 @@ public class Utilities {
 		return false;
 	}
 
+	public static BitmapDrawable getIconWithColor(Context context) {
+		final Resources res = context.getResources();
+		Drawable maskDrawable = res.getDrawable(R.drawable.icon_expand);
+		if (!(maskDrawable instanceof BitmapDrawable)) {
+			return null;
+		}
+
+		Bitmap maskBitmap = ((BitmapDrawable) maskDrawable).getBitmap();
+		final int width = maskBitmap.getWidth();
+		final int height = maskBitmap.getHeight();
+
+		Bitmap outBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+		Canvas canvas = new Canvas(outBitmap);
+		canvas.drawBitmap(maskBitmap, 0, 0, null);
+
+		Paint maskedPaint = new Paint();
+		maskedPaint.setColor(res.getColor(R.color.teal500));
+		maskedPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
+
+		canvas.drawRect(0, 0, width, height, maskedPaint);
+
+		BitmapDrawable outDrawable = new BitmapDrawable(res, outBitmap);
+		return outDrawable;
+	}
 }

@@ -22,7 +22,6 @@ import com.nut.Jandan.R;
 import com.nut.cache.Pic;
 import com.nut.cache.PicFile;
 import com.nut.http.PicParser;
-import com.nut.ui.DividerItemDecoration;
 
 import java.util.ArrayList;
 
@@ -72,10 +71,10 @@ public class PicsFragment extends Fragment implements BaseFragmentInterface {
 		swipeLayout.setProgressViewOffset(false, toolbarSize, toolbarSize + 128);
 
 		mRecyclerView = (RecyclerView) rootView.findViewById(R.id.pic_list);
-		mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
+		// mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), null));
 		// mRecyclerView.addHeaderView();
 
-		mRecyclerView.setOnScrollListener(new NewsFragment.HidingScrollListener() {
+		mRecyclerView.addOnScrollListener(new NewsFragment.HidingScrollListener() {
 			private int previousTotal = 0; // The total number of items in the dataset after the last load
 			private boolean loading = true; // True if we are still waiting for the last set of data to load.
 			private int visibleThreshold = 5;

@@ -146,7 +146,7 @@ public abstract class BaseFragmentActivity extends ActionBarActivity {
 
 
 	@SuppressLint("CommitTransaction")
-	private FragmentTransaction getTransaction() {
+	protected FragmentTransaction getTransaction() {
 		FragmentManager fragmentManager = getFragmentManager();
 		FragmentTransaction transaction = fragmentManager.beginTransaction();
 //        transaction.setCustomAnimations(

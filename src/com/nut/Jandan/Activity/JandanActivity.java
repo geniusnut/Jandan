@@ -9,19 +9,16 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
-import com.larvalabs.svgandroid.SVG;
 import com.nut.Jandan.Fragment.NewsFragment;
 import com.nut.Jandan.Fragment.PicsFragment;
-import com.nut.Jandan.Fragment.SettingsFragment;
 import com.nut.Jandan.R;
-import com.nut.ui.BadgeView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,8 +33,6 @@ public class JandanActivity extends BarFragmentActivity implements
 	private ViewGroup mDrawerPanel;
 	private Toolbar mToolbar;
 	private ListView mDrawerList;
-	private ActionBarDrawerToggle toggle=null;
-	private BadgeView mBadgeView;
 
 	private int mSelected = -1;
 
@@ -45,17 +40,26 @@ public class JandanActivity extends BarFragmentActivity implements
 	private ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
 	private static String[] strings = {"img", "title", "info"};
 	private int[] ids = {R.id.img, R.id.title, R.id.info};
+	private ImageView mAccountToggle;
+	private NavigationView mNavigationView;
+
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//			getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//			getWindow().setStatusBarColor(getResources().getColor(R.color.yellow500));
+//		}
 
 		final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 		final SharedPreferences.Editor editor = pref.edit();
 		editor.putBoolean("news", false);
 		editor.apply();
+
+		// setStatusBarColor(findViewById(R.id.statusBarBackground), getResources().getColor(android.R.color.white));
 
 		mToolbar = (Toolbar) findViewById(R.id.toolbar);
 		if (mToolbar != null) {
@@ -69,9 +73,40 @@ public class JandanActivity extends BarFragmentActivity implements
 		initDrawer();
 		if (getFragmentManager().findFragmentById(R.id.content) == null) {
 			mSelected = 0;
-			showNews();
+			showPic();
 		}
 
+	}
+
+	public void setStatusBarColor(View statusBar, int color) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			Window w = getWindow();
+			w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			//status bar height
+			int actionBarHeight = getActionBarHeight();
+			int statusBarHeight = getStatusBarHeight();
+			//action bar height
+			statusBar.getLayoutParams().height = actionBarHeight + statusBarHeight;
+			statusBar.setBackgroundColor(color);
+		}
+	}
+
+	public int getActionBarHeight() {
+		int actionBarHeight = 0;
+		TypedValue tv = new TypedValue();
+		if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+			actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+		}
+		return actionBarHeight;
+	}
+
+	public int getStatusBarHeight() {
+		int result = 0;
+		int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+		if (resourceId > 0) {
+			result = getResources().getDimensionPixelSize(resourceId);
+		}
+		return result;
 	}
 
 	@Override
@@ -121,48 +156,24 @@ public class JandanActivity extends BarFragmentActivity implements
 
 	private void initDrawer(){
 		mDrawerLayout = (DrawerLayout) this.findViewById(R.id.drawer_layout);
-		mDrawerPanel = (ViewGroup) mDrawerLayout.findViewById(R.id.drawer_panel);
-		mDrawerList = (ListView) mDrawerPanel.findViewById(R.id.drawer_list);
+		mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
 
-		initList();
-		mDrawerPanel.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (mDrawerLayout.isDrawerOpen(Gravity.LEFT))
-					mDrawerLayout.closeDrawer(Gravity.LEFT);
-			}
-		});
-
-		mDrawerList.setAdapter(new DrawerAdapter());
-		mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-				if (position == 0) {
-					final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(view.getContext());
-					final SharedPreferences.Editor editor = pref.edit();
-					editor.putBoolean("news", true);
-					editor.apply();
-					showNews();
-				} else if (position == 1) {
-					showPic();
-				} else if (position == 2) {
-					showOOXX();
-				}
-				mDrawerLayout.closeDrawers();
-			}
-		});
-
-		mDrawerLayout.setDrawerListener(toggle);
-
+		mDrawerLayout.setDrawerListener(mDrawerToggle);
 		setDrawerLayout(mDrawerLayout);
 
-		final View settings = findViewById(R.id.settings);
-		settings.setOnClickListener(new View.OnClickListener() {
+		if (mNavigationView != null) {
+			setupDrawerContent();
+		}
+
+	}
+
+	private void setupDrawerContent() {
+		mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
 			@Override
-			public void onClick(View v) {
-				// ((BaseFragmentActivity) v.getContext()).showFragment(new SettingsFragment());
-				new SettingsFragment().show((BaseFragmentActivity) mDrawerLayout.getContext());
+			public boolean onNavigationItemSelected(MenuItem menuItem) {
+				menuItem.setChecked(true);
 				mDrawerLayout.closeDrawers();
+				return true;
 			}
 		});
 	}
@@ -218,51 +229,18 @@ public class JandanActivity extends BarFragmentActivity implements
 		}
 	}
 
-
-	private void initList(){
-		final HashMap<String, Object> newsMap = new HashMap<String, Object>();
-		final TextView tv = (TextView)findViewById(R.id.title);
-		final int color = 0x8A000000;
-
-		//Log.d("JandanActivity", "color = " + color);
-		Drawable iconNews = SVG.getDrawable(getResources(), R.raw.ic_explore_24px, color);
-		newsMap.put("img", iconNews);
-		newsMap.put("title", "新鲜事");
-		newsMap.put("info", "地球上没有新鲜事");
-		list.add(newsMap);
-
-		final HashMap<String, Object> picMap = new HashMap<String, Object>();
-		Drawable iconPic = SVG.getDrawable(getResources(), R.raw.ic_image_24px, color);
-		picMap.put("img", iconPic);
-		picMap.put("title", "无聊图");
-		picMap.put("info", "");
-		list.add(picMap);
-
-		final HashMap<String, Object> ooxxMap = new HashMap<String, Object>();
-		Drawable iconOOXX = SVG.getDrawable(getResources(), R.raw.ic_local_movies_24px, color);
-		ooxxMap.put("img", iconOOXX);
-		ooxxMap.put("title", "妹子图");
-		ooxxMap.put("info", "");
-		list.add(ooxxMap);
-
-		ImageView settingImage = (ImageView) findViewById(R.id.image_setting);
-		Drawable iconSetting = SVG.getDrawable(getResources(), R.raw.ic_settings_applications_24px, color);
-		settingImage.setImageDrawable(iconSetting);
-	}
-
 	public Toolbar getToolbar() {
 		if (mToolbar != null)
 			return mToolbar;
 		return null;
 	}
 	private void showNews() {
-		mDrawerList.setItemChecked(0, true);
+		// mDrawerList.setItemChecked(0, true);
 		if (newsFrag == null)
 			newsFrag = new NewsFragment();
 		this.showOnly(newsFrag);
 	}
 	private void showPic() {
-		mDrawerList.setItemChecked(1, true);
 		if (picFrag == null)
 			picFrag = new PicsFragment();
 		this.showOnly(picFrag);

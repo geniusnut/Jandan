@@ -21,7 +21,6 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.nut.Jandan.Activity.BaseFragmentActivity;
 import com.nut.Jandan.Activity.JandanActivity;
 import com.nut.Jandan.Activity.PostActivity;
@@ -95,7 +94,7 @@ public class NewsFragment extends Fragment implements BaseFragmentInterface {
 		mRecList.setLayoutManager(llm);
 		newsAdapter = new NewsAdapter();
 		mRecList.setAdapter(newsAdapter);
-		mRecList.setOnScrollListener(new HidingScrollListener() {
+		mRecList.addOnScrollListener(new HidingScrollListener() {
 			private int previousTotal = 0; // The total number of items in the dataset after the last load
 			private boolean loading = true; // True if we are still waiting for the last set of data to load.
 			private int visibleThreshold = 5;
@@ -389,20 +388,21 @@ public class NewsFragment extends Fragment implements BaseFragmentInterface {
 			imageView.setImageDrawable(cover);
 		} else {
 			imageView.setImageBitmap(null);
-			mImageLoader.loadImage(thumbUrl, options, new SimpleImageLoadingListener() {
-				@Override
-				public void onLoadingComplete(String imageUri, View view, final Bitmap loadedImage) {
-					// Do whatever you want with Bitmap
-					mHandler.post(new Runnable() {
-						@Override
-						public void run() {
-							if (imageView.getTag() == thumbUrl) {
-								imageView.setImageBitmap(loadedImage);
-							}
-						}
-					});
-				}
-			});
+			mImageLoader.displayImage(thumbUrl, imageView, options);
+//			mImageLoader.loadImage(thumbUrl, options, new SimpleImageLoadingListener() {
+//				@Override
+//				public void onLoadingComplete(String imageUri, View view, final Bitmap loadedImage) {
+//					// Do whatever you want with Bitmap
+//					mHandler.post(new Runnable() {
+//						@Override
+//						public void run() {
+//							if (imageView.getTag() == thumbUrl) {
+//								imageView.setImageBitmap(loadedImage);
+//							}
+//						}
+//					});
+//				}
+//			});
 		}
 	}
 }

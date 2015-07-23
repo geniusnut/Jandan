@@ -76,7 +76,13 @@ public class PostFormater {
 				document.getElementsByClass("entry").get(0).toString();
 
 		Log.d(TAG, "Postinfo : " + data);
-		return CSS + data;
+		String js = "<script type=\"text/javascript\">\n" +
+				"    function showAndroidToast(toast) {\n" +
+				"        Android.showToast(toast);\n" +
+				"    }\n" +
+				"</script>";
+
+		return js + CSS + data;
 	}
 
 	public String commFormater(String link){
@@ -128,7 +134,12 @@ public class PostFormater {
 		data = document.getElementsByClass("commentlist").toString();
 
 		// Log.d(TAG, "CommentInfo : " + data);
-		return CSS + data;
+		String js = "<script type=\"text/javascript\">\n" +
+				"    function showAndroidToast(toast) {\n" +
+				"        Android.showToast(toast);\n" +
+				"    }\n" +
+				"</script>";
+		return js + CSS + data;
 	}
 }
 

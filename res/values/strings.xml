@@ -18,4 +18,8 @@
     <string name="settings_about">About</string>
     <string name="settings_about_summary">about us</string>
     <string name="share">share</string>
+    <string name="nav_news">news</string>
+    <string name="nav_pics">pics</string>
+    <string name="nav_ooxx">ooxx</string>
+    <string name="nav_sub_header">sub_header</string>
 </resources>

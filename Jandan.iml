@@ -18,8 +18,18 @@
     <orderEntry type="library" name="android-support-v4" level="project" />
     <orderEntry type="library" name="jsoup-1.8.1" level="project" />
     <orderEntry type="module" module-name="cardview" />
-    <orderEntry type="library" name="android-support-v7-cardview" level="project" />
     <orderEntry type="library" name="android-support-v7-recyclerview" level="project" />
     <orderEntry type="library" name="universal-image-loader-1.9.3" level="project" />
+    <orderEntry type="module" module-name="recyclerview" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/android-sdk-linux/extras/android/support/design/libs/android-support-design.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module" module-name="design" />
   </component>
 </module>

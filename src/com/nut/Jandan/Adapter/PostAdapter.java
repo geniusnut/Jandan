@@ -13,11 +13,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.alensw.Jandan.CommentModel;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
@@ -28,6 +30,8 @@ import com.nut.http.PostParser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Administrator on 2015/5/25.
@@ -216,6 +220,7 @@ public class PostAdapter extends RecyclerView.Adapter {
             super(itemView);
             mWebView = (WebView) itemView.findViewById(R.id.webview);
             mWebView.getSettings().setJavaScriptEnabled(true);
+
             mWebView.setWebViewClient(new WebViewClient());
             commTextView = (TextView) itemView.findViewById(R.id.btn_post_comm_text);
             ivCarat = (ImageView) itemView.findViewById(R.id.ivCarat);
@@ -244,7 +249,6 @@ public class PostAdapter extends RecyclerView.Adapter {
     }
 
     static class HeaderWrapper extends RelativeLayout {
-
         private int mOffset;
         private boolean mIsClipped;
 
@@ -267,7 +271,7 @@ public class PostAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public static class webViewLoad extends AsyncTask<String, Void, String> {
+    public class webViewLoad extends AsyncTask<String, Void, String> {
         private final WebView mWebView;
         private final int mType;
 
@@ -284,7 +288,44 @@ public class PostAdapter extends RecyclerView.Adapter {
 
         @Override
         protected void onPostExecute(String data) {
+            data = addJS(data);
+            mWebView.addJavascriptInterface(new WebAppInterface(mWebView.getContext()), "Android");
             mWebView.loadDataWithBaseURL("", data, "text/html", "UTF-8", "");
+        }
+    }
+
+    public static String addJS(String data) {
+        Pattern patt = Pattern.compile("<img src=.+?>");
+        Matcher matcher = patt.matcher(data);
+
+        while (matcher.find()) {
+            String str = matcher.group(0);
+            String str1 = str.substring(0, str.length() - 1).concat(" onClick=\"showAndroidToast('Hello Android!')\" />");
+            // str1 = str1.replace("<img", "<input type=\"image\"");
+            // str1 = "<input type=\"button\" value=\"Say hello\" onClick=\"showAndroidToast('Hello Android!')\" />";
+            data = data.replace(str, str1);
+        }
+        Log.d(TAG, "data: " + data);
+        return data;
+    }
+
+
+    public class WebAppInterface {
+        Context mContext;
+
+        /**
+         * Instantiate the interface and set the context
+         */
+        WebAppInterface(Context c) {
+            mContext = c;
+        }
+
+        /**
+         * Show a toast from the web page
+         */
+        @JavascriptInterface
+        public void showToast(String toast) {
+            Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show();
         }
     }
 
