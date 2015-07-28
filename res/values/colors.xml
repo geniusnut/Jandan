@@ -14,7 +14,9 @@
     <color name="teal500">#009688</color>
     <color name="tealA200">#64ffda</color>
     <color name="yellow500">#ffeb3b</color>
-    <color name="yellowA200">#ffeb3b</color>
+    <color name="yellowA200">#ffff00</color>
+    <color name="amber500">#ffc107</color>
+    <color name="ambera200">#ffd740</color>
     <color name="deepOrange">#ff5722</color>
     <color name="deepOrangeA200">#ff6e40</color>
     <color name="cyan500">#00bcd4</color>

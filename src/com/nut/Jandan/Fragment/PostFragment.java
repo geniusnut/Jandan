@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +53,22 @@ public class PostFragment extends Fragment {
 		mToolbar = ((PostActivity) getActivity()).getToolbar();
 		mToolbar.getBackground().setAlpha(0);
 
+		ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+			@Override
+			public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+				return 0;
+			}
+
+			@Override
+			public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder viewHolder1) {
+				return false;
+			}
+
+			@Override
+			public void onSwiped(RecyclerView.ViewHolder viewHolder, int i) {
+
+			}
+		});
 		mRecyclerView = (RecyclerView) view.findViewById(R.id.post_recycler);
 		mLayoutManager = new LinearLayoutManager(getActivity());
 		mLayoutManager.setSmoothScrollbarEnabled(true);
@@ -63,7 +80,8 @@ public class PostFragment extends Fragment {
 			public void onParallaxScroll(float percentage, float offset, View parallax) {
 				Drawable c = mToolbar.getBackground();
 				c.setAlpha(Math.round(percentage * 255));
-				mToolbar.setBackground(c);
+				mToolbar.setAlpha(Math.round(percentage * 255));
+				((PostActivity) getActivity()).getStatusBar().setAlpha(Math.round(percentage * 255));
 			}
 		});
 		mRecyclerView.setAdapter(mPostAdapter);

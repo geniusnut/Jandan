@@ -93,7 +93,7 @@ public class PicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 		holder.mWrapper.setLayoutParams(flp);
 		final String url = pic.mUrls.get(0);
 		new loadImage(url, holder.progressWheel).execute();
-		// loadPic(holder.scaleImage, url);
+		mImageLoader.displayImage(url, holder.scaleImage);
 	}
 
 	private int calcLayoutParams() {

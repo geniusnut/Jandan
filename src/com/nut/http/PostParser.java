@@ -97,4 +97,8 @@ public class PostParser {
 			return 0;
 		}
 	}
+
+	// http://i.jandan.net/?oxwlxojflwblxbsapi=jandan.get_duan_comments
+	// http://i.jandan.net/?oxwlxojflwblxbsapi=jandan.get_duan_comments&page=2
+	// http://i.jandan.net/?oxwlxojflwblxbsapi=get_post&id=66451&include=content
 }

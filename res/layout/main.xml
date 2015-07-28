@@ -3,20 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/toolbar" />
-
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/white">
 
-        <LinearLayout
-            android:id="@+id/content"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <include layout="@layout/content_layout" />
 
-        </LinearLayout>
 
         <android.support.design.widget.NavigationView
             android:id="@+id/navigation_view"
@@ -34,4 +28,11 @@
         <!--tools:layout="@layout/drawer"/>-->
 
     </android.support.v4.widget.DrawerLayout>
+
+    <View xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/statusBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/statusBarHeight"
+        android:elevation="@dimen/statusBarElevation"
+        android:background="?attr/colorPrimaryDark" />
 </FrameLayout>

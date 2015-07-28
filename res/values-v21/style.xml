@@ -2,10 +2,9 @@
 <resources>
 
     <style name="myAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/yellowA200</item>
-        <item name="colorPrimaryDark">@color/yellow500</item>
+        <item name="colorPrimary">@color/ambera200</item>
+        <item name="colorPrimaryDark">@color/amber500</item>
         <item name="android:textColorSecondary">@android:color/black</item>
-        <item name="android:statusBarColor">@color/yellow500</item>
 
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
         <item name="android:actionOverflowButtonStyle">@style/Widget.ActionButton.Overflow</item>

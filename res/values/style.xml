@@ -2,22 +2,14 @@
 <resources>
 
     <style name="myAppTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="colorPrimary">@color/yellowA200</item>
-        <item name="colorPrimaryDark">@color/yellow500</item>
+        <item name="colorPrimary">@color/amber500</item>
+        <item name="colorPrimaryDark">@color/ambera200</item>
         <item name="android:textColorSecondary">@android:color/black</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
     </style>
 
-    <style name="Theme.Jandan.Post" parent="Theme.AppCompat.NoActionBar">
-        <item name="colorPrimary">@color/yellowA200</item>
-        <item name="colorPrimaryDark">@color/yellow500</item>
-        <item name="android:textColorSecondary">@color/cyan500</item>
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
-    </style>
 
     <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="spinBars">true</item>

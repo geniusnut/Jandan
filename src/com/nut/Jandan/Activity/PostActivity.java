@@ -37,12 +37,16 @@ public class PostActivity extends ActionBarActivity {
 
 	private NewsFile mNewsFile = new NewsFile();
 	private ShareActionProvider mShareActionProvider;
+	private View mStatusBar;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		//getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		setContentView(R.layout.activity_post);
+
+		mStatusBar = findViewById(R.id.postStatusBar);
+		mStatusBar.setAlpha(0);
 
 		mNewsFile.load(this, NewsFile.NEWS_FILE_NAME);
 		ViewPager pager = (ViewPager) findViewById(R.id.post_pager);
@@ -68,6 +72,10 @@ public class PostActivity extends ActionBarActivity {
 
 	public Toolbar getToolbar() {
 		return mToolbar;
+	}
+
+	public View getStatusBar() {
+		return mStatusBar;
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

@@ -16,9 +16,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.*;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nut.Jandan.Activity.BaseFragmentActivity;
@@ -28,8 +30,6 @@ import com.nut.Jandan.R;
 import com.nut.cache.NewsFile;
 import com.nut.cache.Post;
 import com.nut.http.PostParser;
-import com.nut.ui.FloatingActionButton;
-import com.nut.ui.FloatingActionsMenu;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +43,6 @@ public class NewsFragment extends Fragment implements BaseFragmentInterface {
 	private Toolbar mToolbar;
 	protected ListView mListView;
 	private RecyclerView mRecList;
-	private FloatingActionsMenu mFam;
 	protected SwipeRefreshLayout swipeLayout;
 	RecyclerView.ItemAnimator mCachedAnimator = null;
 
@@ -94,19 +93,11 @@ public class NewsFragment extends Fragment implements BaseFragmentInterface {
 		mRecList.setLayoutManager(llm);
 		newsAdapter = new NewsAdapter();
 		mRecList.setAdapter(newsAdapter);
-		mRecList.addOnScrollListener(new HidingScrollListener() {
+		mRecList.addOnScrollListener(new RecyclerView.OnScrollListener() {
 			private int previousTotal = 0; // The total number of items in the dataset after the last load
 			private boolean loading = true; // True if we are still waiting for the last set of data to load.
 			private int visibleThreshold = 5;
 			int firstVisibleItem, visibleItemCount, totalItemCount;
-			@Override
-			public void onHide() {
-				hideViews();
-			}
-			@Override
-			public void onShow() {
-				showViews();
-			}
 
 			@Override
 			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -132,17 +123,6 @@ public class NewsFragment extends Fragment implements BaseFragmentInterface {
 		mCachedAnimator.setSupportsChangeAnimations(true);
 		mRecList.setItemAnimator(mCachedAnimator);
 
-		mFam = (FloatingActionsMenu) rootView.findViewById(R.id.fam);
-
-		for (int i = 0; i < 9; i++) {
-			FloatingActionButton fab = new FloatingActionButton.Builder(getActivity())
-					.withDrawable(FloatingActionsMenu.createLikeDrawable(getActivity(), false))
-					.withSize(64) // dp
-					.withMargins(16, 0, 0, 16)// dp
-					.create();
-			fab.setTitle("This is the " + Integer.toString(i) + " fab.");
-			mFam.addButton(fab);
-		}
 		return rootView;
 	}
 
@@ -210,19 +190,19 @@ public class NewsFragment extends Fragment implements BaseFragmentInterface {
 
 	}
 
-	private void hideViews() {
-		mToolbar.animate().translationY(-mToolbar.getHeight()).setInterpolator(new AccelerateInterpolator(2));
-		mToolbar.animate().alpha(0).setInterpolator(new AccelerateInterpolator(2));
-		FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mFam.getLayoutParams();
-		int fabBottomMargin = lp.bottomMargin;
-		mFam.animate().translationY(mFam.getHeight() + fabBottomMargin).setInterpolator(new AccelerateInterpolator(2)).start();
-	}
-
-	private void showViews() {
-		mToolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
-		mToolbar.animate().alpha(1).setInterpolator(new DecelerateInterpolator(2));
-		mFam.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
-	}
+//	private void hideViews() {
+//		mToolbar.animate().translationY(-mToolbar.getHeight()).setInterpolator(new AccelerateInterpolator(2));
+//		mToolbar.animate().alpha(0).setInterpolator(new AccelerateInterpolator(2));
+//		FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mFam.getLayoutParams();
+//		int fabBottomMargin = lp.bottomMargin;
+//		mFam.animate().translationY(mFam.getHeight() + fabBottomMargin).setInterpolator(new AccelerateInterpolator(2)).start();
+//	}
+//
+//	private void showViews() {
+//		mToolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
+//		mToolbar.animate().alpha(1).setInterpolator(new DecelerateInterpolator(2));
+//		mFam.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+//	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {

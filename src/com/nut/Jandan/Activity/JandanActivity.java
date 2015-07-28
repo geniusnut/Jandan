@@ -1,6 +1,8 @@
 package com.nut.Jandan.Activity;
 
 import android.annotation.TargetApi;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -10,6 +12,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
+import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
@@ -17,6 +22,7 @@ import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import com.nut.Jandan.Fragment.NewsFragment;
+import com.nut.Jandan.Fragment.PageFragment;
 import com.nut.Jandan.Fragment.PicsFragment;
 import com.nut.Jandan.R;
 
@@ -32,6 +38,7 @@ public class JandanActivity extends BarFragmentActivity implements
 	private PicsFragment picFrag = null;
 	private ViewGroup mDrawerPanel;
 	private Toolbar mToolbar;
+	private TabLayout mTableLayout;
 	private ListView mDrawerList;
 
 	private int mSelected = -1;
@@ -43,37 +50,44 @@ public class JandanActivity extends BarFragmentActivity implements
 	private ImageView mAccountToggle;
 	private NavigationView mNavigationView;
 
+	private SampleFragmentPagerAdapter mFragmentAdapter;
+	private ViewPager mViewPager;
+
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//			getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-//			getWindow().setStatusBarColor(getResources().getColor(R.color.yellow500));
-//		}
-
 		final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 		final SharedPreferences.Editor editor = pref.edit();
 		editor.putBoolean("news", false);
 		editor.apply();
 
-		// setStatusBarColor(findViewById(R.id.statusBarBackground), getResources().getColor(android.R.color.white));
+		// setStatusBarColor(findViewById(R.id.statusBar), getResources().getColor(R.color.yellowA200));
 
 		mToolbar = (Toolbar) findViewById(R.id.toolbar);
 		if (mToolbar != null) {
 			mToolbar.setTitle("煎蛋");
-			// ToolbarColorHelper.colorizeToolbar(mToolbar, Color.BLACK, this);
 			setSupportActionBar(mToolbar);
 		}
 		mToolbar.setLogo(R.drawable.jandan);
 		View NavView = getNavButtonView(mToolbar);
 
+		// init table layout;
+
+		mViewPager = (ViewPager) findViewById(R.id.viewpager);
+		mFragmentAdapter = new SampleFragmentPagerAdapter(getFragmentManager(),
+				JandanActivity.this);
+		mViewPager.setAdapter(mFragmentAdapter);
+
+		mTableLayout = (TabLayout) findViewById(R.id.tabs);
+		mTableLayout.setupWithViewPager(mViewPager);
+
 		initDrawer();
-		if (getFragmentManager().findFragmentById(R.id.content) == null) {
+		// viewPager.setCurrentItem();
+		if (getFragmentManager().findFragmentById(R.id.viewpager) == null) {
 			mSelected = 0;
-			showPic();
 		}
 
 	}
@@ -83,10 +97,10 @@ public class JandanActivity extends BarFragmentActivity implements
 			Window w = getWindow();
 			w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 			//status bar height
-			int actionBarHeight = getActionBarHeight();
+
 			int statusBarHeight = getStatusBarHeight();
 			//action bar height
-			statusBar.getLayoutParams().height = actionBarHeight + statusBarHeight;
+			statusBar.getLayoutParams().height = statusBarHeight;
 			statusBar.setBackgroundColor(color);
 		}
 	}
@@ -111,7 +125,7 @@ public class JandanActivity extends BarFragmentActivity implements
 
 	@Override
 	public int getContentId() {
-		return R.id.content;
+		return R.id.viewpager;
 	}
 
 	private ImageButton getNavButtonView(Toolbar toolbar) {
@@ -172,6 +186,18 @@ public class JandanActivity extends BarFragmentActivity implements
 			@Override
 			public boolean onNavigationItemSelected(MenuItem menuItem) {
 				menuItem.setChecked(true);
+				int id = menuItem.getItemId();
+				switch (id) {
+					case R.id.nav_news:
+						mViewPager.setCurrentItem(0);
+						break;
+					case R.id.nav_pics:
+						showPic();
+						break;
+					case R.id.nav_ooxx:
+						showOOXX();
+						break;
+				}
 				mDrawerLayout.closeDrawers();
 				return true;
 			}
@@ -235,7 +261,6 @@ public class JandanActivity extends BarFragmentActivity implements
 		return null;
 	}
 	private void showNews() {
-		// mDrawerList.setItemChecked(0, true);
 		if (newsFrag == null)
 			newsFrag = new NewsFragment();
 		this.showOnly(newsFrag);
@@ -261,5 +286,44 @@ public class JandanActivity extends BarFragmentActivity implements
 			mActionBarSize = (int) value.getDimension(res.getDisplayMetrics());
 		}
 		return mActionBarSize;
+	}
+
+	public class SampleFragmentPagerAdapter extends FragmentPagerAdapter {
+		final int PAGE_COUNT = 3;
+		private int tabTitles[] = new int[]{R.string.nav_news, R.string.nav_pics, R.string.nav_ooxx};
+		private Context context;
+
+		public SampleFragmentPagerAdapter(FragmentManager fm, Context context) {
+			super(fm);
+			this.context = context;
+		}
+
+		@Override
+		public int getCount() {
+			return PAGE_COUNT;
+		}
+
+		@Override
+		public Fragment getItem(int position) {
+			switch (position) {
+				case 0:
+					if (newsFrag == null)
+						newsFrag = new NewsFragment();
+					return newsFrag;
+				case 1:
+					if (picFrag == null)
+						picFrag = new PicsFragment();
+					return picFrag;
+				case 2:
+					return PageFragment.newInstance(position + 1);
+			}
+			return PageFragment.newInstance(position + 1);
+		}
+
+		@Override
+		public CharSequence getPageTitle(int position) {
+			// Generate title based on item position
+			return getString(tabTitles[position]);
+		}
 	}
 }
