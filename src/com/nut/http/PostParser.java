@@ -2,8 +2,9 @@ package com.nut.http;
 
 import android.graphics.drawable.Drawable;
 import android.util.Log;
-import com.alensw.Jandan.CommentModel;
+import com.nut.dao.CommentModel;
 import com.nut.cache.Post;
+import com.nut.dao.JokeModel;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,6 +13,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,6 +24,7 @@ public class PostParser {
 	final static String TAG = "";
 	final static String POSTS_URL = "http://i.jandan.net/?oxwlxojflwblxbsapi=get_recent_posts&include=url,date,tags,author,title,comment_count,custom_fields&custom_fields=thumb_c&dev=1";
 	final static String POST_URL = "http://i.jandan.net/?oxwlxojflwblxbsapi=get_post";
+	final static String JOKE_URL = "http://i.jandan.net/?oxwlxojflwblxbsapi=jandan.get_duan_comments";
 	// ?oxwlxojflwblxbsapi=get_post&id=62799&include=content
 	// http://i.jandan.net/?oxwlxojflwblxbsapi=get_post&id=62799&include=comments
 
@@ -89,6 +92,25 @@ public class PostParser {
 		return comments;
 	}
 
+	public static ArrayList<JokeModel> parseJokes(int page) {
+		final String url = JOKE_URL + "&page=" + page;
+		final String content = HttpClient.downloadJson(url);
+
+		ArrayList<JokeModel> jokes = new ArrayList<JokeModel>();
+		try {
+			JSONObject json = new JSONObject(content);
+			Log.d(TAG, "Post json: " + json.toString());
+			JSONArray jsonPosts = json.getJSONArray("comments");
+			for (int i = 0; i < jsonPosts.length(); i++) {
+				JokeModel joke = new JokeModel();
+
+				jokes.add(joke);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jokes;
+	}
 
 	private long parseTime(String time) {
 		try {

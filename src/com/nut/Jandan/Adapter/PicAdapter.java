@@ -183,7 +183,7 @@ public class PicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 						mRatioMap.put(thumbUrl, ratio);
 					}
 					imageView.post(new Runnable() {
-						@Override
+
 						public void run() {
 							if (imageView.getTag() == thumbUrl) {
 								imageView.setImageBitmap(loadedImage);

@@ -17,6 +17,8 @@
     <color name="yellowA200">#ffff00</color>
     <color name="amber500">#ffc107</color>
     <color name="ambera200">#ffd740</color>
+    <color name="orange500">#ff9800</color>
+    <color name="orangea200">#ffab40</color>
     <color name="deepOrange">#ff5722</color>
     <color name="deepOrangeA200">#ff6e40</color>
     <color name="cyan500">#00bcd4</color>

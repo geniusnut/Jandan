@@ -9,13 +9,13 @@
         android:layout_width="wrap_content"
         android:layout_height="@dimen/navdrawer_image_height"
         android:scaleType="centerCrop"
-        android:src="@null" />
+        android:src="@color/amber500" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/txtViewName"
-        android:text="Paresh Mayani"
+        android:text="煎蛋@jandan.net"
         android:layout_marginTop="@dimen/margin_user_name"
         android:textStyle="bold"
         android:layout_marginLeft="@dimen/margin_user_layout"
@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/txtViewEmail"
-        android:text="pareshmayani@gmail.com"
+        android:text="地球上没有新鲜事"
         android:layout_marginBottom="@dimen/margin_user_email"
         android:layout_alignLeft="@+id/txtViewName"
         android:layout_alignParentBottom="true"

@@ -1,4 +1,4 @@
-package com.alensw.Jandan;
+package com.nut.dao;
 
 /**
  * Created by Administrator on 2015/6/1.

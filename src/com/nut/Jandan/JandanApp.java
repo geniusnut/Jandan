@@ -36,7 +36,7 @@ public class JandanApp extends Application {
 				.imageScaleType(ImageScaleType.EXACTLY)
 				.cacheOnDisk(true)
 				.displayer(new FadeInBitmapDisplayer(200))
-				.showImageOnLoading(R.drawable.ic_back)
+				.showImageOnLoading(R.drawable.loading)
 				.build();
 
 		File cacheDir;

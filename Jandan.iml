@@ -24,5 +24,14 @@
     <orderEntry type="module" module-name="recyclerview" />
     <orderEntry type="module" module-name="design" />
     <orderEntry type="library" name="android-support-design" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://D:/Android/sdk/extras/android/support/design/libs/android-support-design.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
