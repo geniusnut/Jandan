@@ -50,7 +50,7 @@
                         android:layout_height="wrap_content"
                         android:text="Title"
                         android:textSize="6pt"
-                        android:textColor="@color/red"
+                        android:textColor="@color/red500"
                         android:id="@+id/title"
                         android:paddingLeft="4dp"
                         android:paddingRight="2dp" />

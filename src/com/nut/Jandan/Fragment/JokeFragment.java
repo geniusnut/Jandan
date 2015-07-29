@@ -1,6 +1,7 @@
 package com.nut.Jandan.Fragment;
 
 import android.app.Fragment;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -80,6 +81,10 @@ public class JokeFragment extends Fragment {
 	private RecyclerView.Adapter mAdapter = new RecyclerView.Adapter() {
 		private static final int ITEM_TYPE = 0;
 
+		private void disableOX() {
+
+		}
+
 		@Override
 		public int getItemViewType(int position) {
 			return ITEM_TYPE;
@@ -89,7 +94,25 @@ public class JokeFragment extends Fragment {
 		public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 			if (viewType == ITEM_TYPE) {
 				View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_jokes_item, viewGroup, false);
-				return new JokeViewHolder(view);
+				final JokeViewHolder jokeVH = new JokeViewHolder(view);
+				final Resources res = viewGroup.getContext().getResources();
+				jokeVH.mOO.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						jokeVH.mOO.setTextColor(res.getColor(R.color.redA200));
+						jokeVH.mOO.setEnabled(false);
+						jokeVH.mXX.setEnabled(false);
+					}
+				});
+				jokeVH.mXX.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						jokeVH.mXX.setTextColor(res.getColor(R.color.cyanA200));
+						jokeVH.mOO.setEnabled(false);
+						jokeVH.mXX.setEnabled(false);
+					}
+				});
+				return jokeVH;
 			} else {
 				return null;
 			}

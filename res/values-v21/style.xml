@@ -2,7 +2,7 @@
 <resources>
 
     <style name="myAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/ambera200</item>
+        <item name="colorPrimary">@color/amberA200</item>
         <item name="colorPrimaryDark">@color/amber500</item>
         <item name="android:textColorSecondary">@android:color/black</item>
 

@@ -4,7 +4,8 @@
     <color name="white">#ffffff</color>
     <color name="high_light">#a00099cc</color>
     <color name="holo_blue">#ff0099cc</color>
-    <color name="red">#e51c23</color>
+    <color name="red500">#e51c23</color>
+    <color name="redA200">#ff5177</color>
     <color name="purple500">#9c27b0</color>
     <color name="purpleA200">#e040fb</color>
     <color name="lightBlue">#03a9f4</color>
@@ -16,9 +17,9 @@
     <color name="yellow500">#ffeb3b</color>
     <color name="yellowA200">#ffff00</color>
     <color name="amber500">#ffc107</color>
-    <color name="ambera200">#ffd740</color>
+    <color name="amberA200">#ffd740</color>
     <color name="orange500">#ff9800</color>
-    <color name="orangea200">#ffab40</color>
+    <color name="orangeA200">#ffab40</color>
     <color name="deepOrange">#ff5722</color>
     <color name="deepOrangeA200">#ff6e40</color>
     <color name="cyan500">#00bcd4</color>
