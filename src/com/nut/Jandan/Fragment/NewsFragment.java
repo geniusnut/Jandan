@@ -88,7 +88,7 @@ public class NewsFragment extends Fragment implements BaseFragmentInterface {
 
 		mRecList = (RecyclerView) rootView.findViewById(R.id.cardList);
 		mRecList.setHasFixedSize(true);
-		LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+		final LinearLayoutManager llm = new LinearLayoutManager(getActivity());
 		llm.setOrientation(LinearLayoutManager.VERTICAL);
 		mRecList.setLayoutManager(llm);
 		newsAdapter = new NewsAdapter();
@@ -103,7 +103,8 @@ public class NewsFragment extends Fragment implements BaseFragmentInterface {
 			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 				super.onScrolled(recyclerView, dx, dy);
 				visibleItemCount = recyclerView.getChildCount();
-				totalItemCount = ((LinearLayoutManager) recyclerView.getLayoutManager()).getItemCount();
+				totalItemCount = llm.getItemCount();
+				firstVisibleItem = llm.findFirstVisibleItemPosition();
 
 				if (loading) {
 					if (totalItemCount > previousTotal) {

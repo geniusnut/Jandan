@@ -21,6 +21,7 @@ import android.util.TypedValue;
 import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
+import com.nut.Jandan.Fragment.JokeFragment;
 import com.nut.Jandan.Fragment.NewsFragment;
 import com.nut.Jandan.Fragment.PageFragment;
 import com.nut.Jandan.Fragment.PicsFragment;
@@ -36,6 +37,8 @@ public class JandanActivity extends BarFragmentActivity implements
 	private final String TAG = "JandanActivity";
 	private NewsFragment newsFrag = null;
 	private PicsFragment picFrag = null;
+	private JokeFragment jokeFrag;
+
 	private ViewGroup mDrawerPanel;
 	private Toolbar mToolbar;
 	private TabLayout mTableLayout;
@@ -290,7 +293,7 @@ public class JandanActivity extends BarFragmentActivity implements
 
 	public class SampleFragmentPagerAdapter extends FragmentPagerAdapter {
 		final int PAGE_COUNT = 3;
-		private int tabTitles[] = new int[]{R.string.nav_news, R.string.nav_pics, R.string.nav_ooxx};
+		private int tabTitles[] = new int[]{R.string.nav_news, R.string.nav_pics, R.string.nav_joke};
 		private Context context;
 
 		public SampleFragmentPagerAdapter(FragmentManager fm, Context context) {
@@ -315,7 +318,9 @@ public class JandanActivity extends BarFragmentActivity implements
 						picFrag = new PicsFragment();
 					return picFrag;
 				case 2:
-					return PageFragment.newInstance(position + 1);
+					if (jokeFrag == null)
+						jokeFrag = new JokeFragment();
+					return jokeFrag;
 			}
 			return PageFragment.newInstance(position + 1);
 		}

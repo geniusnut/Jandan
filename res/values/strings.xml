@@ -23,4 +23,8 @@
     <string name="nav_ooxx">妹子图</string>
     <string name="nav_joke">段子</string>
     <string name="nav_sub_header">sub_header</string>
+
+    <string name="joke_oo">oo:[%d]</string>
+    <string name="joke_xx">xx:[%d]</string>
+    <string name="joke_comments">↓吐槽:[%d]</string>
 </resources>

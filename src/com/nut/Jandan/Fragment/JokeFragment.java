@@ -3,12 +3,14 @@ package com.nut.Jandan.Fragment;
 import android.app.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import com.nut.Jandan.Activity.JandanActivity;
 import com.nut.Jandan.R;
 import com.nut.dao.JokeModel;
 import com.nut.http.PostParser;
@@ -19,26 +21,60 @@ import java.util.ArrayList;
  * Created by yw07 on 15-7-28.
  */
 public class JokeFragment extends Fragment {
-	private RecyclerView mRecyclerView;
-	private ArrayList<JokeModel> mJokes;
+	private int mPage;
+	private ArrayList<JokeModel> mJokes = new ArrayList<>(0);
+	private SwipeRefreshLayout swipeLayout;
+	private RecyclerView mRecList;
+
+	private int mLastTotal = 0;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return new RecyclerView(container.getContext());
+		ViewGroup rootView = (ViewGroup) inflater.inflate(
+				R.layout.swipe_news_frag, container, false);
+		swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
+		swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+			@Override
+			public void onRefresh() {
+				mPage = 1;
+				new JokesTask().execute(mPage);
+			}
+		});
+
+		int color = getResources().getColor(R.color.teal500);
+		int toolbarSize = JandanActivity.getActionBarSize(getActivity());
+		swipeLayout.setColorSchemeColors(color);
+		swipeLayout.setProgressViewOffset(false, toolbarSize, toolbarSize + 128);
+
+		mRecList = (RecyclerView) rootView.findViewById(R.id.cardList);
+		mRecList.setHasFixedSize(true);
+		final LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+		llm.setOrientation(LinearLayoutManager.VERTICAL);
+		mRecList.setLayoutManager(llm);
+		mRecList.setAdapter(mAdapter);
+		mRecList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+			@Override
+			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+				super.onScrolled(recyclerView, dx, dy);
+				int visibleItemCount = recyclerView.getChildCount();
+				int totalItemCount = llm.getItemCount();
+				int firstVisibleItem = llm.findFirstVisibleItemPosition();
+
+				if (firstVisibleItem + visibleItemCount >= totalItemCount
+						&& mLastTotal != totalItemCount) {
+					mLastTotal = totalItemCount;
+					new JokesTask().execute(mPage++);
+				}
+			}
+		});
+		return rootView;
 	}
 
 	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
 
-		// final RecyclerListAdapter adapter = new RecyclerListAdapter(getActivity(), this);
-
-		RecyclerView recyclerView = (RecyclerView) view;
-		recyclerView.setHasFixedSize(true);
-		recyclerView.setAdapter(mAdapter);
-
-		final int spanCount = 2;
-		final GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), spanCount);
-		recyclerView.setLayoutManager(layoutManager);
+		new JokesTask().execute(mPage++);
 	}
 
 	private RecyclerView.Adapter mAdapter = new RecyclerView.Adapter() {
@@ -52,7 +88,8 @@ public class JokeFragment extends Fragment {
 		@Override
 		public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 			if (viewType == ITEM_TYPE) {
-
+				View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_jokes_item, viewGroup, false);
+				return new JokeViewHolder(view);
 			} else {
 				return null;
 			}
@@ -60,45 +97,65 @@ public class JokeFragment extends Fragment {
 
 		@Override
 		public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i) {
-
+			JokeModel jokeModel = mJokes.get(i);
+			if (viewHolder instanceof JokeViewHolder) {
+				JokeViewHolder vh = (JokeViewHolder) viewHolder;
+				vh.mAuthor.setText(jokeModel.mAuthor);
+				vh.mContent.setText(jokeModel.mContent);
+				vh.mDate.setText(jokeModel.mDate);
+				vh.mOO.setText(String.format(getString(R.string.joke_oo), jokeModel.mPositive));
+				vh.mXX.setText(String.format(getString(R.string.joke_xx), jokeModel.mNegative));
+				vh.mComments.setText(String.format(getString(R.string.joke_comments), jokeModel.mComments));
+			}
 		}
 
 		@Override
 		public int getItemCount() {
-			return 0;
+			return mJokes.size();
 		}
 	};
 
 	public static class JokeViewHolder extends RecyclerView.ViewHolder {
-		public TextView mJokeId;
 		public TextView mAuthor;
 		public TextView mDate;
 		public TextView mContent;
 		public TextView mOO;
+		public TextView mXX;
+		public TextView mComments;
 		public JokeViewHolder(View itemView) {
 			super(itemView);
-			mJokeId = (TextView) itemView.findViewById(R.id.joke_id);
 			mAuthor = (TextView) itemView.findViewById(R.id.joke_author);
 			mDate = (TextView) itemView.findViewById(R.id.joke_date);
 			mContent = (TextView) itemView.findViewById(R.id.joke_content);
+			mOO = (TextView) itemView.findViewById(R.id.joke_oo);
+			mXX = (TextView) itemView.findViewById(R.id.joke_xx);
+			mComments = (TextView) itemView.findViewById(R.id.joke_comments);
 		}
 	}
-	public class JokesTask extends AsyncTask<Integer, Void, ArrayList<JokeModel>> {
 
+	public class JokesTask extends AsyncTask<Integer, Void, ArrayList<JokeModel>> {
 		@Override
 		protected ArrayList<JokeModel> doInBackground(Integer... params) {
 			return PostParser.parseJokes(params[0]);
 		}
 
 		@Override
-		protected void onPostExecute(ArrayList<JokeModel> commentModels) {
-			if (mJokes.size() > 0 )
-				mJokes.clear();
-			mJokes.addAll(commentModels);
-			mAdapter.notifyItemRangeChanged(2, mJokes.size());
-			//  mCommToggle.setEnabled(true);
-			if (mRecyclerView != null)
-				mRecyclerView.smoothScrollToPosition(2);
+		protected void onPostExecute(ArrayList<JokeModel> jokes) {
+			swipeLayout.setRefreshing(false);
+			if (mPage == 1) {
+				if (mJokes.size() > 0)
+					mJokes.clear();
+				mLastTotal = 0;
+				mJokes.addAll(jokes);
+				mAdapter.notifyDataSetChanged();
+			} else {
+				int size = mJokes.size();
+				long lastId = mJokes.get(mJokes.size() - 1).mId;
+				while (jokes.get(0).mId >= lastId)
+					jokes.remove(0);
+				mJokes.addAll(jokes);
+				mAdapter.notifyItemRangeInserted(size, jokes.size());
+			}
 		}
 	}
 }

@@ -2,8 +2,8 @@ package com.nut.http;
 
 import android.graphics.drawable.Drawable;
 import android.util.Log;
-import com.nut.dao.CommentModel;
 import com.nut.cache.Post;
+import com.nut.dao.CommentModel;
 import com.nut.dao.JokeModel;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,7 +13,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -92,6 +91,30 @@ public class PostParser {
 		return comments;
 	}
 
+	//	comments":[
+//	{
+//		"comment_ID":"2880802",
+//			"comment_post_ID":"55592",
+//			"comment_author":"光消失的地方",
+//			"comment_author_email":"aqua5200@qq.com",
+//			"comment_author_url":"",
+//			"comment_author_IP":"1.57.117.249",
+//			"comment_date":"2015-07-29 08:05:32",
+//			"comment_date_gmt":"2015-07-29 00:05:32",
+//			"comment_content":"天秤座的我在爱情方面总是犹豫不决，不知道该喜欢女生还是男生。",
+//			"comment_karma":"0",
+//			"comment_approved":"1",
+//			"comment_agent":"UCWEB/2.0 (MIDP-2.0; U; zh-CN; TCL M2M) U2/1.0.0 UCBrowser/10.6.0.620 U2/1.0.0 Mobile",
+//			"comment_type":"",
+//			"comment_parent":"0",
+//			"user_id":"0",
+//			"comment_subscribe":"N",
+//			"comment_reply_ID":"0",
+//			"vote_positive":"12",
+//			"vote_negative":"0",
+//			"text_content":"天秤座的我在爱情方面总是犹豫不决，不知道该喜欢女生还是男生。",
+//			"videos":{
+//	}
 	public static ArrayList<JokeModel> parseJokes(int page) {
 		final String url = JOKE_URL + "&page=" + page;
 		final String content = HttpClient.downloadJson(url);
@@ -100,10 +123,19 @@ public class PostParser {
 		try {
 			JSONObject json = new JSONObject(content);
 			Log.d(TAG, "Post json: " + json.toString());
-			JSONArray jsonPosts = json.getJSONArray("comments");
-			for (int i = 0; i < jsonPosts.length(); i++) {
+			int totalJokes = json.getInt("total_comments");
+			int firstId = totalJokes - (page - 1) * 25 - 1;
+			JSONArray jsonJokes = json.getJSONArray("comments");
+			for (int i = 0; i < jsonJokes.length(); i++) {
 				JokeModel joke = new JokeModel();
-
+				JSONObject jsonJoke = (JSONObject) jsonJokes.get(i);
+				joke.mId = firstId - i;
+				joke.mAuthor = jsonJoke.getString("comment_author");
+				joke.mDate = jsonJoke.getString("comment_date");
+				joke.mContent = jsonJoke.getString("text_content");
+				joke.mPositive = jsonJoke.getInt("vote_positive");
+				joke.mNegative = jsonJoke.getInt("vote_negative");
+				joke.mCommentId = jsonJoke.getLong("comment_ID");
 				jokes.add(joke);
 			}
 		} catch (JSONException e) {
@@ -112,6 +144,8 @@ public class PostParser {
 		return jokes;
 	}
 
+
+	// http://jandan.duoshuo.com/api/threads/counts.json?threads=comment-2881436,comment-2881435,comment-2881340,comment-2881324,comment-2881322,comment-2881307,comment-2881287,comment-2881257,comment-2881217,comment-2881158,comment-2881157,comment-2881147,comment-2881142,comment-2881110,comment-2881102,comment-2881100,comment-2881061,comment-2881053,comment-2881042,comment-2881023,comment-2881013,comment-2880945,comment-2880905,comment-2880903,comment-2880802,
 	private long parseTime(String time) {
 		try {
 			return mDateFormat.parse(time).getTime() / 1000;
