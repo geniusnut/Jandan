@@ -12,7 +12,6 @@ import android.widget.TextView;
 import com.nut.Jandan.R;
 import com.nut.dao.JokeModel;
 import com.nut.http.PostParser;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -46,9 +45,17 @@ public class JokeFragment extends Fragment {
 		private static final int ITEM_TYPE = 0;
 
 		@Override
+		public int getItemViewType(int position) {
+			return ITEM_TYPE;
+		}
+
+		@Override
 		public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-			if (viewType == )
-			return null;
+			if (viewType == ITEM_TYPE) {
+
+			} else {
+				return null;
+			}
 		}
 
 		@Override
