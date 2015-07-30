@@ -1,6 +1,7 @@
 package com.nut.Jandan.Adapter;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.AsyncTask;
@@ -20,11 +21,11 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.nut.dao.CommentModel;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.nut.Jandan.R;
 import com.nut.cache.Post;
+import com.nut.dao.CommentModel;
 import com.nut.dao.PostFormater;
 import com.nut.http.PostParser;
 
@@ -150,9 +151,10 @@ public class PostAdapter extends RecyclerView.Adapter {
         } else if (viewHolder instanceof VHItem) {
 
             Log.d(TAG, "webViewLoad : " + mPost.mLink);
-            new webViewLoad(((VHItem) viewHolder).mWebView, PostFormater.POST_FORMAT).execute(mPost.mLink);
-
-            //((VHItem) viewHolder).commTextView.setText(getString(R.string.post_comments, mPost.mCont));
+            //new webViewLoad(((VHItem) viewHolder).mWebView, PostFormater.POST_FORMAT).execute(mPost.mLink);
+            new ContentTask(((VHItem) viewHolder).mWebView).execute(Integer.toString(mPost.mId));
+            Resources res = viewHolder.itemView.getResources();
+            ((VHItem) viewHolder).commTextView.setText(String.format(res.getString(R.string.post_comments), mPost.mCont));
 
             ((VHItem) viewHolder).commToggle.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -291,6 +293,64 @@ public class PostAdapter extends RecyclerView.Adapter {
             data = addJS(data);
             mWebView.addJavascriptInterface(new WebAppInterface(mWebView.getContext()), "Android");
             mWebView.loadDataWithBaseURL("", data, "text/html", "UTF-8", "");
+        }
+    }
+
+    public class ContentTask extends AsyncTask<String, Void, String> {
+
+        private final WebView mWebView;
+
+        public ContentTask(WebView webView) {
+            mWebView = webView;
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            return "<h2>人放屁的速度有多快？</h2>\n" + PostParser.parseContent(params[0]);
+        }
+
+        @Override
+        protected void onPostExecute(String data) {
+            // mWebView.addJavascriptInterface(new WebAppInterface(mWebView.getContext()), "Android");
+            String CSS = "<head>\n" +
+                    "\t<meta http-equiv=\"Content-Type\" content=\"text/html;\" />\n" +
+                    "\t<title>CSS</title>\n" +
+                    "\t<style type=\"text/css\">\n" +
+                    "\t\th2 {\n" +
+                    "\t\t\tcolor:#e51c23;\n" +
+                    "\t\t\tfont-size:1em;\n" +
+                    "\t\t}\n" +
+                    "\t\tbody {\n" +
+                    "\t\t\tbackground:#fafafa;\n" +
+                    "\t\t\tfont-family:Arial, Helvetica, sans-serif;\n" +
+                    "\t\t\tfont-size:1em;\n" +
+                    "\t\t\tcolor: #454545; \n" +
+                    "\t\t\tline-height:160%;" +
+                    "\t\t\tpadding:3%;\n" +
+                    "\t\t}\n" +
+                    "\t\tembed {\n" +
+                    "\t\t\tdisplay:none;\n" +
+                    "\t\t}\n" +
+                    "\t\timg {\n" +
+                    "\t\t\twidth: 100%;\n" +
+                    "\t\t\theight: auto\n" +
+                    "\t\t}\n" +
+                    "\t\tem {\n" +
+                    "\t\t\tfont-size:0.9em;\n" +
+                    "\t\t\tcolor: #b3b3b3; \n" +
+                    "\t\t}\n" +
+                    "\t\t.postinfo {\n" +
+                    "\t\t\tfont-size:0.9em;\n" +
+                    "\t\t\tcolor: #b3b3b3; \n" +
+                    "\t\t}\n" +
+                    "\t\ta {  \n" +
+                    "\t\t\tfont-size:1.1em;\n" +
+                    "\t\t\tcolor: #e51c23;  \n" +
+                    "\t\t\ttext-decoration: none;  \n" +
+                    "\t\t}  \n" +
+                    "\t</style>\n" +
+                    "</head>";
+            mWebView.loadDataWithBaseURL("", CSS + data, "text/html", "UTF-8", "");
         }
     }
 

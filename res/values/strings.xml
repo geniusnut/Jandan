@@ -6,8 +6,8 @@
     <string name="column_ooxx">OOXX</string>
     <string name="news_tag"> </string>
     <string name="news_comments">[%s]</string>
-    <string name="action_settings">settings</string>
-    <string name="post_comments">共有%s条评论</string>
+    <string name="action_settings">设置</string>
+    <string name="post_comments">共有%d条评论</string>
     <string name="settings_nomal">settings</string>
     <string name="settings_check_update">check updating</string>
     <string name="settings_check_update_summary">version:</string>

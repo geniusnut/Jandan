@@ -8,6 +8,10 @@
             android:id="@+id/nav_pics"
             android:title="@string/nav_pics" />
         <item
+            android:id="@+id/nav_jokes"
+            android:title="@string/nav_joke" />
+
+        <item
             android:id="@+id/nav_ooxx"
             android:title="@string/nav_ooxx" />
 
@@ -16,7 +20,7 @@
             android:title="@string/nav_sub_header">
             <menu>
                 <item
-                    android:id="@+id/navigation_sub_item_1"
+                    android:id="@+id/nav_setting"
                     android:title="@string/action_settings" />
             </menu>
         </item>

@@ -65,6 +65,18 @@ public class PostParser {
 		return posts;
 	}
 
+	public static String parseContent(String id) {
+		final String url = POST_URL + "&id=" + id + "&include=content";
+		final String content = HttpClient.downloadJson(url);
+		try {
+			JSONObject json = new JSONObject(content);
+			return json.getJSONObject("post").getString("content");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	public static ArrayList<CommentModel> parseComments(String id) {
 		final String url = POST_URL + "&id=" + id + "&include=comments";
 		final String content = HttpClient.downloadJson(url);

@@ -21,6 +21,7 @@ import android.util.TypedValue;
 import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
+import com.larvalabs.svgandroid.SVG;
 import com.nut.Jandan.Fragment.JokeFragment;
 import com.nut.Jandan.Fragment.NewsFragment;
 import com.nut.Jandan.Fragment.PageFragment;
@@ -55,6 +56,7 @@ public class JandanActivity extends BarFragmentActivity implements
 
 	private SampleFragmentPagerAdapter mFragmentAdapter;
 	private ViewPager mViewPager;
+	private Menu mNaviMenu;
 
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	@Override
@@ -77,8 +79,9 @@ public class JandanActivity extends BarFragmentActivity implements
 		mToolbar.setLogo(R.drawable.jandan);
 		View NavView = getNavButtonView(mToolbar);
 
-		// init table layout;
+		initDrawer();
 
+		// init table layout;
 		mViewPager = (ViewPager) findViewById(R.id.viewpager);
 		mFragmentAdapter = new SampleFragmentPagerAdapter(getFragmentManager(),
 				JandanActivity.this);
@@ -87,7 +90,25 @@ public class JandanActivity extends BarFragmentActivity implements
 		mTableLayout = (TabLayout) findViewById(R.id.tabs);
 		mTableLayout.setupWithViewPager(mViewPager);
 
-		initDrawer();
+		mTableLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+			@Override
+			public void onTabSelected(TabLayout.Tab tab) {
+				int pos = tab.getPosition();
+				mViewPager.setCurrentItem(pos);
+				mNaviMenu.getItem(pos).setChecked(true);
+			}
+
+			@Override
+			public void onTabUnselected(TabLayout.Tab tab) {
+
+			}
+
+			@Override
+			public void onTabReselected(TabLayout.Tab tab) {
+
+			}
+		});
+
 		// viewPager.setCurrentItem();
 		if (getFragmentManager().findFragmentById(R.id.viewpager) == null) {
 			mSelected = 0;
@@ -128,7 +149,7 @@ public class JandanActivity extends BarFragmentActivity implements
 
 	@Override
 	public int getContentId() {
-		return R.id.viewpager;
+		return R.id.main_content;
 	}
 
 	private ImageButton getNavButtonView(Toolbar toolbar) {
@@ -178,6 +199,14 @@ public class JandanActivity extends BarFragmentActivity implements
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 		setDrawerLayout(mDrawerLayout);
 
+		final Resources res = getResources();
+		mNaviMenu = mNavigationView.getMenu();
+		mNaviMenu.getItem(0).setIcon(SVG.getDrawable(res, R.raw.ic_explore_24px));
+		mNaviMenu.getItem(1).setIcon(SVG.getDrawable(res, R.raw.ic_photo_library_24px));
+		mNaviMenu.getItem(2).setIcon(SVG.getDrawable(res, R.raw.ic_face_24px));
+		mNaviMenu.getItem(3).setIcon(SVG.getDrawable(res, R.raw.ooxx));
+
+		mNaviMenu.findItem(R.id.nav_setting).setIcon(SVG.getDrawable(res, R.raw.ic_settings_applications_24px));
 		if (mNavigationView != null) {
 			setupDrawerContent();
 		}
@@ -195,10 +224,13 @@ public class JandanActivity extends BarFragmentActivity implements
 						mViewPager.setCurrentItem(0);
 						break;
 					case R.id.nav_pics:
-						showPic();
+						mViewPager.setCurrentItem(1);
+						break;
+					case R.id.nav_jokes:
+						mViewPager.setCurrentItem(2);
 						break;
 					case R.id.nav_ooxx:
-						showOOXX();
+						mViewPager.setCurrentItem(3);
 						break;
 				}
 				mDrawerLayout.closeDrawers();
@@ -292,8 +324,8 @@ public class JandanActivity extends BarFragmentActivity implements
 	}
 
 	public class SampleFragmentPagerAdapter extends FragmentPagerAdapter {
-		final int PAGE_COUNT = 3;
-		private int tabTitles[] = new int[]{R.string.nav_news, R.string.nav_pics, R.string.nav_joke};
+		final int PAGE_COUNT = 4;
+		private int tabTitles[] = new int[]{R.string.nav_news, R.string.nav_pics, R.string.nav_joke, R.string.nav_ooxx};
 		private Context context;
 
 		public SampleFragmentPagerAdapter(FragmentManager fm, Context context) {
