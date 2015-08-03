@@ -81,10 +81,6 @@ public class JokeFragment extends Fragment {
 	private RecyclerView.Adapter mAdapter = new RecyclerView.Adapter() {
 		private static final int ITEM_TYPE = 0;
 
-		private void disableOX() {
-
-		}
-
 		@Override
 		public int getItemViewType(int position) {
 			return ITEM_TYPE;

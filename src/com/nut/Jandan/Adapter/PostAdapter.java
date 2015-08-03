@@ -1,9 +1,11 @@
 package com.nut.Jandan.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v7.widget.LinearLayoutManager;
@@ -223,7 +225,14 @@ public class PostAdapter extends RecyclerView.Adapter {
             mWebView = (WebView) itemView.findViewById(R.id.webview);
             mWebView.getSettings().setJavaScriptEnabled(true);
 
-            mWebView.setWebViewClient(new WebViewClient());
+            mWebView.setWebViewClient(new WebViewClient() {
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    Log.d(TAG, "click url: " + url);
+                    view.getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                    return true;
+                }
+            });
             commTextView = (TextView) itemView.findViewById(R.id.btn_post_comm_text);
             ivCarat = (ImageView) itemView.findViewById(R.id.ivCarat);
             mCommWebView = (WebView) itemView.findViewById(R.id.post_comm);
@@ -306,7 +315,7 @@ public class PostAdapter extends RecyclerView.Adapter {
 
         @Override
         protected String doInBackground(String... params) {
-            return "<h2>人放屁的速度有多快？</h2>\n" + PostParser.parseContent(params[0]);
+            return "<h1>" + mPost.mTitle + "</h1>\n" + PostParser.parseContent(params[0]);
         }
 
         @Override
@@ -316,7 +325,7 @@ public class PostAdapter extends RecyclerView.Adapter {
                     "\t<meta http-equiv=\"Content-Type\" content=\"text/html;\" />\n" +
                     "\t<title>CSS</title>\n" +
                     "\t<style type=\"text/css\">\n" +
-                    "\t\th2 {\n" +
+                    "\t\th1 {\n" +
                     "\t\t\tcolor:#e51c23;\n" +
                     "\t\t\tfont-size:1em;\n" +
                     "\t\t}\n" +

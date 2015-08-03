@@ -5,6 +5,7 @@ package com.nut.dao;
  */
 public class CommentModel {
     public int mId;
+    public String mAvatar;
     public String mAuthor;
     public String mDate;
     public String mContent;

@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import com.nut.cache.Post;
 import com.nut.dao.CommentModel;
+import com.nut.dao.DuoshuoComment;
 import com.nut.dao.JokeModel;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -169,4 +170,15 @@ public class PostParser {
 	// http://i.jandan.net/?oxwlxojflwblxbsapi=jandan.get_duan_comments
 	// http://i.jandan.net/?oxwlxojflwblxbsapi=jandan.get_duan_comments&page=2
 	// http://i.jandan.net/?oxwlxojflwblxbsapi=get_post&id=66451&include=content
+
+	// http://jandan.duoshuo.com/api/threads/listPosts.json?thread_key=comment-2886207
+
+	public static DuoshuoComment getDuoshuoComments(String commentId) {
+		final String url = " http://jandan.duoshuo.com/api/threads/listPosts.json?thread_key=comment-" + commentId;
+		final String content = HttpClient.downloadJson(url);
+
+		return new DuoshuoComment(content);
+	}
+
+
 }
