@@ -1,6 +1,7 @@
 package com.nut.Jandan.Fragment;
 
 import android.app.Fragment;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,8 +10,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nut.Jandan.Activity.BaseFragmentActivity;
 import com.nut.Jandan.R;
 import com.nut.dao.DuoshuoComment;
 import com.nut.http.PostParser;
@@ -19,16 +22,16 @@ import com.nut.ui.CircleImageView;
 /**
  * Created by yw07 on 15-7-31.
  */
-public class CommentFragment extends Fragment {
-	private DuoshuoComment mComment;
+public class CommentFragment extends Fragment implements BaseFragmentInterface {
+	private DuoshuoComment mComment = new DuoshuoComment();
 	private ImageLoader mImageLoader;
-	private String mPostId;
+	private Long mCommentId;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Bundle args = getArguments();
-		mPostId = args.getString("postId");
+		mCommentId = args.getLong("commentId");
 	}
 
 	@Nullable
@@ -49,18 +52,32 @@ public class CommentFragment extends Fragment {
 		recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
 		mImageLoader = ImageLoader.getInstance();
-		new CommentsTask().execute(mPostId);
+		new CommentsTask().execute(mCommentId);
 	}
 
-	public class CommentsTask extends AsyncTask<String, Void, DuoshuoComment> {
+	@Override
+	public void show(BaseFragmentActivity activity) {
+		if (activity == null) {
+			return;
+		}
+		activity.showFragment(this);
+	}
+
+	@Override
+	public boolean onBackPressed() {
+		return false;
+	}
+
+	public class CommentsTask extends AsyncTask<Long, Void, Boolean> {
+
 		@Override
-		protected DuoshuoComment doInBackground(String... params) {
-			return PostParser.getDuoshuoComments(params[0]);
+		protected Boolean doInBackground(Long... params) {
+			PostParser.getDuoshuoComments(params[0], mComment);
+			return true;
 		}
 
 		@Override
-		protected void onPostExecute(DuoshuoComment duoshuoComment) {
-			mComment = duoshuoComment;
+		protected void onPostExecute(Boolean res) {
 			mAdapter.notifyDataSetChanged();
 		}
 	}
@@ -80,15 +97,32 @@ public class CommentFragment extends Fragment {
 		}
 	}
 
+	private static class HeaderViewHolder extends RecyclerView.ViewHolder {
+		public TextView mTitle;
+
+		public HeaderViewHolder(View itemView, String text) {
+			super(itemView);
+			LinearLayout linearLayout = (LinearLayout) itemView;
+			mTitle = new TextView(linearLayout.getContext());
+			mTitle.setTextColor(Color.BLACK);
+			mTitle.setText(text);
+			linearLayout.addView(mTitle);
+		}
+	}
+
 	private RecyclerView.Adapter mAdapter = new RecyclerView.Adapter() {
-		private static final int TYPE_HEADER = 0;
-		private static final int TYPE_ITEM = 1;
+		private static final int TYPE_HEADER_HOT = 0;
+		private static final int TYPE_HEADER = 1;
+		private static final int TYPE_ITEM = 10;
 
 		@Override
 		public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-			if (i == TYPE_HEADER) {
-				View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_duoshuo_comment, viewGroup, false);
-				return new CommentViewHolder(view);
+			if (i == TYPE_HEADER_HOT) {
+				LinearLayout linearLayout = new LinearLayout(viewGroup.getContext());
+				return new HeaderViewHolder(linearLayout, "hot");
+			} else if (i == TYPE_HEADER) {
+				LinearLayout linearLayout = new LinearLayout(viewGroup.getContext());
+				return new HeaderViewHolder(linearLayout, "all");
 			} else if (i == TYPE_ITEM) {
 				View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_duoshuo_comment, viewGroup, false);
 				return new CommentViewHolder(view);
@@ -98,13 +132,21 @@ public class CommentFragment extends Fragment {
 
 		@Override
 		public int getItemViewType(int position) {
-			if (position == 0)
-				return TYPE_HEADER;
-			else if (position == mComment.getHotComments().size()) {
-				return TYPE_HEADER;
+			if (mComment.mHotComments.size() > 0) {
+				if (position == 0)
+					return TYPE_HEADER_HOT;
+				else if (position == mComment.getHotComments().size()) {
+					return TYPE_HEADER;
+				} else {
+					return TYPE_ITEM;
+				}
 			} else {
-				return TYPE_ITEM;
+				if (position == 0)
+					return TYPE_HEADER;
+				else
+					return TYPE_ITEM;
 			}
+
 		}
 
 		@Override
@@ -123,7 +165,7 @@ public class CommentFragment extends Fragment {
 
 		@Override
 		public int getItemCount() {
-			return mComment.getSize();
+			return mComment.getSize() + 1 + mComment.getHotSize() == 0 ? 0 : mComment.getHotSize() + 1;
 		}
 	};
 }

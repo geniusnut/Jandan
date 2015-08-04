@@ -154,11 +154,16 @@ public class PostParser {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+
+		final StringBuilder sb = new StringBuilder("http://jandan.duoshuo.com/api/threads/counts.json?threads=");
+		for (JokeModel joke : jokes) {
+			sb.append("comment-").append(joke.mCommentId).append(",");
+		}
+
 		return jokes;
 	}
 
 
-	// http://jandan.duoshuo.com/api/threads/counts.json?threads=comment-2881436,comment-2881435,comment-2881340,comment-2881324,comment-2881322,comment-2881307,comment-2881287,comment-2881257,comment-2881217,comment-2881158,comment-2881157,comment-2881147,comment-2881142,comment-2881110,comment-2881102,comment-2881100,comment-2881061,comment-2881053,comment-2881042,comment-2881023,comment-2881013,comment-2880945,comment-2880905,comment-2880903,comment-2880802,
 	private long parseTime(String time) {
 		try {
 			return mDateFormat.parse(time).getTime() / 1000;
@@ -167,17 +172,18 @@ public class PostParser {
 		}
 	}
 
+	// http://jandan.duoshuo.com/api/threads/counts.json?threads=comment-2881436,comment-2881435,comment-2881340,comment-2881324,comment-2881322,comment-2881307,comment-2881287,comment-2881257,comment-2881217,comment-2881158,comment-2881157,comment-2881147,comment-2881142,comment-2881110,comment-2881102,comment-2881100,comment-2881061,comment-2881053,comment-2881042,comment-2881023,comment-2881013,comment-2880945,comment-2880905,comment-2880903,comment-2880802,
 	// http://i.jandan.net/?oxwlxojflwblxbsapi=jandan.get_duan_comments
 	// http://i.jandan.net/?oxwlxojflwblxbsapi=jandan.get_duan_comments&page=2
 	// http://i.jandan.net/?oxwlxojflwblxbsapi=get_post&id=66451&include=content
 
 	// http://jandan.duoshuo.com/api/threads/listPosts.json?thread_key=comment-2886207
 
-	public static DuoshuoComment getDuoshuoComments(String commentId) {
+	public static void getDuoshuoComments(Long commentId, DuoshuoComment comment) {
 		final String url = " http://jandan.duoshuo.com/api/threads/listPosts.json?thread_key=comment-" + commentId;
 		final String content = HttpClient.downloadJson(url);
 
-		return new DuoshuoComment(content);
+		comment.update(content);
 	}
 
 

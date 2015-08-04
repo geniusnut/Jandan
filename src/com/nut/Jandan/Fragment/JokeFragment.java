@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import com.nut.Jandan.Activity.BaseFragmentActivity;
 import com.nut.Jandan.Activity.JandanActivity;
 import com.nut.Jandan.R;
 import com.nut.dao.JokeModel;
@@ -92,6 +93,7 @@ public class JokeFragment extends Fragment {
 				View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_jokes_item, viewGroup, false);
 				final JokeViewHolder jokeVH = new JokeViewHolder(view);
 				final Resources res = viewGroup.getContext().getResources();
+
 				jokeVH.mOO.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -106,6 +108,17 @@ public class JokeFragment extends Fragment {
 						jokeVH.mXX.setTextColor(res.getColor(R.color.cyanA200));
 						jokeVH.mOO.setEnabled(false);
 						jokeVH.mXX.setEnabled(false);
+					}
+				});
+				jokeVH.mComments.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						final JokeModel joke = mJokes.get(jokeVH.getAdapterPosition());
+						Bundle args = new Bundle();
+						args.putLong("commentId", joke.mCommentId);
+						CommentFragment fragment = new CommentFragment();
+						fragment.setArguments(args);
+						fragment.show((BaseFragmentActivity) getActivity());
 					}
 				});
 				return jokeVH;

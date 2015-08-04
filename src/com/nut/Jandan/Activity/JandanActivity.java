@@ -22,10 +22,7 @@ import android.view.*;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import com.larvalabs.svgandroid.SVG;
-import com.nut.Jandan.Fragment.JokeFragment;
-import com.nut.Jandan.Fragment.NewsFragment;
-import com.nut.Jandan.Fragment.PageFragment;
-import com.nut.Jandan.Fragment.PicsFragment;
+import com.nut.Jandan.Fragment.*;
 import com.nut.Jandan.R;
 
 import java.util.ArrayList;
@@ -80,40 +77,7 @@ public class JandanActivity extends BarFragmentActivity implements
 		View NavView = getNavButtonView(mToolbar);
 
 		initDrawer();
-
-		// init table layout;
-		mViewPager = (ViewPager) findViewById(R.id.viewpager);
-		mFragmentAdapter = new SampleFragmentPagerAdapter(getFragmentManager(),
-				JandanActivity.this);
-		mViewPager.setAdapter(mFragmentAdapter);
-
-		mTableLayout = (TabLayout) findViewById(R.id.tabs);
-		mTableLayout.setupWithViewPager(mViewPager);
-
-		mTableLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-			@Override
-			public void onTabSelected(TabLayout.Tab tab) {
-				int pos = tab.getPosition();
-				mViewPager.setCurrentItem(pos);
-				mNaviMenu.getItem(pos).setChecked(true);
-			}
-
-			@Override
-			public void onTabUnselected(TabLayout.Tab tab) {
-
-			}
-
-			@Override
-			public void onTabReselected(TabLayout.Tab tab) {
-
-			}
-		});
-
-		// viewPager.setCurrentItem();
-		if (getFragmentManager().findFragmentById(R.id.viewpager) == null) {
-			mSelected = 0;
-		}
-
+		showFragment(new JandanFragment());
 	}
 
 	public void setStatusBarColor(View statusBar, int color) {
@@ -149,7 +113,7 @@ public class JandanActivity extends BarFragmentActivity implements
 
 	@Override
 	public int getContentId() {
-		return R.id.main_content;
+		return R.id.container;
 	}
 
 	private ImageButton getNavButtonView(Toolbar toolbar) {

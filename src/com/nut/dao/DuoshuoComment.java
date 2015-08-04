@@ -13,38 +13,16 @@ public class DuoshuoComment {
 
 	public ArrayList<Long> mHotIds = new ArrayList<>();
 
-	public final ArrayList<Comment> mComments = new ArrayList<>();
-	public final ArrayList<Comment> mHotComments = new ArrayList<>();
+	public final ArrayList<Comment> mComments;
+	public final ArrayList<Comment> mHotComments;
 
-	public DuoshuoComment(final String content) {
-		try {
-			JSONObject json = new JSONObject(content);
+	public DuoshuoComment() {
+		mComments = new ArrayList<>();
+		mHotComments = new ArrayList<>();
+	}
 
-			JSONArray jsonHotComments = json.getJSONArray("hotPosts");
-			for (int i = 0; i < jsonHotComments.length(); i++) {
-				mHotIds.add((Long) jsonHotComments.get(i));
-			}
-
-			JSONArray jsonArrayComments = json.getJSONArray("parentPosts");
-			for (int i = 0; i < jsonArrayComments.length(); i++) {
-				Comment comment = new Comment();
-				JSONObject jsonComment = (JSONObject) jsonArrayComments.get(i);
-				comment.mId = jsonComment.getLong("post_id");
-				comment.mParentId = jsonComment.getLong("parent_id");
-				comment.mContent = jsonComment.getString("message");
-				comment.mDate = jsonComment.getString("created_at");
-				comment.mLikes = jsonComment.getInt("likes");
-				JSONObject jsonAuthor = jsonComment.getJSONObject("author");
-				comment.mAuthor = jsonAuthor.getString("name");
-				comment.mAuthor = jsonAuthor.getString("avatar_url");
-				mComments.add(comment);
-			}
-			for (Long id : mHotIds) {
-				mHotComments.add(getComment(id));
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+	public int getHotSize() {
+		return mHotComments.size();
 	}
 
 	public int getSize() {
@@ -68,6 +46,40 @@ public class DuoshuoComment {
 			}
 		}
 		return null;
+	}
+
+	public void update(String content) {
+		mComments.clear();
+		mHotComments.clear();
+		try {
+			JSONObject json = new JSONObject(content);
+
+			JSONArray jsonHotComments = json.getJSONArray("hotPosts");
+			for (int i = 0; i < jsonHotComments.length(); i++) {
+				mHotIds.add((Long) jsonHotComments.get(i));
+			}
+
+			JSONArray jsonArrayComments = json.getJSONArray("response");
+			JSONObject jsonComments = json.getJSONObject("parentPosts");
+			for (int i = 0; i < jsonArrayComments.length(); i++) {
+				Comment comment = new Comment();
+				JSONObject jsonComment = jsonComments.getJSONObject((String) jsonArrayComments.get(i));
+				comment.mId = jsonComment.getLong("post_id");
+				comment.mParentId = jsonComment.getLong("parent_id");
+				comment.mContent = jsonComment.getString("message");
+				comment.mDate = jsonComment.getString("created_at");
+				comment.mLikes = jsonComment.getInt("likes");
+				JSONObject jsonAuthor = jsonComment.getJSONObject("author");
+				comment.mAuthor = jsonAuthor.getString("name");
+				comment.mAuthor = jsonAuthor.getString("avatar_url");
+				mComments.add(comment);
+			}
+			for (Long id : mHotIds) {
+				mHotComments.add(getComment(id));
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static class Comment {
