@@ -183,6 +183,8 @@ public class JokeFragment extends Fragment {
 				mAdapter.notifyDataSetChanged();
 			} else {
 				int size = mJokes.size();
+				if (jokes.size() <= 0 )
+					return;
 				long lastId = mJokes.get(mJokes.size() - 1).mId;
 				while (jokes.get(0) != null && jokes.get(0).mId >= lastId)
 					jokes.remove(0);

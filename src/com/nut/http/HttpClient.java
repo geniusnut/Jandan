@@ -1,6 +1,7 @@
 package com.nut.http;
 
 import android.os.Build;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,6 +21,7 @@ public class HttpClient {
 	private static final int TIMEOUT_READ = 60 * 1000;
 
 	private static final int BLOCK_SIZE = 16 * 1024;
+	private static String TAG = "HttpClient";
 
 	public static String downloadJson(String url) {
 		String content = null;
@@ -55,11 +57,12 @@ public class HttpClient {
 			conn.setConnectTimeout(TIMEOUT_CONNECT);
 			conn.setReadTimeout(TIMEOUT_READ);
 			conn.setRequestMethod("POST");
+			conn.setRequestProperty("Cookie", "duoshuo_unique=485b62b18abf63e9");
 
 			byte[] data = content.getBytes("UTF-8");
 			conn.setDoOutput(true);
 			conn.setUseCaches(false);
-			conn.setRequestProperty("Content-Type", "application/json; charset=utf8");
+			conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 			conn.setRequestProperty("Content-Length", String.valueOf(data.length));
 			setContentLength(conn, data.length);
 
@@ -71,6 +74,7 @@ public class HttpClient {
 			int statusCode = 0;
 			try {
 				statusCode = conn.getResponseCode();
+				Log.d(TAG, "statusCode: " + statusCode);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

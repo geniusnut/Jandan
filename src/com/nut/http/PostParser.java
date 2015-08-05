@@ -164,8 +164,12 @@ public class PostParser {
 		try {
 			JSONObject json = new JSONObject(commentContent).getJSONObject("response");
 			for (JokeModel joke : jokes) {
-				JSONObject jsonJoke = json.getJSONObject("comment-" + joke.mCommentId);
-				joke.mComments = jsonJoke.getInt("comments");
+				try {
+					JSONObject jsonJoke = json.getJSONObject("comment-" + joke.mCommentId);
+					joke.mComments = jsonJoke.getInt("comments");
+				} catch (JSONException e) {
+
+				}
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -191,7 +195,7 @@ public class PostParser {
 	// http://jandan.duoshuo.com/api/threads/listPosts.json?thread_key=comment-2886207
 
 	public static void getDuoshuoComments(Long commentId, DuoshuoComment comment) {
-		final String url = " http://jandan.duoshuo.com/api/threads/listPosts.json?thread_key=comment-" + commentId;
+		final String url = "http://jandan.duoshuo.com/api/threads/listPosts.json?thread_key=comment-" + commentId;
 		final String content = HttpClient.downloadJson(url);
 
 		comment.update(content);
@@ -204,7 +208,7 @@ public class PostParser {
 //	parent_id	1185181175767334618
 //	author_name	nut
 //	author_email	geniusnut@126.com
-	private static final String REPLY_URL = "http://jandan.duoshuo.com/api/posts/create.json";
+	private static final String REPLY_URL = "http://jandan.duoshuo.com/api/posts/create.json"; //?message=%E7%9B%B8%E4%BF%A1jandan&thread_id=1185181175765958294&parent_id=&author_name=nut&author_email=geniusnut%40126.com";
 
 	public static void postComment(ReplyModel reply) {
 		final StringBuilder sb = new StringBuilder();
@@ -214,6 +218,7 @@ public class PostParser {
 		sb.append("\"author_name\":\"").append(reply.name).append("\"");
 		sb.append("\"author_email\":\"").append(reply.email).append("\"");
 		sb.append("}");
-		HttpClient.uploadString(REPLY_URL, sb.toString());
+		String data = "message=%E7%9B%B8%E4%BF%A1jandan1&thread_id=1185181175765958294&parent_id=&author_name=nut&author_email=geniusnut%40126.com";
+		HttpClient.uploadString(REPLY_URL, data);
 	}
 }
