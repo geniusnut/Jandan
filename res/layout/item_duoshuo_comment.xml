@@ -1,62 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white">
 
+
+    <com.nut.ui.CircleImageView
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_margin="8dp"
+        android:layout_gravity="left|top"
+        android:src="@drawable/ic_avatar"
+        android:id="@+id/avatar" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <com.nut.ui.CircleImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_avatar"
-            android:id="@+id/avatar" />
+        android:orientation="vertical"
+        android:layout_toRightOf="@id/avatar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="4dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:textSize="12sp"
-                    android:textColor="#b3b4b7"
-                    android:text="author"
-                    android:lines="1"
-                    android:id="@+id/author" />
-
-                <TextView
-                    android:layout_marginLeft="8dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:text="time"
-                    android:id="@+id/time"
-                    android:textColor="#b3b4b7" />
-            </LinearLayout>
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp">
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/comment_content"
+                android:textStyle="bold"
+                android:textSize="12sp"
                 android:textColor="@android:color/black"
-                android:layout_weight="1" />
+                android:text="author"
+                android:lines="1"
+                android:id="@+id/author" />
+
+            <TextView
+                android:layout_marginLeft="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:text="time"
+                android:id="@+id/time"
+                android:textColor="#b3b4b7" />
         </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/comment_content"
+            android:textColor="@android:color/black"
+            android:layout_weight="1" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_margin="8dp"
+            android:background="@color/digest_separator_color_morning" />
     </LinearLayout>
-</FrameLayout>
+</RelativeLayout>

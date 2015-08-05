@@ -27,4 +27,8 @@
     <string name="joke_oo">oo:[%d]</string>
     <string name="joke_xx">xx:[%d]</string>
     <string name="joke_comments">↓吐槽:[%d]</string>
+    <string name="hotComments">热门评论</string>
+    <string name="allComments">所有评论</string>
+    <string name="hint">回复@%s：</string>
+    <string name="comment_too_short">你的。。。太短</string>
 </resources>

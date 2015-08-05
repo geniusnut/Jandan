@@ -11,7 +11,7 @@ import java.util.ArrayList;
  */
 public class DuoshuoComment {
 
-	public ArrayList<Long> mHotIds = new ArrayList<>();
+	public ArrayList<String> mHotIds = new ArrayList<>();
 
 	public final ArrayList<Comment> mComments;
 	public final ArrayList<Comment> mHotComments;
@@ -31,13 +31,13 @@ public class DuoshuoComment {
 
 	public ArrayList<Comment> getHotComments() {
 		ArrayList<Comment> hotComments = new ArrayList<>();
-		for (Long id : mHotIds) {
+		for (String id : mHotIds) {
 			hotComments.add(getComment(id));
 		}
 		return hotComments;
 	}
 
-	private Comment getComment(Long id) {
+	private Comment getComment(String id) {
 		if (mComments.size() <= 0)
 			throw new NullPointerException("mComments has not been initialized");
 		for (Comment comment : mComments) {
@@ -50,13 +50,15 @@ public class DuoshuoComment {
 
 	public void update(String content) {
 		mComments.clear();
+
+		mHotIds.clear();
 		mHotComments.clear();
 		try {
 			JSONObject json = new JSONObject(content);
 
 			JSONArray jsonHotComments = json.getJSONArray("hotPosts");
 			for (int i = 0; i < jsonHotComments.length(); i++) {
-				mHotIds.add((Long) jsonHotComments.get(i));
+				mHotIds.add((String) jsonHotComments.get(i));
 			}
 
 			JSONArray jsonArrayComments = json.getJSONArray("response");
@@ -64,17 +66,17 @@ public class DuoshuoComment {
 			for (int i = 0; i < jsonArrayComments.length(); i++) {
 				Comment comment = new Comment();
 				JSONObject jsonComment = jsonComments.getJSONObject((String) jsonArrayComments.get(i));
-				comment.mId = jsonComment.getLong("post_id");
+				comment.mId = jsonComment.getString("post_id");
 				comment.mParentId = jsonComment.getLong("parent_id");
 				comment.mContent = jsonComment.getString("message");
 				comment.mDate = jsonComment.getString("created_at");
 				comment.mLikes = jsonComment.getInt("likes");
 				JSONObject jsonAuthor = jsonComment.getJSONObject("author");
 				comment.mAuthor = jsonAuthor.getString("name");
-				comment.mAuthor = jsonAuthor.getString("avatar_url");
+				comment.mAvatar = jsonAuthor.getString("avatar_url");
 				mComments.add(comment);
 			}
-			for (Long id : mHotIds) {
+			for (String id : mHotIds) {
 				mHotComments.add(getComment(id));
 			}
 		} catch (JSONException e) {
@@ -83,7 +85,7 @@ public class DuoshuoComment {
 	}
 
 	public static class Comment {
-		public long mId;
+		public String mId;
 		public long mParentId;
 		public long mRootId;
 		public String mAvatar;

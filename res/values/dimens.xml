@@ -24,4 +24,6 @@
     <dimen name="margin_user_layout">25dp</dimen>
     <dimen name="margin_user_name">3dp</dimen>
     <dimen name="margin_user_email">20dp</dimen>
+
+    <dimen name="title_text_size">12sp</dimen>
 </resources>

@@ -2,6 +2,7 @@ package com.nut.http;
 
 import android.graphics.drawable.Drawable;
 import android.util.Log;
+import com.nut.Jandan.model.ReplyModel;
 import com.nut.cache.Post;
 import com.nut.dao.CommentModel;
 import com.nut.dao.DuoshuoComment;
@@ -159,6 +160,16 @@ public class PostParser {
 		for (JokeModel joke : jokes) {
 			sb.append("comment-").append(joke.mCommentId).append(",");
 		}
+		final String commentContent = HttpClient.downloadJson(sb.toString());
+		try {
+			JSONObject json = new JSONObject(commentContent).getJSONObject("response");
+			for (JokeModel joke : jokes) {
+				JSONObject jsonJoke = json.getJSONObject("comment-" + joke.mCommentId);
+				joke.mComments = jsonJoke.getInt("comments");
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 
 		return jokes;
 	}
@@ -187,4 +198,22 @@ public class PostParser {
 	}
 
 
+	//
+//	message	哈哈哈
+//	thread_id	1185181175765957611
+//	parent_id	1185181175767334618
+//	author_name	nut
+//	author_email	geniusnut@126.com
+	private static final String REPLY_URL = "http://jandan.duoshuo.com/api/posts/create.json";
+
+	public static void postComment(ReplyModel reply) {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("{").append("\"message\":\"").append(reply.message).append("\"");
+		sb.append("\"thread_id\":\"").append(reply.threadId).append("\"");
+		sb.append("\"parent_id\":\"").append(reply.parentId).append("\"");
+		sb.append("\"author_name\":\"").append(reply.name).append("\"");
+		sb.append("\"author_email\":\"").append(reply.email).append("\"");
+		sb.append("}");
+		HttpClient.uploadString(REPLY_URL, sb.toString());
+	}
 }

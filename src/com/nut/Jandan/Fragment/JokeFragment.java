@@ -76,6 +76,7 @@ public class JokeFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
+		swipeLayout.setRefreshing(true);
 		new JokesTask().execute(mPage++);
 	}
 
@@ -183,7 +184,7 @@ public class JokeFragment extends Fragment {
 			} else {
 				int size = mJokes.size();
 				long lastId = mJokes.get(mJokes.size() - 1).mId;
-				while (jokes.get(0).mId >= lastId)
+				while (jokes.get(0) != null && jokes.get(0).mId >= lastId)
 					jokes.remove(0);
 				mJokes.addAll(jokes);
 				mAdapter.notifyItemRangeInserted(size, jokes.size());
