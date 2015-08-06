@@ -3,16 +3,17 @@ package com.nut.Jandan.Fragment;
 import android.app.Fragment;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.TextView;
+import com.larvalabs.svgandroid.SVG;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
@@ -61,6 +62,7 @@ public class CommentFragment extends Fragment implements BaseFragmentInterface, 
 		final LinearLayoutManager llm = new LinearLayoutManager(getActivity());
 		llm.setOrientation(LinearLayoutManager.VERTICAL);
 		mRecyclerView.setLayoutManager(llm);
+
 		return rootView;
 	}
 
@@ -80,6 +82,16 @@ public class CommentFragment extends Fragment implements BaseFragmentInterface, 
 						build();
 		swipeLayout.setRefreshing(true);
 		new CommentsTask().execute(mCommentId);
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.reply, menu);
+
+		final int color = Color.BLACK;
+		final int size = 56;
+		Drawable iconSend = SVG.getDrawable(getResources(), R.raw.ic_send, color, size);
+		menu.findItem(R.id.send).setIcon(iconSend);
 	}
 
 	@Override
@@ -164,6 +176,8 @@ public class CommentFragment extends Fragment implements BaseFragmentInterface, 
 						Bundle args = new Bundle();
 						// args.putLong("", comme);
 						Fragment fragment = new ReplyFragment();
+						args.putString("thread_id", mComment.mThreadId);
+						args.putString("parent_id", comment.mId);
 						fragment.setArguments(args);
 						fragment.setTargetFragment(CommentFragment.this, 0);
 						((BaseFragmentActivity) getActivity()).showFragment(fragment);

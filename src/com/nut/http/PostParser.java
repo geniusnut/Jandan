@@ -1,6 +1,7 @@
 package com.nut.http;
 
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.util.Log;
 import com.nut.Jandan.model.ReplyModel;
 import com.nut.cache.Post;
@@ -212,13 +213,16 @@ public class PostParser {
 
 	public static void postComment(ReplyModel reply) {
 		final StringBuilder sb = new StringBuilder();
-		sb.append("{").append("\"message\":\"").append(reply.message).append("\"");
-		sb.append("\"thread_id\":\"").append(reply.threadId).append("\"");
-		sb.append("\"parent_id\":\"").append(reply.parentId).append("\"");
-		sb.append("\"author_name\":\"").append(reply.name).append("\"");
-		sb.append("\"author_email\":\"").append(reply.email).append("\"");
-		sb.append("}");
+		sb.append("message=").append(Uri.encode(reply.message));
+		sb.append("&thread_id=").append(Uri.encode(reply.threadId));
+		sb.append("&parent_id=").append(Uri.encode(reply.parentId));
+		sb.append("&author_name=").append(Uri.encode(reply.name));
+		sb.append("&author_email=").append(Uri.encode(reply.email));
+
 		String data = "message=%E7%9B%B8%E4%BF%A1jandan1&thread_id=1185181175765958294&parent_id=&author_name=nut&author_email=geniusnut%40126.com";
-		HttpClient.uploadString(REPLY_URL, data);
+		HttpClient.uploadString(REPLY_URL, sb.toString());
 	}
+
+	// ooxx
+	//http://i.jandan.net/wp-admin/?acv_ajax=true&option=1&ID=2889661
 }

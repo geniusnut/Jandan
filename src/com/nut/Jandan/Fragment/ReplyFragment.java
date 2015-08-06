@@ -6,12 +6,15 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import com.larvalabs.svgandroid.SVG;
+import com.nut.Jandan.Activity.BaseFragmentActivity;
 import com.nut.Jandan.R;
 import com.nut.Jandan.model.ReplyModel;
 import com.nut.http.PostParser;
@@ -19,11 +22,14 @@ import com.nut.http.PostParser;
 /**
  * Created by yw07 on 15-6-15.
  */
-public class ReplyFragment extends Fragment {
+public class ReplyFragment extends Fragment implements CustomDialogFragment.UserNameListener {
 
 	private EditText mContentView;
 
 	private OnCommentPostListener mListener;
+	private String mParentId;
+	private String mThreadId;
+	private String mContent;
 
 	public interface OnCommentPostListener {
 		public void onCommentPost();
@@ -34,6 +40,9 @@ public class ReplyFragment extends Fragment {
 		super.onCreate(state);
 		Bundle args = getArguments();
 
+		mThreadId = args.getString("thread_id");
+		mParentId = args.getString("parent_id", "");
+		mContent = "";
 
 		try {
 			mListener = (OnCommentPostListener) getTargetFragment();
@@ -56,6 +65,7 @@ public class ReplyFragment extends Fragment {
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+
 				String content = mContentView.getText().toString();
 				if (content.length() <= 1) {
 					Toast.makeText(getActivity(), getString(R.string.comment_too_short), Toast.LENGTH_SHORT).show();
@@ -64,48 +74,26 @@ public class ReplyFragment extends Fragment {
 				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
 						Context.INPUT_METHOD_SERVICE);
 				imm.hideSoftInputFromWindow(mContentView.getWindowToken(), 0);
-
-				postComment(content);
+				CustomDialogFragment editNameDialog = new CustomDialogFragment(content);
+				editNameDialog.setTargetFragment(ReplyFragment.this, 0);
+				editNameDialog.show(getFragmentManager(), "fragment_edit_name");
+				mContent = content;
+//				postComment(content);
 			}
 		});
 		return rootView;
 	}
 
 	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.reply, menu);
+	public void onFinishUserDialog(String user, String email) {
+		ReplyModel replyModel = new ReplyModel();
+		replyModel.name = user;
+		replyModel.email = email;
+		replyModel.message = mContent;
+		replyModel.parentId = mParentId;
+		replyModel.threadId = mThreadId;
+		new ReplyTask().execute(replyModel);
 
-		final int color = getResources().getColor(R.color.yellow500);
-		final int size = 56;
-		Drawable iconSend = SVG.getDrawable(getResources(), R.raw.ic_send, color, size);
-		menu.findItem(R.id.send).setIcon(iconSend);
-	}
-
-	@Override
-	public void onPrepareOptionsMenu(Menu menu) {
-		super.onPrepareOptionsMenu(menu);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		final int id = item.getItemId();
-		switch (id) {
-			case R.id.send:
-				String content = mContentView.getText().toString();
-				if (content.length() <= 1) {
-					Toast.makeText(getActivity(), getString(R.string.comment_too_short), Toast.LENGTH_SHORT).show();
-					return false;
-				}
-				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
-						Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(mContentView.getWindowToken(), 0);
-
-				postComment(content);
-				break;
-			default:
-				return false;
-		}
-		return true;
 	}
 
 	private void postComment(final String content) {
@@ -141,6 +129,9 @@ public class ReplyFragment extends Fragment {
 		protected void onPostExecute(Boolean res) {
 			if (res)
 				mListener.onCommentPost();
+
+			((BaseFragmentActivity) getActivity()).onBackPressed();
+
 		}
 	}
 }

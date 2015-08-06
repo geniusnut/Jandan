@@ -123,6 +123,7 @@ public class JandanActivity extends BarFragmentActivity implements
 
 		return null;
 	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
@@ -174,7 +175,6 @@ public class JandanActivity extends BarFragmentActivity implements
 		if (mNavigationView != null) {
 			setupDrawerContent();
 		}
-
 	}
 
 	private void setupDrawerContent() {

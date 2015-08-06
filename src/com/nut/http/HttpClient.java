@@ -52,12 +52,11 @@ public class HttpClient {
 
 	public static void uploadString(String url, String content) {
 		try {
-
 			final HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 			conn.setConnectTimeout(TIMEOUT_CONNECT);
 			conn.setReadTimeout(TIMEOUT_READ);
 			conn.setRequestMethod("POST");
-			conn.setRequestProperty("Cookie", "duoshuo_unique=485b62b18abf63e9");
+			// conn.setRequestProperty("Cookie", "duoshuo_unique=485b62b18abf63e9");
 
 			byte[] data = content.getBytes("UTF-8");
 			conn.setDoOutput(true);
@@ -79,10 +78,7 @@ public class HttpClient {
 				e.printStackTrace();
 			}
 		} catch (Exception e) {
-
 		}
-
-
 	}
 
 	public static void setContentLength(HttpURLConnection conn, long length) {

@@ -10,11 +10,12 @@ import java.util.ArrayList;
  * Created by yw07 on 15-8-3.
  */
 public class DuoshuoComment {
-
 	public ArrayList<String> mHotIds = new ArrayList<>();
 
 	public final ArrayList<Comment> mComments;
 	public final ArrayList<Comment> mHotComments;
+
+	public String mThreadId;
 
 	public DuoshuoComment() {
 		mComments = new ArrayList<>();
@@ -56,6 +57,7 @@ public class DuoshuoComment {
 		try {
 			JSONObject json = new JSONObject(content);
 
+			mThreadId = json.getJSONObject("thread").getString("thread_id");
 			JSONArray jsonHotComments = json.getJSONArray("hotPosts");
 			for (int i = 0; i < jsonHotComments.length(); i++) {
 				mHotIds.add((String) jsonHotComments.get(i));
