@@ -31,4 +31,7 @@
     <string name="allComments">所有评论</string>
     <string name="hint">回复@%s：</string>
     <string name="comment_too_short">你的。。。太短</string>
+
+    <string name="loading">Loading…</string>
+    <string name="load_failed">Load failed!</string>
 </resources>

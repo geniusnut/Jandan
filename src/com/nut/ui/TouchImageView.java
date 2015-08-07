@@ -34,7 +34,7 @@ import android.widget.OverScroller;
 import android.widget.Scroller;
 import com.nut.gif.GifMovie;
 
-public class TouchImageView extends PictureView implements Gif {
+public class TouchImageView extends PictureView1 implements Gif {
 
 	private static final String DEBUG = "DEBUG";
 

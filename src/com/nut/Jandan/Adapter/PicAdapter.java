@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -78,7 +77,6 @@ public class PicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 		final Pic pic = mPicFile.get(position);
 
-
 		ViewHolder holder = (ViewHolder) viewHolder;
 		holder.updater.setText(pic.mAuthor);
 		holder.text.setText(pic.mDesc);
@@ -87,17 +85,10 @@ public class PicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 		holder.time.setText(Utilities.convertTime(pic.mTime));
 		holder.scaleImage.setImageDrawable(mContext.getResources().getDrawable(R.drawable.loading));
 
-
-		int height = calcLayoutParams();
-		FrameLayout.LayoutParams flp = new FrameLayout.LayoutParams(-1, height);
-		holder.mWrapper.setLayoutParams(flp);
 		final String url = pic.mUrls.get(0);
-		new loadImage(url, holder.progressWheel).execute();
-		mImageLoader.displayImage(url, holder.scaleImage);
-	}
-
-	private int calcLayoutParams() {
-		return 800;
+//		new loadImage(url, holder.progressWheel).execute();
+//		mImageLoader.displayImage(url, holder.scaleImage);
+		loadPicUIL(holder.scaleImage, url);
 	}
 
 	@Override

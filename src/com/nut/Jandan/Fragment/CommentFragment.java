@@ -178,6 +178,7 @@ public class CommentFragment extends Fragment implements BaseFragmentInterface, 
 						Fragment fragment = new ReplyFragment();
 						args.putString("thread_id", mComment.mThreadId);
 						args.putString("parent_id", comment.mId);
+						args.putString("reply_to", comment.mAuthor);
 						fragment.setArguments(args);
 						fragment.setTargetFragment(CommentFragment.this, 0);
 						((BaseFragmentActivity) getActivity()).showFragment(fragment);

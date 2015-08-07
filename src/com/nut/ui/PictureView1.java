@@ -12,7 +12,7 @@ import android.widget.ImageView;
 /**
  * Created by yw07 on 15-1-5.
  */
-public class PictureView  extends ImageView {
+public class PictureView1 extends ImageView {
 
 	private static final boolean IS_ICS_OR_HIGHER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
 
@@ -20,15 +20,15 @@ public class PictureView  extends ImageView {
 
 	public int mWidth, mHeight;
 
-	public PictureView(Context context) {
+	public PictureView1(Context context) {
 		super(context);
 	}
 
-	public PictureView(Context context, AttributeSet attrs) {
+	public PictureView1(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
 
-	public PictureView(Context context, AttributeSet attrs, int defStyle) {
+	public PictureView1(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
 

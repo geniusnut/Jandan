@@ -38,4 +38,7 @@
     <color name="blue_semi_transparent_pressed">#80738ffe</color>
 
     <color name="digest_separator_color_morning">#ffe5e5e5</color>
+
+    <color name="icon_light">#b0000000</color>
+    <color name="warning">#ffcc3333</color>
 </resources>

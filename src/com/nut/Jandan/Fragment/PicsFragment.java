@@ -5,8 +5,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,7 +41,7 @@ public class PicsFragment extends Fragment implements BaseFragmentInterface {
 	private PicParser mPicParser;
 	private Handler mHandler;
 	private boolean mNeedReload = true;
-	private StaggeredGridLayoutManager mLayoutManager;
+	private LinearLayoutManager mLayoutManager;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -96,8 +96,7 @@ public class PicsFragment extends Fragment implements BaseFragmentInterface {
 				super.onScrolled(recyclerView, dx, dy);
 				visibleItemCount = recyclerView.getChildCount();
 				totalItemCount = mLayoutManager.getItemCount();
-				mLayoutManager.findFirstVisibleItemPositions(into);
-				firstVisibleItem = into[0];
+				firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
 				if (loading) {
 					if (totalItemCount > previousTotal) {
 						loading = false;
@@ -113,8 +112,7 @@ public class PicsFragment extends Fragment implements BaseFragmentInterface {
 			}
 
 		});
-		mLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-		mLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
+		mLayoutManager = new LinearLayoutManager(getActivity());
 		mRecyclerView.setLayoutManager(mLayoutManager);
 		mRecyclerView.setHasFixedSize(false);
 		picAdapter = new PicAdapter(getActivity(), mPicFile, mHandler);

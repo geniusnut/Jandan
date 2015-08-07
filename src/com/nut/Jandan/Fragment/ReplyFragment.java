@@ -29,6 +29,7 @@ public class ReplyFragment extends Fragment implements CustomDialogFragment.User
 	private OnCommentPostListener mListener;
 	private String mParentId;
 	private String mThreadId;
+	private String mReplyTo;
 	private String mContent;
 
 	public interface OnCommentPostListener {
@@ -42,6 +43,7 @@ public class ReplyFragment extends Fragment implements CustomDialogFragment.User
 
 		mThreadId = args.getString("thread_id");
 		mParentId = args.getString("parent_id", "");
+		mReplyTo = args.getString("reply_to", "");
 		mContent = "";
 
 		try {
@@ -56,7 +58,7 @@ public class ReplyFragment extends Fragment implements CustomDialogFragment.User
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_reply, container, false);
 		mContentView = (EditText) rootView.findViewById(R.id.editor);
-		mContentView.setHint(String.format(getString(R.string.hint), "nut"));
+		mContentView.setHint(String.format(getString(R.string.hint), mReplyTo));
 		ImageButton button = (ImageButton) rootView.findViewById(R.id.send);
 		final int color = getResources().getColor(R.color.yellow500);
 		final int size = 56;
@@ -93,28 +95,6 @@ public class ReplyFragment extends Fragment implements CustomDialogFragment.User
 		replyModel.parentId = mParentId;
 		replyModel.threadId = mThreadId;
 		new ReplyTask().execute(replyModel);
-
-	}
-
-	private void postComment(final String content) {
-
-		//comment id 2888770
-//		"1185181175767342657":{
-//			"post_id":"1185181175767342657",
-//					"thread_id":"1185181175765958285",
-//					"status":"approved",
-//					"source":"duoshuo",
-//					"author_id":3429320,
-//					"author_key":"0",
-//					"message":"那你特么倒是给啊",
-//					"created_at":"2015-08-05T18:00:08+08:00",
-		ReplyModel replyModel = new ReplyModel();
-		replyModel.email = "geniusnut@126.com";
-		replyModel.name = "nut";
-		replyModel.message = "Hello, world";
-		replyModel.parentId = "1185181175767342657";
-		replyModel.threadId = "1185181175765958285";
-		new ReplyTask().execute(replyModel);
 	}
 
 	private class ReplyTask extends AsyncTask<ReplyModel, Void, Boolean> {
@@ -131,7 +111,6 @@ public class ReplyFragment extends Fragment implements CustomDialogFragment.User
 				mListener.onCommentPost();
 
 			((BaseFragmentActivity) getActivity()).onBackPressed();
-
 		}
 	}
 }

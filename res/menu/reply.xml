@@ -5,4 +5,10 @@
         android:id="@+id/send"
         android:title="send"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/bookmark"
+        android:title="test"
+        app:showAsAction="never" />
+
 </menu>

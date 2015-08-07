@@ -45,8 +45,13 @@ public class CustomDialogFragment extends DialogFragment {
 		okButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (mEditText.getText() == null)
+				if (mEditText.getText().length() < 1) {
 					return;
+				}
+
+				if (mEditEmail.getText().length() < 1) {
+					return;
+				}
 
 				UserNameListener listener = (UserNameListener) getTargetFragment();
 				listener.onFinishUserDialog(mEditText.getText().toString(), mEditEmail.getText().toString());

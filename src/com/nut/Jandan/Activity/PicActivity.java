@@ -27,7 +27,7 @@ import com.nut.cache.Pic;
 import com.nut.dao.ParcelFile;
 import com.nut.gif.GifImageView;
 import com.nut.gif.GifMovie;
-import com.nut.ui.PictureView;
+import com.nut.ui.PictureView1;
 import com.nut.ui.TouchImageView;
 
 import java.io.*;
@@ -194,7 +194,7 @@ public class PicActivity extends ActionBarActivity {
 		 *
 		 * Using a weak reference will avoid memory leaks if the target ImageView is retired from memory before the load finishes.
 		 */
-		private final WeakReference<PictureView> mImageViewRef;
+		private final WeakReference<PictureView1> mImageViewRef;
 
 		/**
 		 * Weak reference to the target {@link android.widget.TextView} where error messages will be written.
@@ -218,7 +218,7 @@ public class PicActivity extends ActionBarActivity {
 		 *
 		 * @param imageView     Target {@link android.widget.ImageView} where the bitmap will be loaded into.
 		 */
-		public BitmapLoader(PictureView imageView, TextView messageView, ProgressBar progressWheel) {
+		public BitmapLoader(PictureView1 imageView, TextView messageView, ProgressBar progressWheel) {
 			mImageViewRef = new WeakReference<>(imageView);
 			mMessageViewRef = new WeakReference<>(messageView);
 			mProgressWheelRef = new WeakReference<>(progressWheel);
@@ -288,7 +288,7 @@ public class PicActivity extends ActionBarActivity {
 		@SuppressLint("InlinedApi")
 		private void showLoadedImage(Bitmap result) {
 			if (mImageViewRef != null) {
-				final PictureView imageView = mImageViewRef.get();
+				final PictureView1 imageView = mImageViewRef.get();
 				if (imageView != null) {
 					imageView.setBitmap(result);
 					imageView.setImageBitmap(result);
