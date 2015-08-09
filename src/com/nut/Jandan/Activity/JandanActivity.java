@@ -166,12 +166,12 @@ public class JandanActivity extends BarFragmentActivity implements
 
 		final Resources res = getResources();
 		mNaviMenu = mNavigationView.getMenu();
-		mNaviMenu.getItem(0).setIcon(SVG.getDrawable(res, R.raw.ic_explore_24px));
-		mNaviMenu.getItem(1).setIcon(SVG.getDrawable(res, R.raw.ic_photo_library_24px));
-		mNaviMenu.getItem(2).setIcon(SVG.getDrawable(res, R.raw.ic_face_24px));
-		mNaviMenu.getItem(3).setIcon(SVG.getDrawable(res, R.raw.ooxx));
-
-		mNaviMenu.findItem(R.id.nav_setting).setIcon(SVG.getDrawable(res, R.raw.ic_settings_applications_24px));
+//		mNaviMenu.getItem(0).setIcon(SVG.getDrawable(res, R.raw.ic_explore_24px));
+//		mNaviMenu.getItem(1).setIcon(SVG.getDrawable(res, R.raw.ic_photo_library_24px));
+//		mNaviMenu.getItem(2).setIcon(SVG.getDrawable(res, R.raw.ic_face_24px));
+//		mNaviMenu.getItem(3).setIcon(SVG.getDrawable(res, R.raw.ooxx));
+//
+//		mNaviMenu.findItem(R.id.nav_setting).setIcon(SVG.getDrawable(res, R.raw.ic_settings_applications_24px));
 		if (mNavigationView != null) {
 			setupDrawerContent();
 		}

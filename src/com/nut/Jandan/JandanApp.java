@@ -30,6 +30,7 @@ public class JandanApp extends Application {
 	private static Application mContext;
 
 	public static PictureLoader mPictureLoader;
+	public static ImageLoader mImageLoader;
 
 
 	public static int mAnimationDuration;
