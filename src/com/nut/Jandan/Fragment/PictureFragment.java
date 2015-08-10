@@ -12,21 +12,60 @@ import android.widget.ImageView;
 import com.alensw.support.picture.Picture;
 import com.alensw.view.PictureView;
 import com.dao.PictureLoader;
+import com.nut.Jandan.Activity.BaseFragmentActivity;
 import com.nut.Jandan.JandanApp;
 import com.nut.Jandan.R;
 import com.nut.Jandan.model.MediaModel;
+import com.nut.cache.Pic;
+
+import java.util.ArrayList;
 
 /**
  * Created by yw07 on 15-5-28.
  */
-public class PictureFragment extends Fragment implements Handler.Callback {
+public class PictureFragment extends Fragment implements Handler.Callback, BaseFragmentInterface {
 	public static final int MSG_REQUEST_PICTURES = 3000;
 	private static final int REQUEST_PICTURES_DELAY = 20;
+	public static final String EXTRA_PIC = "pic";
 
 	private PictureView mPictureView;
 	private ImageView mShowingView;
+	private Pic mPic;
+
+	@Override
+	public void show(BaseFragmentActivity activity) {
+		if (activity == null) {
+			return;
+		}
+		activity.showFragment(this);
+	}
+
+	@Override
+	public boolean onBackPressed() {
+		return false;
+	}
 
 
+	private static class MediasModel {
+		final ArrayList<MediaModel> mMedias = new ArrayList<>();
+		int mIndex = 0;
+
+		private MediasModel() {
+
+		}
+
+		public void add(MediaModel mediaModel) {
+			mMedias.add(mediaModel);
+		}
+
+		public MediaModel get(int i) {
+			return mMedias.get(i);
+		}
+
+		public int count() {
+			return mMedias.size();
+		}
+	}
 	private MediasModel mMedias;
 	private MediaModel mCurrMedia;
 	private Picture mNextPicture;
@@ -38,10 +77,16 @@ public class PictureFragment extends Fragment implements Handler.Callback {
 		super.onCreate(savedInstanceState);
 
 		Bundle args = getArguments();
-		int position = args.getInt("media_position");
-		long postId = args.getLong("post_id");
-		mMedias = new MediasModel(MediaCache.getInstance(getActivity()).query(Long.toString(postId)).medias, position);
-		mCurrMedia = new MediaModel(mMedias.get(position));
+
+		mMedias = new MediasModel();
+		mPic = args.getParcelable(EXTRA_PIC);
+		for (int i = 0; i < mPic.mUrls.size(); i++) {
+
+			mMedias.add(new MediaModel(mPic.mUrls.get(i)));
+		}
+
+
+		mCurrMedia = mMedias.get(0);
 		mHandler = new Handler(this);
 	}
 
@@ -194,7 +239,7 @@ public class PictureFragment extends Fragment implements Handler.Callback {
 		if (mMedias != null && (ptype == Picture.TYPE_ERROR || ptype >= Picture.TYPE_THUMB)) {
 			final int nextIndex = getNextIndex(mMedias.mIndex, mForward);
 			if (nextIndex != mMedias.mIndex) {
-				final MediaModel media2 = mMedias.getMedia(nextIndex);
+				final MediaModel media2 = mMedias.get(nextIndex);
 				final Uri uri2 = media2 != null ? media2.getUri() : Uri.EMPTY;
 				if (mNextThumbTask != null && !mNextThumbTask.isHandlingUri(uri2)) {
 					mNextThumbTask.cancel(false);
@@ -237,7 +282,7 @@ public class PictureFragment extends Fragment implements Handler.Callback {
 		if (picture.equalsUri(uri)) {
 			setPicture(picture, false);
 		} else if (mMedias != null) {
-			final Uri uri2 = mNextPicture != null ? mNextPicture.mUri : mMedias.getFileUri(getNextIndex(mMedias.mIndex, mForward));
+			final Uri uri2 = mNextPicture != null ? mNextPicture.mUri : mMedias.get(getNextIndex(mMedias.mIndex, mForward)).getUri();
 			if (picture.equalsUri(uri2)) {
 				if (mNextPicture != null && mNextPicture.mType < picture.mType) {
 					mNextPicture.release();
@@ -273,7 +318,7 @@ public class PictureFragment extends Fragment implements Handler.Callback {
 			if (mMedias != null) {
 				mForward = dir > 0;
 				final int index = getNextIndex(mMedias.mIndex, mForward);
-				final MediaModel media2 = mMedias.getMedia(index);
+				final MediaModel media2 = mMedias.get(index);
 				final Uri uri2 = media2 != null ? media2.getUri() : Uri.EMPTY;
 				if (mNextPicture != null) {
 					if (/*mNextPicture.mType == Picture.TYPE_BLANK && */mNextPicture.equalsUri(uri2))
@@ -294,7 +339,7 @@ public class PictureFragment extends Fragment implements Handler.Callback {
 				//	Log.d("PictureInteraction", "switch pictures: " + mCurrUri + " -> " + mNextUri + ", dir=" + dir);
 				mForward = dir > 0;
 				mMedias.mIndex = getNextIndex(mMedias.mIndex, mForward);
-				mCurrMedia = mMedias.getMedia(mMedias.mIndex);
+				mCurrMedia = mMedias.get(mMedias.mIndex);
 
 				final Uri uri = mCurrMedia.getUri();
 				Picture picture;
@@ -361,7 +406,6 @@ public class PictureFragment extends Fragment implements Handler.Callback {
 
 	protected void setPicture(Picture picture, boolean reset) {
 		final Uri uri = mCurrMedia.getUri();
-		final char type = mCurrMedia.getType();
 
 		if (picture != null && picture.isError()
 				&& mMedias == null

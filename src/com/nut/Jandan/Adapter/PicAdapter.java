@@ -2,10 +2,10 @@ package com.nut.Jandan.Adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.*;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,8 +18,9 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.utils.DiskCacheUtils;
-import com.nut.Jandan.Activity.PicActivity;
+import com.nut.Jandan.Activity.BaseFragmentActivity;
 import com.nut.Jandan.Fragment.NewsFragment;
+import com.nut.Jandan.Fragment.PictureFragment;
 import com.nut.Jandan.R;
 import com.nut.Jandan.Utility.Utilities;
 import com.nut.Jandan.model.UrlFile;
@@ -64,9 +65,14 @@ public class PicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 		holder.itemView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(mContext, PicActivity.class);
-				intent.putExtra(PicActivity.EXTRA_PIC, mPicFile.get(holder.getPosition()));
-				mContext.startActivity(intent);
+//				Intent intent = new Intent(mContext, PicActivity.class);
+//				intent.putExtra(PicActivity.EXTRA_PIC, mPicFile.get(holder.getPosition()));
+//				mContext.startActivity(intent);
+				Bundle args = new Bundle();
+				args.putParcelable(PictureFragment.EXTRA_PIC, mPicFile.get(holder.getPosition()));
+				PictureFragment fragment = new PictureFragment();
+				fragment.setArguments(args);
+				fragment.show((BaseFragmentActivity) mContext);
 			}
 		});
 		return holder;
