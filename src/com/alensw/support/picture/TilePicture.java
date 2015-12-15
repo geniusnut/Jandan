@@ -331,7 +331,7 @@ public class TilePicture extends Picture {    //	Blank picture to compute the si
 		opts.inSampleSize = Tile.getScale(tile);
 
 		final Bitmap bitmap = decodeTile(rect, opts);
-		//	Log.d("TilePicture", "decode tile: " + Tile.toString(tile) + ", " + bitmap + ", " + opts);
+		Log.d("TilePicture", "decode tile: " + Tile.toString(tile) + ", " + bitmap + ", " + opts);
 		if (bitmap == null) {
 			if (opts.mCancel) // region decoder can not be cancelled by opts.requestCancel()?
 				return false;
@@ -480,7 +480,7 @@ public class TilePicture extends Picture {    //	Blank picture to compute the si
 				}
 				if (ret)
 					ret = decodeTileToCache(tile, rect, opts);
-				//	else Log.i("TilePicture", "ignore tile: " + Tile.toString(tile));
+				else Log.i("TilePicture", "ignore tile: " + Tile.toString(tile));
 
 				final View view;
 				synchronized (mQueue) {

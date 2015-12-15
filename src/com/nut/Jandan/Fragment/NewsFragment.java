@@ -370,20 +370,6 @@ public class NewsFragment extends Fragment implements BaseFragmentInterface {
 		} else {
 			imageView.setImageBitmap(null);
 			mImageLoader.displayImage(thumbUrl, imageView, options);
-//			mImageLoader.loadImage(thumbUrl, options, new SimpleImageLoadingListener() {
-//				@Override
-//				public void onLoadingComplete(String imageUri, View view, final Bitmap loadedImage) {
-//					// Do whatever you want with Bitmap
-//					mHandler.post(new Runnable() {
-//						@Override
-//						public void run() {
-//							if (imageView.getTag() == thumbUrl) {
-//								imageView.setImageBitmap(loadedImage);
-//							}
-//						}
-//					});
-//				}
-//			});
 		}
 	}
 }

@@ -65,11 +65,8 @@ public class PicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 		holder.itemView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-//				Intent intent = new Intent(mContext, PicActivity.class);
-//				intent.putExtra(PicActivity.EXTRA_PIC, mPicFile.get(holder.getPosition()));
-//				mContext.startActivity(intent);
 				Bundle args = new Bundle();
-				args.putParcelable(PictureFragment.EXTRA_PIC, mPicFile.get(holder.getPosition()));
+				args.putParcelable(PictureFragment.EXTRA_PIC, mPicFile.get(holder.getAdapterPosition()));
 				PictureFragment fragment = new PictureFragment();
 				fragment.setArguments(args);
 				fragment.show((BaseFragmentActivity) mContext);

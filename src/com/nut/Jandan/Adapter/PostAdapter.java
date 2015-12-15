@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.nut.Jandan.R;
+import com.nut.Jandan.model.CSSModel;
 import com.nut.cache.Post;
 import com.nut.dao.CommentModel;
 import com.nut.dao.PostFormater;
@@ -163,7 +164,6 @@ public class PostAdapter extends RecyclerView.Adapter {
                 public void onClick(View view) {
                     mShowComment = !mShowComment;
                     if (mShowComment) {
-                        ((VHItem) viewHolder).commToggle.setEnabled(false);
                         ((VHItem) viewHolder).ivCarat.setRotation(0);
                         new CommentsTask(((VHItem) viewHolder).commToggle).execute(String.valueOf(mPost.mId));
                     } else {
@@ -320,46 +320,7 @@ public class PostAdapter extends RecyclerView.Adapter {
 
         @Override
         protected void onPostExecute(String data) {
-            // mWebView.addJavascriptInterface(new WebAppInterface(mWebView.getContext()), "Android");
-            String CSS = "<head>\n" +
-                    "\t<meta http-equiv=\"Content-Type\" content=\"text/html;\" />\n" +
-                    "\t<title>CSS</title>\n" +
-                    "\t<style type=\"text/css\">\n" +
-                    "\t\th1 {\n" +
-                    "\t\t\tcolor:#e51c23;\n" +
-                    "\t\t\tfont-size:1em;\n" +
-                    "\t\t}\n" +
-                    "\t\tbody {\n" +
-                    "\t\t\tbackground:#fafafa;\n" +
-                    "\t\t\tfont-family:Arial, Helvetica, sans-serif;\n" +
-                    "\t\t\tfont-size:1em;\n" +
-                    "\t\t\tcolor: #454545; \n" +
-                    "\t\t\tline-height:160%;" +
-                    "\t\t\tpadding:3%;\n" +
-                    "\t\t}\n" +
-                    "\t\tembed {\n" +
-                    "\t\t\tdisplay:none;\n" +
-                    "\t\t}\n" +
-                    "\t\timg {\n" +
-                    "\t\t\twidth: 100%;\n" +
-                    "\t\t\theight: auto\n" +
-                    "\t\t}\n" +
-                    "\t\tem {\n" +
-                    "\t\t\tfont-size:0.9em;\n" +
-                    "\t\t\tcolor: #b3b3b3; \n" +
-                    "\t\t}\n" +
-                    "\t\t.postinfo {\n" +
-                    "\t\t\tfont-size:0.9em;\n" +
-                    "\t\t\tcolor: #b3b3b3; \n" +
-                    "\t\t}\n" +
-                    "\t\ta {  \n" +
-                    "\t\t\tfont-size:1.1em;\n" +
-                    "\t\t\tcolor: #e51c23;  \n" +
-                    "\t\t\ttext-decoration: none;  \n" +
-                    "\t\t}  \n" +
-                    "\t</style>\n" +
-                    "</head>";
-            mWebView.loadDataWithBaseURL("", CSS + data, "text/html", "UTF-8", "");
+            mWebView.loadDataWithBaseURL("", CSSModel.POST_CSS + data, "text/html", "UTF-8", "");
         }
     }
 

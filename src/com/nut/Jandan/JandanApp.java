@@ -6,6 +6,9 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.util.DisplayMetrics;
+import com.alensw.support.picture.BitmapUtils;
+import com.alensw.support.picture.TilePicture;
+import com.android.volley.VolleyWrapper;
 import com.dao.PictureLoader;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiscCache;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
@@ -30,8 +33,6 @@ public class JandanApp extends Application {
 	private static Application mContext;
 
 	public static PictureLoader mPictureLoader;
-	public static ImageLoader mImageLoader;
-
 
 	public static int mAnimationDuration;
 	public static int mScreenMinSideDP;
@@ -45,7 +46,9 @@ public class JandanApp extends Application {
 
 		mContext = this;
 		SSLSocketFactory.getSocketFactory().setHostnameVerifier(new AllowAllHostnameVerifier());
+		BitmapUtils.init(this);
 		initImageLoader();
+		VolleyWrapper.getInstance(this);
 
 		final Resources res = getResources();
 		final Configuration config = res.getConfiguration();
@@ -72,6 +75,7 @@ public class JandanApp extends Application {
 			lastSide = side;
 		}
 		mScreenMaxSidePX = maxSide;
+		TilePicture.init(this, mScreenMinSidePX);
 
 		mPictureLoader = new PictureLoader(this);
 	}

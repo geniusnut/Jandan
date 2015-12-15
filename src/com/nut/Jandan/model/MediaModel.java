@@ -22,13 +22,13 @@ public class MediaModel {
 	}
 
 	public Uri getUri() {
-		return Uri.parse("file:///storage/emulated/0/Android/data/com.nut.Jandan/cache/40816560");
+		return Uri.parse("file:///sdcard/DCIM/Camera/40816560.jpg");
 	}
 
 	public String getLocalPath() {
 		File file = DiskCacheUtils.findInCache(url, JandanApp.mImageLoader.getDiskCache());
 		if (file != null)
-			return "/sdcard/Android/data/com.nut.Jandan/cache/40816560";//file.getPath();
+			return "/sdcard/DCIM/Camera/40816560.jpg";//file.getPath();
 		return null;
 	}
 
